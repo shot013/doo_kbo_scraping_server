@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { PaginatedResult } from '../../../common/pagination/pagination';
 import { GameStat } from '../domain/entities/game-stat.entity';
 import {
   GAME_STAT_REPOSITORY,
@@ -13,7 +14,7 @@ export class GameStatService {
     private readonly gameStatRepository: GameStatRepository,
   ) {}
 
-  findAll(filter: GameStatFilter = {}): Promise<GameStat[]> {
+  findAll(filter: GameStatFilter = {}): Promise<PaginatedResult<GameStat>> {
     return this.gameStatRepository.findAll(filter);
   }
 

@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { PaginatedResult } from '../../../common/pagination/pagination';
 import { Standing } from '../domain/entities/standing.entity';
-import { STANDING_REPOSITORY } from '../domain/repositories/standing.repository';
+import {
+  STANDING_REPOSITORY,
+  StandingFilter,
+} from '../domain/repositories/standing.repository';
 import type { StandingRepository } from '../domain/repositories/standing.repository';
 
 @Injectable()
@@ -10,8 +14,8 @@ export class StandingService {
     private readonly standingRepository: StandingRepository,
   ) {}
 
-  findBySeasonYear(seasonYear: number): Promise<Standing[]> {
-    return this.standingRepository.findBySeasonYear(seasonYear);
+  findBySeasonYear(filter: StandingFilter): Promise<PaginatedResult<Standing>> {
+    return this.standingRepository.findBySeasonYear(filter);
   }
 
   upsertMany(standings: Standing[]): Promise<Standing[]> {

@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { PaginatedResult } from '../../../common/pagination/pagination';
 import { Game } from '../domain/entities/game.entity';
 import {
   GAME_REPOSITORY,
@@ -12,7 +13,7 @@ export class GameService {
     @Inject(GAME_REPOSITORY) private readonly gameRepository: GameRepository,
   ) {}
 
-  findAll(filter: GameFilter = {}): Promise<Game[]> {
+  findAll(filter: GameFilter = {}): Promise<PaginatedResult<Game>> {
     return this.gameRepository.findAll(filter);
   }
 

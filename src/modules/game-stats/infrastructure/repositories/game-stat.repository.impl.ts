@@ -1,12 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsOrder, Repository } from 'typeorm';
+import {
+  buildPaginatedResult,
+  normalizePagination,
+  normalizeSortOrder,
+  PaginatedResult,
+} from '../../../../common/pagination/pagination';
 import { GameStat } from '../../domain/entities/game-stat.entity';
 import {
   GameStatFilter,
   GameStatRepository,
+  GameStatSortField,
 } from '../../domain/repositories/game-stat.repository';
 import { GameStatOrmEntity } from '../orm/game-stat.orm-entity';
+
+const SORT_FIELD_MAP: Record<GameStatSortField, keyof GameStatOrmEntity> = {
+  id: 'id',
+  teamCode: 'teamCode',
+  playerName: 'playerName',
+  homeRuns: 'homeRuns',
+  rbi: 'rbi',
+  battingAverage: 'battingAverage',
+  era: 'era',
+};
 
 @Injectable()
 export class GameStatRepositoryImpl implements GameStatRepository {
@@ -15,17 +32,37 @@ export class GameStatRepositoryImpl implements GameStatRepository {
     private readonly ormRepository: Repository<GameStatOrmEntity>,
   ) {}
 
-  async findAll(filter: GameStatFilter = {}): Promise<GameStat[]> {
+  async findAll(
+    filter: GameStatFilter = {},
+  ): Promise<PaginatedResult<GameStat>> {
     const where: Record<string, unknown> = {};
     if (filter.gameId !== undefined) where.gameId = filter.gameId;
     if (filter.teamCode !== undefined) where.teamCode = filter.teamCode;
     if (filter.statType !== undefined) where.statType = filter.statType;
 
-    const rows = await this.ormRepository.find({
+    const { page, limit, skip } = normalizePagination(filter);
+    const sortField = SORT_FIELD_MAP[filter.sortBy as GameStatSortField];
+    const sortOrder = normalizeSortOrder(filter.sortOrder);
+
+    const order: FindOptionsOrder<GameStatOrmEntity> = sortField
+      ? sortField === 'id'
+        ? { id: sortOrder }
+        : { [sortField]: sortOrder, id: 'ASC' }
+      : { teamCode: 'ASC', id: 'ASC' };
+
+    const [rows, total] = await this.ormRepository.findAndCount({
       where,
-      order: { teamCode: 'ASC', id: 'ASC' },
+      order,
+      skip,
+      take: limit,
     });
-    return rows.map((row) => this.toDomain(row));
+
+    return buildPaginatedResult(
+      rows.map((row) => this.toDomain(row)),
+      total,
+      page,
+      limit,
+    );
   }
 
   async findById(id: number): Promise<GameStat | null> {

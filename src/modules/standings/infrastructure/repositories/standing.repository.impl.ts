@@ -1,9 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsOrder, Repository } from 'typeorm';
+import {
+  buildPaginatedResult,
+  normalizePagination,
+  normalizeSortOrder,
+  PaginatedResult,
+} from '../../../../common/pagination/pagination';
 import { Standing } from '../../domain/entities/standing.entity';
-import { StandingRepository } from '../../domain/repositories/standing.repository';
+import {
+  StandingFilter,
+  StandingRepository,
+  StandingSortField,
+} from '../../domain/repositories/standing.repository';
 import { StandingOrmEntity } from '../orm/standing.orm-entity';
+
+const SORT_FIELD_MAP: Record<StandingSortField, keyof StandingOrmEntity> = {
+  rank: 'rank',
+  winRate: 'winRate',
+  gamesBehind: 'gamesBehind',
+  wins: 'wins',
+  losses: 'losses',
+  gamesPlayed: 'gamesPlayed',
+};
 
 @Injectable()
 export class StandingRepositoryImpl implements StandingRepository {
@@ -12,12 +31,30 @@ export class StandingRepositoryImpl implements StandingRepository {
     private readonly ormRepository: Repository<StandingOrmEntity>,
   ) {}
 
-  async findBySeasonYear(seasonYear: number): Promise<Standing[]> {
-    const rows = await this.ormRepository.find({
-      where: { seasonYear },
-      order: { rank: 'ASC' },
+  async findBySeasonYear(
+    filter: StandingFilter,
+  ): Promise<PaginatedResult<Standing>> {
+    const { page, limit, skip } = normalizePagination(filter);
+    const sortField = SORT_FIELD_MAP[filter.sortBy as StandingSortField];
+    const sortOrder = normalizeSortOrder(filter.sortOrder);
+
+    const order: FindOptionsOrder<StandingOrmEntity> = sortField
+      ? { [sortField]: sortOrder }
+      : { rank: 'ASC' };
+
+    const [rows, total] = await this.ormRepository.findAndCount({
+      where: { seasonYear: filter.seasonYear },
+      order,
+      skip,
+      take: limit,
     });
-    return rows.map((row) => this.toDomain(row));
+
+    return buildPaginatedResult(
+      rows.map((row) => this.toDomain(row)),
+      total,
+      page,
+      limit,
+    );
   }
 
   async upsertMany(standings: Standing[]): Promise<Standing[]> {
