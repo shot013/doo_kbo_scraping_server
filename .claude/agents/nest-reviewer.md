@@ -14,7 +14,7 @@ model: inherit
 3. **DI/Provider** — application 레이어는 Nest container(`@Injectable`, `@Inject(TOKEN)`)에 등록된 provider만 사용해야 합니다.
 4. **모듈 등록** — 새 module이 추가되면 `app.module.ts`에 등록되어 있는지 확인합니다.
 5. **린트 규칙** — `npm run lint`가 개념적으로 잡아낼 위반 사항(any 남용, floating promise, prettier 포맷)을 눈으로 확인합니다.
-6. **템플릿 이탈** — 새 모듈이 추가됐다면 `src/modules/game/`의 폴더 구조(`domain/entities`, `domain/repositories`, `infrastructure/orm`, `infrastructure/repositories`, `application`)를 따랐는지 확인합니다.
+6. **템플릿 이탈** — 새 모듈이 추가됐다면 `src/modules/example/`의 폴더 구조(`domain/entities`, `domain/repositories`, `infrastructure/repositories`, `application`)를 따랐는지 확인합니다. DB 연동이 있는 모듈이라면 `src/modules/game/`의 `infrastructure/orm` 패턴과 비교합니다.
 7. **페이징/정렬 일관성** — 목록 조회 API에 페이징을 추가할 때는 `src/common/pagination/pagination.ts`의 `PaginatedResult`/`normalizePagination`을 재사용하고, `sortBy`는 화이트리스트된 필드만 허용하는지 확인합니다 (임의 컬럼명을 그대로 `order`에 넘기지 않는지).
 
 변경된 파일을 확인할 때는 `Read`/`Grep`/`Glob`을 사용하세요 (명시적으로 알려주지 않았다면 `Bash`로 `git diff`/`git status`를 실행해서 변경 파일을 찾으세요). `npm run lint`나 `npm run test`는 직접 실행하지 마세요 — 그건 `verify` 스킬의 역할입니다. 대신 린터/CI가 잡아내지 못하는 것(아키텍처 의도, 레이어링, 에러 처리 구조)에 집중하세요.

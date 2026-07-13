@@ -10,7 +10,7 @@
 | 층 | 위치 | 언제 적용되나 | 내용 |
 |---|---|---|---|
 | 규칙 | `CLAUDE.md`, `.claude/rules/*.md` | 항상 (매 세션 시작 시 자동 로드) | 빌드/테스트 명령어, 아키텍처, 레이어링·린트·git 규칙 |
-| Skills | `.claude/skills/*/SKILL.md` | Claude가 관련 작업이라고 판단하면 자동 사용, 또는 `/verify` `/scaffold-module`로 직접 호출 | 반복 업무 절차 (새 모듈 스캐폴딩, 변경 검증) |
+| Skills | `.claude/skills/*/SKILL.md` | Claude가 관련 작업이라고 판단하면 자동 사용, 또는 `/verify` `/add-feature`로 직접 호출 | 반복 업무 절차 (새 모듈 스캐폴딩, 변경 검증) |
 | Hooks | `.claude/settings.json`, `.claude/hooks/*.sh` | 완전 자동, 사람 개입 없음 | 파일 저장 시 자동 포맷, 생성 파일 수정 차단 |
 | Subagent | `.claude/agents/nest-reviewer.md` | Claude가 필요하다고 판단하면 자동 위임, 또는 "리뷰해줘"로 직접 요청 | 변경된 코드에 대한 아키텍처·컨벤션 리뷰 |
 
@@ -32,7 +32,7 @@ Claude Code는 이 내용을 이미 알고 작업을 시작합니다.
 작업 내용을 보고 관련 스킬이 있으면 Claude가 먼저 판단해서 사용합니다.
 사람이 슬래시 명령으로 직접 호출할 수도 있습니다.
 
-- **scaffold-module** — `src/modules/game/`을 복사해 새 기능을 만드는 절차
+- **add-feature** — `src/modules/example/`을 복사해 새 기능을 만드는 절차
 - **verify** — CI(`.github/workflows/ci.yaml`)와 동일하게 포맷 체크 → 린트 → 테스트를 실행해 변경을 검증하는 절차
 
 ## Hooks — `.claude/settings.json`, `.claude/hooks/`

@@ -32,12 +32,12 @@ src/
       repositories/          # domain repository 인터페이스 구현체
 ```
 
-`src/modules/game/`은 실제로 동작하는 참고 구현체이자 새 module을 만들 때 복사할 템플릿입니다 (entity → domain repository → infrastructure/orm + repository 구현 → application service/controller 순으로 레이어가 이어짐).
+`src/modules/example/`은 새 module을 만들 때 복사할 순수 템플릿입니다 (실제 기능이 아닌 더미 데이터, `src/modules/example/README.md` 참고). 실제 TypeORM/DB 연동 패턴을 볼 때는 `src/modules/game/`을 참고하세요 (entity → domain repository → infrastructure/orm + repository 구현 → application service/controller 순으로 레이어가 이어짐).
 
-**새 module 체크리스트** (`.claude/rules/architecture.md` 참고):
-1. `src/modules/game/`을 새 이름으로 복사한다.
+**새 module 체크리스트** (`docs/ARCHITECTURE.md`, `.claude/rules/architecture.md` 참고):
+1. `src/modules/example/`을 새 이름으로 복사한다.
 2. `domain/entities`, `domain/repositories`부터 새 도메인에 맞게 다시 작성한다.
-3. `infrastructure/orm`, `infrastructure/repositories`에서 domain 인터페이스를 구현한다.
+3. `infrastructure/orm`, `infrastructure/repositories`에서 domain 인터페이스를 구현한다 (DB 연동이 필요 없다면 `example`처럼 인메모리로 남겨둬도 된다).
 4. `application/controllers`, `application/services`에서 진입점과 흐름을 연결한다.
 5. `app.module.ts`에 새 모듈을 등록한다.
 

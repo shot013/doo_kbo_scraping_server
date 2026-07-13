@@ -45,7 +45,7 @@ chore: bump dependency to latest
 
 ## 코드 작성 규칙
 
-- 새 기능은 `src/modules/game/`의 폴더 구조를 그대로 복사해서 시작하세요.
-  (레이어 분리 등 자세한 내용은 [.claude/rules/architecture.md](.claude/rules/architecture.md) 참고)
+- 새 기능은 `src/modules/example/`의 폴더 구조를 그대로 복사해서 시작하세요.
+  (레이어 분리 등 자세한 내용은 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [.claude/rules/architecture.md](.claude/rules/architecture.md) 참고)
 - 도메인/핵심 로직 레이어(`domain/`)는 Nest 프레임워크나 `application/`/`infrastructure/`를 import하지 않습니다.
 - `npm run lint`에서 경고가 나오지 않는 것을 기본 목표로 합니다.
