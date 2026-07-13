@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './common/database/database.module';
+import { ExampleModule } from './modules/example/example.module';
 import { GameModule } from './modules/game/game.module';
 import { GameStatsModule } from './modules/game-stats/game-stats.module';
 import { StandingsModule } from './modules/standings/standings.module';
@@ -13,6 +14,7 @@ import { ScrapeModule } from './modules/scrape/scrape.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
+    ExampleModule,
     GameModule,
     GameStatsModule,
     StandingsModule,
