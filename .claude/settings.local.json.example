@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run test)",
+      "Skill(run)",
+      "Skill(run:*)"
+    ]
+  }
+}
