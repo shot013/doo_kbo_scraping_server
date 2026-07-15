@@ -70,24 +70,21 @@ export class GameStatRepositoryImpl implements GameStatRepository {
     return row ? this.toDomain(row) : null;
   }
 
-  async upsertMany(stats: GameStat[]): Promise<GameStat[]> {
-    const saved: GameStatOrmEntity[] = [];
-    for (const stat of stats) {
-      const existing = await this.ormRepository.findOne({
-        where: {
-          gameId: stat.gameId,
-          teamCode: stat.teamCode,
-          playerName: stat.playerName,
-          statType: stat.statType,
-        },
-      });
-      const orm = this.toOrm(stat);
-      if (existing) {
-        orm.id = existing.id;
-      }
-      saved.push(await this.ormRepository.save(orm));
+  async upsert(stat: GameStat): Promise<GameStat> {
+    const existing = await this.ormRepository.findOne({
+      where: {
+        gameId: stat.gameId,
+        teamCode: stat.teamCode,
+        playerName: stat.playerName,
+        statType: stat.statType,
+      },
+    });
+    const orm = this.toOrm(stat);
+    if (existing) {
+      orm.id = existing.id;
     }
-    return saved.map((row) => this.toDomain(row));
+    const saved = await this.ormRepository.save(orm);
+    return this.toDomain(saved);
   }
 
   private toDomain(row: GameStatOrmEntity): GameStat {

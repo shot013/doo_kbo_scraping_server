@@ -28,5 +28,5 @@ export interface GameStatFilter {
 export interface GameStatRepository {
   findAll(filter?: GameStatFilter): Promise<PaginatedResult<GameStat>>;
   findById(id: number): Promise<GameStat | null>;
-  upsertMany(stats: GameStat[]): Promise<GameStat[]>;
+  upsert(stat: GameStat): Promise<GameStat>;
 }

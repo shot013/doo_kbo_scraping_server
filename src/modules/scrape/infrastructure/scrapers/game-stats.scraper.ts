@@ -5,6 +5,8 @@ import { PlayerStatType } from '../../../game-stats/domain/entities/game-stat.en
 export const GAME_CENTER_SOURCE_URL =
   'https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx';
 
+const GAME_ID_PATTERN = /^\d{8}[A-Za-z]{2}[A-Za-z]{2}\d+$/;
+
 interface KboCell {
   Text: string;
 }
@@ -65,6 +67,9 @@ export class GameStatsScraper {
   private readonly logger = new Logger(GameStatsScraper.name);
 
   async scrape(gameId: string): Promise<ScrapedGameStat[]> {
+    if (!GAME_ID_PATTERN.test(gameId)) {
+      throw new Error(`Invalid gameId format: ${gameId}`);
+    }
     const gameDate = gameId.slice(0, 8);
     const awayTeamCode = gameId.slice(8, 10);
     const homeTeamCode = gameId.slice(10, 12);
@@ -84,6 +89,11 @@ export class GameStatsScraper {
       const data = (await response.json()) as BoxScoreResponse;
       if (data.code !== '100') {
         throw new Error(`KBO box score returned code ${data.code}`);
+      }
+      if (!Array.isArray(data.arrHitter) || !Array.isArray(data.arrPitcher)) {
+        throw new Error(
+          'Unexpected KBO box score response shape: arrHitter/arrPitcher is not an array',
+        );
       }
 
       const stats = [
@@ -117,37 +127,43 @@ export class GameStatsScraper {
 
     blocks.forEach((block, teamIndex) => {
       const teamCode = teamIndex === 0 ? awayTeamCode : homeTeamCode;
-      const names = JSON.parse(block.table1) as KboTable;
-      const lines = JSON.parse(block.table3) as KboTable;
+      try {
+        const names = JSON.parse(block.table1) as KboTable;
+        const lines = JSON.parse(block.table3) as KboTable;
 
-      names.rows.forEach((nameRow, i) => {
-        const playerName = cellText(nameRow, 2);
-        const lineRow = lines.rows[i];
-        if (!playerName || !lineRow) return;
+        names.rows.forEach((nameRow, i) => {
+          const playerName = cellText(nameRow, 2);
+          const lineRow = lines.rows[i];
+          if (!playerName || !lineRow) return;
 
-        stats.push({
-          gameId,
-          teamCode,
-          playerName,
-          statType: PlayerStatType.BATTING,
-          atBats: toIntOrNull(cellText(lineRow, 0)),
-          hits: toIntOrNull(cellText(lineRow, 1)),
-          rbi: toIntOrNull(cellText(lineRow, 2)),
-          runs: toIntOrNull(cellText(lineRow, 3)),
-          battingAverage: cellText(lineRow, 4) || null,
-          inningsPitched: null,
-          hitsAllowed: null,
-          earnedRuns: null,
-          strikeoutsPitched: null,
-          walksAllowed: null,
-          homeRunsAllowed: null,
-          win: false,
-          loss: false,
-          save: false,
-          hold: false,
-          era: null,
+          stats.push({
+            gameId,
+            teamCode,
+            playerName,
+            statType: PlayerStatType.BATTING,
+            atBats: toIntOrNull(cellText(lineRow, 0)),
+            hits: toIntOrNull(cellText(lineRow, 1)),
+            rbi: toIntOrNull(cellText(lineRow, 2)),
+            runs: toIntOrNull(cellText(lineRow, 3)),
+            battingAverage: cellText(lineRow, 4) || null,
+            inningsPitched: null,
+            hitsAllowed: null,
+            earnedRuns: null,
+            strikeoutsPitched: null,
+            walksAllowed: null,
+            homeRunsAllowed: null,
+            win: false,
+            loss: false,
+            save: false,
+            hold: false,
+            era: null,
+          });
         });
-      });
+      } catch (error) {
+        this.logger.warn(
+          `Skipping malformed hitter block for team ${teamCode} in game ${gameId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
     });
 
     return stats;
@@ -163,35 +179,41 @@ export class GameStatsScraper {
 
     blocks.forEach((block, teamIndex) => {
       const teamCode = teamIndex === 0 ? awayTeamCode : homeTeamCode;
-      const table = JSON.parse(block.table) as KboTable;
+      try {
+        const table = JSON.parse(block.table) as KboTable;
 
-      for (const row of table.rows) {
-        const playerName = cellText(row, 0);
-        if (!playerName) continue;
-        const result = cellText(row, 2);
+        for (const row of table.rows) {
+          const playerName = cellText(row, 0);
+          if (!playerName) continue;
+          const result = cellText(row, 2);
 
-        stats.push({
-          gameId,
-          teamCode,
-          playerName,
-          statType: PlayerStatType.PITCHING,
-          atBats: null,
-          hits: null,
-          rbi: null,
-          runs: null,
-          battingAverage: null,
-          inningsPitched: parseInningsPitched(cellText(row, 6)),
-          hitsAllowed: toIntOrNull(cellText(row, 10)),
-          homeRunsAllowed: toIntOrNull(cellText(row, 11)),
-          walksAllowed: toIntOrNull(cellText(row, 12)),
-          strikeoutsPitched: toIntOrNull(cellText(row, 13)),
-          earnedRuns: toIntOrNull(cellText(row, 15)),
-          era: cellText(row, 16) || null,
-          win: result === '승',
-          loss: result === '패',
-          save: result === '세',
-          hold: result === '홀드',
-        });
+          stats.push({
+            gameId,
+            teamCode,
+            playerName,
+            statType: PlayerStatType.PITCHING,
+            atBats: null,
+            hits: null,
+            rbi: null,
+            runs: null,
+            battingAverage: null,
+            inningsPitched: parseInningsPitched(cellText(row, 6)),
+            hitsAllowed: toIntOrNull(cellText(row, 10)),
+            homeRunsAllowed: toIntOrNull(cellText(row, 11)),
+            walksAllowed: toIntOrNull(cellText(row, 12)),
+            strikeoutsPitched: toIntOrNull(cellText(row, 13)),
+            earnedRuns: toIntOrNull(cellText(row, 15)),
+            era: cellText(row, 16) || null,
+            win: result === '승',
+            loss: result === '패',
+            save: result === '세',
+            hold: result === '홀드',
+          });
+        }
+      } catch (error) {
+        this.logger.warn(
+          `Skipping malformed pitcher block for team ${teamCode} in game ${gameId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     });
 

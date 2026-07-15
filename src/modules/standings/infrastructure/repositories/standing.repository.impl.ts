@@ -57,22 +57,19 @@ export class StandingRepositoryImpl implements StandingRepository {
     );
   }
 
-  async upsertMany(standings: Standing[]): Promise<Standing[]> {
-    const saved: StandingOrmEntity[] = [];
-    for (const standing of standings) {
-      const existing = await this.ormRepository.findOne({
-        where: {
-          seasonYear: standing.seasonYear,
-          teamCode: standing.teamCode,
-        },
-      });
-      const orm = this.toOrm(standing);
-      if (existing) {
-        orm.id = existing.id;
-      }
-      saved.push(await this.ormRepository.save(orm));
+  async upsert(standing: Standing): Promise<Standing> {
+    const existing = await this.ormRepository.findOne({
+      where: {
+        seasonYear: standing.seasonYear,
+        teamCode: standing.teamCode,
+      },
+    });
+    const orm = this.toOrm(standing);
+    if (existing) {
+      orm.id = existing.id;
     }
-    return saved.map((row) => this.toDomain(row));
+    const saved = await this.ormRepository.save(orm);
+    return this.toDomain(saved);
   }
 
   private toDomain(row: StandingOrmEntity): Standing {
