@@ -62,25 +62,39 @@ export class StandingsScraper {
           awayRecord,
         ] = cells;
 
-        const team = resolveKboTeam(teamShortName);
-        standings.push({
-          teamCode: team.code,
-          teamName: team.fullName,
-          rank: Number(rank),
-          gamesPlayed: Number(gamesPlayed),
-          wins: Number(wins),
-          losses: Number(losses),
-          draws: Number(draws),
-          winRate,
-          gamesBehind: gamesBehind === '0' ? '0.0' : gamesBehind,
-          streak: streak || null,
-          last10: last10 || null,
-          homeRecord: homeRecord || null,
-          awayRecord: awayRecord || null,
-        });
+        try {
+          const team = resolveKboTeam(teamShortName);
+          standings.push({
+            teamCode: team.code,
+            teamName: team.fullName,
+            rank: toStrictInt(rank, 'rank'),
+            gamesPlayed: toStrictInt(gamesPlayed, 'gamesPlayed'),
+            wins: toStrictInt(wins, 'wins'),
+            losses: toStrictInt(losses, 'losses'),
+            draws: toStrictInt(draws, 'draws'),
+            winRate,
+            gamesBehind: gamesBehind === '0' ? '0.0' : gamesBehind,
+            streak: streak || null,
+            last10: last10 || null,
+            homeRecord: homeRecord || null,
+            awayRecord: awayRecord || null,
+          });
+        } catch (error) {
+          this.logger.warn(
+            `Skipping malformed standings row (team=${teamShortName}): ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
       });
 
     this.logger.log(`Scraped ${standings.length} standings rows`);
     return standings;
   }
+}
+
+function toStrictInt(text: string, field: string): number {
+  const value = Number(text);
+  if (text === '' || Number.isNaN(value)) {
+    throw new Error(`Invalid numeric value for ${field}: "${text}"`);
+  }
+  return value;
 }
