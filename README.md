@@ -107,6 +107,40 @@ npm run test           # 전체 테스트
 | GET | `/examples/:id` | - | 예시 단건 조회 |
 | POST | `/examples` | body: `name`(필수), `description` | 예시 생성 |
 
+## API 호출 플로우
+
+모든 API는 `Controller → Service → Repository(TypeORM) → DB` 계층을 통과합니다. `domain`은 Nest/TypeORM을 모르는 순수 인터페이스·엔티티만 가지고, `infrastructure`가 이를 구현합니다 (자세한 규칙은 `.claude/rules/architecture.md` 참고).
+
+### 조회 API — Games / Game Stats / Standings / Scrape Source Health
+
+```
+Controller (application/*.controller.ts)
+  → Service (application/*.service.ts)
+    → Repository 인터페이스 (domain/repositories/*.repository.ts, DI 토큰)
+      → Repository 구현체 (infrastructure/repositories/*.repository.impl.ts)
+        → TypeORM Entity (infrastructure/orm/*.orm-entity.ts) → Postgres
+```
+
+예: `GET /games` → `GameController.findAll` → `GameService.findAll` → `GAME_REPOSITORY` 토큰으로 주입된 구현체가 쿼리 실행 → ORM 결과를 domain `Game` 엔티티로 변환해 페이지네이션 응답으로 반환. `Game Stats`/`Standings`/`Scrape Source Health` 조회도 동일한 구조입니다.
+
+### 스크래핑 API — `POST /scrape/*`
+
+```
+ScrapeController (application/scrape.controller.ts)
+  → ScrapeService (application/scrape.service.ts)
+    → Scraper (infrastructure/scrapers/*.scraper.ts)
+        Playwright로 KBO 사이트에 직접 접속해 내부 API 응답을 가로채 파싱
+      → 파싱 결과를 Game/Standing/GameStat 도메인 엔티티로 변환
+        → 각 모듈의 Service.upsert()로 건별 저장 (개별 실패는 warn 로그 후 계속 진행)
+    → ScrapeSourceHealthService.log()로 성공/실패·소요시간·저장 건수 기록
+```
+
+- `POST /scrape/games`: `GameScraper`가 KBO 스케줄 페이지(`Schedule.aspx`)를 열어 `GetScheduleList` 응답을 파싱 → 경기별로 `GameService.upsert()`
+- `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
+- `POST /scrape/game-stats`: `GameStatsScraper`가 `body.gameId`로 박스스코어(`GetBoxScoreScroll`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남
+
+세 API 모두 스크래핑이 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답).
+
 ## Project structure
 
 ```
