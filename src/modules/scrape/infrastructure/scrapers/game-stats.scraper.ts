@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { chromium } from 'playwright';
+import { chromium, Response } from 'playwright';
 import { PlayerStatType } from '../../../game-stats/domain/entities/game-stat.entity';
 
 export const GAME_CENTER_SOURCE_URL =
@@ -73,11 +73,19 @@ export class GameStatsScraper {
     const browser = await chromium.launch();
     try {
       const page = await browser.newPage();
-      const responsePromise = page.waitForResponse((res) =>
-        res.url().includes('/ws/Schedule.asmx/GetBoxScoreScroll'),
+      const responsePromise = page.waitForResponse(
+        (res) => res.url().includes('/ws/Schedule.asmx/GetBoxScoreScroll'),
+        { timeout: 15000 },
       );
       await page.goto(url, { waitUntil: 'domcontentloaded' });
-      const response = await responsePromise;
+      let response: Response;
+      try {
+        response = await responsePromise;
+      } catch {
+        throw new Error(
+          `Box score not available for game ${gameId} (game may not have started yet)`,
+        );
+      }
       if (!response.ok()) {
         throw new Error(`KBO box score request failed: ${response.status()}`);
       }
