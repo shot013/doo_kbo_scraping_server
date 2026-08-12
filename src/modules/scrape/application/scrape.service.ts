@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { GameService } from '../../game/application/game.service';
 import { Game } from '../../game/domain/entities/game.entity';
 import { GameStatService } from '../../game-stats/application/game-stat.service';
@@ -39,28 +38,6 @@ export class ScrapeService {
     private readonly gameStatService: GameStatService,
     private readonly scrapeSourceHealthService: ScrapeSourceHealthService,
   ) {}
-
-  @Cron(CronExpression.EVERY_HOUR)
-  async scheduledScrapeGames(): Promise<void> {
-    try {
-      await this.scrapeGames(new Date().getFullYear());
-    } catch (error) {
-      this.logger.error(
-        `Scheduled game scrape failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-  }
-
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async scheduledScrapeStandings(): Promise<void> {
-    try {
-      await this.scrapeStandings(new Date().getFullYear());
-    } catch (error) {
-      this.logger.error(
-        `Scheduled standings scrape failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-  }
 
   async scrapeGames(seasonYear: number): Promise<ScrapeSummary> {
     const sourceName = 'kbo-schedule';
