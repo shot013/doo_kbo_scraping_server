@@ -85,11 +85,11 @@ npm run test           # 전체 테스트
 
 ### Scrape (`src/modules/scrape`)
 
-| Method | Path | Query/Body | 설명 |
-| --- | --- | --- | --- |
-| POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도) | 경기 일정/결과 스크래핑 실행 |
-| POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 |
-| POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 |
+| Method | Path | Query/Body | 설명 | 스케줄러 등록 |
+| --- | --- | --- | --- | --- |
+| POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도) | 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
+| POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
+| POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
 
 ### Scrape Source Health (`src/modules/scrape-source-health`)
 
