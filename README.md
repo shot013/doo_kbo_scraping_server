@@ -59,6 +59,10 @@ npm run lint           # 정적 분석
 npm run test           # 전체 테스트
 ```
 
+## 배포
+
+프로덕션용 `Dockerfile`/`docker-compose.prod.yml`이 준비되어 있습니다. AWS EC2 프리티어 기준 배포 절차는 [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) 참고.
+
 ## API 목록
 
 응답 형식은 컨트롤러 참고 (별도 global prefix 없음). 목록 API는 페이지네이션 공통 응답 `{ data, total, page, limit, totalPages }`을 사용하며, `page`/`limit` 기본값은 각각 `1`/`20` (`limit` 최대 `100`), `sortOrder` 기본값은 `ASC`.
