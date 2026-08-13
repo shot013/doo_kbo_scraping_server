@@ -1,8 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { resolveKboTeamByCode, KBO_TEAMS } from '../../../common/kbo/kbo-team';
 import { GameService } from '../../game/application/game.service';
 import { Game } from '../../game/domain/entities/game.entity';
 import { GameStatService } from '../../game-stats/application/game-stat.service';
 import { GameStat } from '../../game-stats/domain/entities/game-stat.entity';
+import { PlayerService } from '../../players/application/player.service';
+import { Player } from '../../players/domain/entities/player.entity';
 import { ScrapeSourceHealthService } from '../../scrape-source-health/application/scrape-source-health.service';
 import { ScrapeStatus } from '../../scrape-source-health/domain/entities/scrape-source-health.entity';
 import { StandingService } from '../../standings/application/standing.service';
@@ -15,6 +18,10 @@ import {
   GameScraper,
   SCHEDULE_SOURCE_URL,
 } from '../infrastructure/scrapers/game.scraper';
+import {
+  ROSTER_SOURCE_URL,
+  RosterScraper,
+} from '../infrastructure/scrapers/roster.scraper';
 import {
   STANDINGS_SOURCE_URL,
   StandingsScraper,
@@ -33,9 +40,11 @@ export class ScrapeService {
     private readonly gameScraper: GameScraper,
     private readonly standingsScraper: StandingsScraper,
     private readonly gameStatsScraper: GameStatsScraper,
+    private readonly rosterScraper: RosterScraper,
     private readonly gameService: GameService,
     private readonly standingService: StandingService,
     private readonly gameStatService: GameStatService,
+    private readonly playerService: PlayerService,
     private readonly scrapeSourceHealthService: ScrapeSourceHealthService,
   ) {}
 
@@ -252,6 +261,81 @@ export class ScrapeService {
     }
   }
 
+  /**
+   * teamCode를 생략하면 KBO 10개 구단 전체를 순회하며 스크래핑한다.
+   * 요청 간 지연을 둬 대상 사이트에 과도한 부하를 주지 않는다.
+   */
+  async scrapeRoster(teamCode?: string): Promise<ScrapeSummary> {
+    const sourceName = 'kbo-player-roster';
+    const startedAt = Date.now();
+    const targetTeams = teamCode ? [resolveKboTeamByCode(teamCode)] : KBO_TEAMS;
+    const now = new Date();
+
+    try {
+      let scrapedCount = 0;
+      let savedCount = 0;
+
+      for (const [index, team] of targetTeams.entries()) {
+        if (index > 0) {
+          await delay(500);
+        }
+
+        const scraped = await this.rosterScraper.scrape(team.code);
+        scrapedCount += scraped.length;
+
+        for (const item of scraped) {
+          try {
+            await this.playerService.upsert(
+              new Player({
+                id: item.id,
+                teamCode: item.teamCode,
+                teamName: resolveKboTeamByCode(item.teamCode).fullName,
+                name: item.name,
+                position: item.position,
+                backNumber: item.backNumber,
+                birthDate: item.birthDate,
+                heightCm: item.heightCm,
+                weightKg: item.weightKg,
+                school: item.school,
+                createdAt: now,
+                updatedAt: now,
+              }),
+            );
+            savedCount++;
+          } catch (error) {
+            this.logger.warn(
+              `Failed to save player ${item.name} (${item.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
+        }
+      }
+
+      if (scrapedCount === 0) {
+        throw new Error('No roster rows scraped from source');
+      }
+
+      const durationMs = Date.now() - startedAt;
+      const failedCount = scrapedCount - savedCount;
+      await this.scrapeSourceHealthService.log({
+        sourceName,
+        targetUrl: ROSTER_SOURCE_URL,
+        status: ScrapeStatus.SUCCESS,
+        httpStatusCode: 200,
+        durationMs,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedCount > 0
+            ? `${failedCount}/${scrapedCount} roster rows failed to save (see server logs)`
+            : null,
+        scrapedAt: now,
+      });
+      return { itemsScraped: savedCount, durationMs };
+    } catch (error) {
+      await this.logFailure(sourceName, ROSTER_SOURCE_URL, startedAt, error);
+      throw error;
+    }
+  }
+
   private async logFailure(
     sourceName: string,
     targetUrl: string,
@@ -278,4 +362,8 @@ export class ScrapeService {
       );
     }
   }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
