@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.git
+.env
+.env.*
+!.env.example
+npm-debug.log
+doo_kbo_harness_kit

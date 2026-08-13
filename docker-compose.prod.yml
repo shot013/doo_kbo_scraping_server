@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres
+    ports:
+      - '3651:3651'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # One-off migration runner: reuses the `build` stage (still has
+  # devDependencies/ts-node) since the final runtime image is prod-only.
+  # Usage: docker compose -f docker-compose.prod.yml run --rm migrate
+  migrate:
+    build:
+      context: .
+      target: build
+    profiles: ['tools']
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres
+    command: npm run migration:run
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
