@@ -5,7 +5,7 @@ import { Game, GameStatus } from '../../game/domain/entities/game.entity';
 import { ScrapeService } from './scrape.service';
 
 const EVENING_HOURLY_CRON = '0 17-23,0,1 * * *';
-const DAILY_ROSTER_CRON = '0 5 * * *';
+const DAILY_ROSTER_CRON = '0 18 * * *';
 const KST_CRON_OPTIONS = { timeZone: 'Asia/Seoul' };
 
 @Injectable()
