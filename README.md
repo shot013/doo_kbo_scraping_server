@@ -87,6 +87,35 @@ npm run test           # 전체 테스트
 | --- | --- | --- | --- |
 | GET | `/standings` | `seasonYear`(미지정 시 현재 연도), `page`, `limit`, `sortBy`(`rank`\|`winRate`\|`gamesBehind`\|`wins`\|`losses`\|`gamesPlayed`), `sortOrder` | 시즌 순위 목록 조회 |
 
+### Teams (`src/modules/teams`)
+
+| Method | Path | Query | 설명 |
+| --- | --- | --- | --- |
+| GET | `/teams` | `seasonYear` | 시즌 팀 요약 목록 조회 |
+| GET | `/teams/:code` | `seasonYear` | 팀 상세 조회 (요약 + 로스터) |
+
+- `seasonYear` 미지정 시 현재 연도. `:code`는 대문자로 정규화되어 조회됨
+- 요약에는 순위/승패/승률/게임차/최근 5경기 폼(`recentForm`)이 포함되며 `standings` + `game`(최근 폼)을 조합해 만듦
+
+### Players (`src/modules/players`)
+
+| Method | Path | Query | 설명 |
+| --- | --- | --- | --- |
+| GET | `/players` | `search`, `teamCode`, `position`, `seasonYear`, `page`, `limit`, `sortOrder` | 선수 목록 조회 |
+| GET | `/players/:id` | `seasonYear` | 선수 상세 조회 |
+
+- `position`: `PITCHER`\|`CATCHER`\|`INFIELDER`\|`OUTFIELDER` (대소문자 무관). `seasonYear` 미지정 시 현재 연도
+- 목록 응답의 각 선수에는 시즌 대표 기록(`primaryStat`, 없으면 `"기록 없음"`)이, 상세 응답에는 시즌 타/투 기록 라인(`statLines`)이 포함됨
+
+### Records (`src/modules/records`)
+
+| Method | Path | Query | 설명 |
+| --- | --- | --- | --- |
+| GET | `/records/batters` | `seasonYear`, `limit` | 타자 시즌 리더보드 |
+| GET | `/records/pitchers` | `seasonYear`, `limit` | 투수 시즌 리더보드 |
+
+- `seasonYear` 미지정 시 현재 연도. `game-stats`를 시즌 단위로 집계해 만듦
+
 ### Scrape (`src/modules/scrape`)
 
 | Method | Path | Query/Body | 설명 | 스케줄러 등록 |
@@ -94,6 +123,7 @@ npm run test           # 전체 테스트
 | POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도) | 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
 | POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
 | POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
+| POST | `/scrape/roster` | body: `teamCode`(미지정 시 전체 팀) | 팀 로스터(포지션/등번호/출신교) 스크래핑 실행 | O (매일 18:00 KST) |
 
 ### Scrape Source Health (`src/modules/scrape-source-health`)
 
@@ -127,6 +157,14 @@ Controller (application/*.controller.ts)
 
 예: `GET /games` → `GameController.findAll` → `GameService.findAll` → `GAME_REPOSITORY` 토큰으로 주입된 구현체가 쿼리 실행 → ORM 결과를 domain `Game` 엔티티로 변환해 페이지네이션 응답으로 반환. `Game Stats`/`Standings`/`Scrape Source Health` 조회도 동일한 구조입니다.
 
+### 조합 API — Teams / Players / Records
+
+`Teams`/`Records`는 자체 domain/infrastructure 레이어 없이 다른 모듈의 Service를 조합해 응답을 만듭니다. `Players`만 자체 `PLAYER_REPOSITORY`를 가진 일반적인 조회 모듈입니다.
+
+- `GET /teams`, `GET /teams/:code`: `TeamsService`가 `StandingService`(순위/승패) + `GameService.getRecentForm()`(최근 5경기 폼) + `PlayerService`(로스터, 상세 조회 시)를 조합
+- `GET /players`, `GET /players/:id`: `PlayerService` → `PLAYER_REPOSITORY` 구현체가 조회, 시즌 대표 기록은 `GameStatService`를 통해 `game_stats`를 집계해 붙임
+- `GET /records/batters`, `GET /records/pitchers`: `RecordsService`가 `GameStatService`로 `game_stats`를 시즌 단위로 집계해 타자/투수 리더보드 생성
+
 ### 스크래핑 API — `POST /scrape/*`
 
 ```
@@ -134,7 +172,7 @@ ScrapeController (application/scrape.controller.ts)
   → ScrapeService (application/scrape.service.ts)
     → Scraper (infrastructure/scrapers/*.scraper.ts)
         Playwright로 KBO 사이트에 직접 접속해 내부 API 응답을 가로채 파싱
-      → 파싱 결과를 Game/Standing/GameStat 도메인 엔티티로 변환
+      → 파싱 결과를 Game/Standing/GameStat/Player 도메인 엔티티로 변환
         → 각 모듈의 Service.upsert()로 건별 저장 (개별 실패는 warn 로그 후 계속 진행)
     → ScrapeSourceHealthService.log()로 성공/실패·소요시간·저장 건수 기록
 ```
@@ -142,8 +180,9 @@ ScrapeController (application/scrape.controller.ts)
 - `POST /scrape/games`: `GameScraper`가 KBO 스케줄 페이지(`Schedule.aspx`)를 열어 `GetScheduleList` 응답을 파싱 → 경기별로 `GameService.upsert()`
 - `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
 - `POST /scrape/game-stats`: `GameStatsScraper`가 `body.gameId`로 박스스코어(`GetBoxScoreScroll`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남
+- `POST /scrape/roster`: `RosterScraper`가 `Player/Search.aspx` 폼 postback으로 팀별 선수 목록(포지션/등번호/출신교)을 요청·파싱 → `PlayerService.upsert()`. `body.teamCode` 미지정 시 전체 팀 순회
 
-세 API 모두 스크래핑이 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답).
+네 API 모두 스크래핑이 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답).
 
 ## Project structure
 
