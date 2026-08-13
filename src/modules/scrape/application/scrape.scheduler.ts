@@ -5,6 +5,7 @@ import { Game, GameStatus } from '../../game/domain/entities/game.entity';
 import { ScrapeService } from './scrape.service';
 
 const EVENING_HOURLY_CRON = '0 17-23,0,1 * * *';
+const KST_CRON_OPTIONS = { timeZone: 'Asia/Seoul' };
 
 @Injectable()
 export class ScrapeScheduler {
@@ -15,7 +16,7 @@ export class ScrapeScheduler {
     private readonly gameService: GameService,
   ) {}
 
-  @Cron(EVENING_HOURLY_CRON)
+  @Cron(EVENING_HOURLY_CRON, KST_CRON_OPTIONS)
   async scrapeGames(): Promise<void> {
     try {
       await this.scrapeService.scrapeGames(new Date().getFullYear());
@@ -26,7 +27,7 @@ export class ScrapeScheduler {
     }
   }
 
-  @Cron(EVENING_HOURLY_CRON)
+  @Cron(EVENING_HOURLY_CRON, KST_CRON_OPTIONS)
   async scrapeStandings(): Promise<void> {
     try {
       await this.scrapeService.scrapeStandings(new Date().getFullYear());
@@ -37,7 +38,7 @@ export class ScrapeScheduler {
     }
   }
 
-  @Cron(EVENING_HOURLY_CRON)
+  @Cron(EVENING_HOURLY_CRON, KST_CRON_OPTIONS)
   async scrapeGameStats(): Promise<void> {
     const gameDate = new Date().toISOString().slice(0, 10);
     let todaysGames: Game[];
