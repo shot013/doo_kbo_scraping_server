@@ -5,6 +5,7 @@ import { Game, GameStatus } from '../../game/domain/entities/game.entity';
 import { ScrapeService } from './scrape.service';
 
 const EVENING_HOURLY_CRON = '0 17-23,0,1 * * *';
+const DAILY_ROSTER_CRON = '0 5 * * *';
 const KST_CRON_OPTIONS = { timeZone: 'Asia/Seoul' };
 
 @Injectable()
@@ -23,6 +24,17 @@ export class ScrapeScheduler {
     } catch (error) {
       this.logger.error(
         `scheduled games scrape failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  @Cron(DAILY_ROSTER_CRON, KST_CRON_OPTIONS)
+  async scrapeRoster(): Promise<void> {
+    try {
+      await this.scrapeService.scrapeRoster();
+    } catch (error) {
+      this.logger.error(
+        `scheduled roster scrape failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
