@@ -1,6 +1,8 @@
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_LIMIT = 20;
-export const MAX_LIMIT = 100;
+// KBO 전체 등록 선수(~300명)를 /players에서 한 번에 내려줄 수 있어야 해서
+// 다른 목록형 엔드포인트보다 여유 있게 잡는다.
+export const MAX_LIMIT = 500;
 
 export type SortOrder = 'ASC' | 'DESC';
 

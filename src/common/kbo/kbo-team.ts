@@ -22,11 +22,20 @@ export const KBO_TEAMS: readonly KboTeam[] = [
 ];
 
 const BY_SHORT_NAME = new Map(KBO_TEAMS.map((team) => [team.shortName, team]));
+const BY_CODE = new Map(KBO_TEAMS.map((team) => [team.code, team]));
 
 export function resolveKboTeam(shortName: string): KboTeam {
   const team = BY_SHORT_NAME.get(shortName);
   if (!team) {
     throw new Error(`Unknown KBO team short name: ${shortName}`);
+  }
+  return team;
+}
+
+export function resolveKboTeamByCode(code: string): KboTeam {
+  const team = BY_CODE.get(code);
+  if (!team) {
+    throw new Error(`Unknown KBO team code: ${code}`);
   }
   return team;
 }

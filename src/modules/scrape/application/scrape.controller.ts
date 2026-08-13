@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ScrapeGameStatsRequestDto } from './dto/scrape-game-stats-request.dto';
 import { ScrapeRequestDto } from './dto/scrape-request.dto';
+import { ScrapeRosterRequestDto } from './dto/scrape-roster-request.dto';
 import { ScrapeService, ScrapeSummary } from './scrape.service';
 
 @Controller('scrape')
@@ -26,5 +27,10 @@ export class ScrapeController {
     @Body() body: ScrapeGameStatsRequestDto,
   ): Promise<ScrapeSummary> {
     return this.scrapeService.scrapeGameStats(body.gameId);
+  }
+
+  @Post('roster')
+  scrapeRoster(@Body() body: ScrapeRosterRequestDto): Promise<ScrapeSummary> {
+    return this.scrapeService.scrapeRoster(body.teamCode);
   }
 }

@@ -7,7 +7,7 @@ import {
   normalizeSortOrder,
   PaginatedResult,
 } from '../../../../common/pagination/pagination';
-import { Game } from '../../domain/entities/game.entity';
+import { Game, GameStatus } from '../../domain/entities/game.entity';
 import {
   GameFilter,
   GameRepository,
@@ -74,6 +74,18 @@ export class GameRepositoryImpl implements GameRepository {
   async upsert(game: Game): Promise<Game> {
     const saved = await this.ormRepository.save(this.toOrm(game));
     return this.toDomain(saved);
+  }
+
+  async findRecentFinished(teamCode: string, limit: number): Promise<Game[]> {
+    const rows = await this.ormRepository.find({
+      where: [
+        { homeTeamCode: teamCode, status: GameStatus.FINISHED },
+        { awayTeamCode: teamCode, status: GameStatus.FINISHED },
+      ],
+      order: { scheduledAt: 'DESC' },
+      take: limit,
+    });
+    return rows.map((row) => this.toDomain(row));
   }
 
   private toDomain(row: GameOrmEntity): Game {

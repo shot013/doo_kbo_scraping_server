@@ -2,8 +2,11 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PaginatedResult } from '../../../common/pagination/pagination';
 import { GameStat } from '../domain/entities/game-stat.entity';
 import {
+  BattingAggregate,
   GAME_STAT_REPOSITORY,
   GameStatFilter,
+  PitchingAggregate,
+  StatAggregateFilter,
 } from '../domain/repositories/game-stat.repository';
 import type { GameStatRepository } from '../domain/repositories/game-stat.repository';
 
@@ -28,5 +31,13 @@ export class GameStatService {
 
   upsert(stat: GameStat): Promise<GameStat> {
     return this.gameStatRepository.upsert(stat);
+  }
+
+  aggregateBatting(filter: StatAggregateFilter): Promise<BattingAggregate[]> {
+    return this.gameStatRepository.aggregateBatting(filter);
+  }
+
+  aggregatePitching(filter: StatAggregateFilter): Promise<PitchingAggregate[]> {
+    return this.gameStatRepository.aggregatePitching(filter);
   }
 }
