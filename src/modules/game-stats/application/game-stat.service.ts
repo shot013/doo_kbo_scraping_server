@@ -26,7 +26,7 @@ export class GameStatService {
     return stat;
   }
 
-  upsertMany(stats: GameStat[]): Promise<GameStat[]> {
-    return this.gameStatRepository.upsertMany(stats);
+  upsert(stat: GameStat): Promise<GameStat> {
+    return this.gameStatRepository.upsert(stat);
   }
 }

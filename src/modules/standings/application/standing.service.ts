@@ -18,7 +18,7 @@ export class StandingService {
     return this.standingRepository.findBySeasonYear(filter);
   }
 
-  upsertMany(standings: Standing[]): Promise<Standing[]> {
-    return this.standingRepository.upsertMany(standings);
+  upsert(standing: Standing): Promise<Standing> {
+    return this.standingRepository.upsert(standing);
   }
 }

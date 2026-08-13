@@ -45,43 +45,58 @@ export class ScrapeService {
 
     try {
       const scraped = await this.gameScraper.scrape(seasonYear);
+      if (scraped.length === 0) {
+        throw new Error('No games scraped from source');
+      }
       const now = new Date();
 
+      let savedCount = 0;
       for (const item of scraped) {
-        await this.gameService.upsert(
-          new Game({
-            id: item.id,
-            seasonYear,
-            gameDate: item.gameDate,
-            scheduledAt: item.scheduledAt,
-            stadium: item.stadium,
-            homeTeamCode: item.homeTeamCode,
-            homeTeamName: item.homeTeamName,
-            awayTeamCode: item.awayTeamCode,
-            awayTeamName: item.awayTeamName,
-            homeScore: item.homeScore,
-            awayScore: item.awayScore,
-            currentInning: null,
-            status: item.status,
-            sourceUrl: item.sourceUrl,
-            createdAt: now,
-            updatedAt: now,
-          }),
-        );
+        try {
+          await this.gameService.upsert(
+            new Game({
+              id: item.id,
+              seasonYear,
+              gameDate: item.gameDate,
+              scheduledAt: item.scheduledAt,
+              stadium: item.stadium,
+              homeTeamCode: item.homeTeamCode,
+              homeTeamName: item.homeTeamName,
+              awayTeamCode: item.awayTeamCode,
+              awayTeamName: item.awayTeamName,
+              homeScore: item.homeScore,
+              awayScore: item.awayScore,
+              currentInning: null,
+              status: item.status,
+              sourceUrl: item.sourceUrl,
+              createdAt: now,
+              updatedAt: now,
+            }),
+          );
+          savedCount++;
+        } catch (error) {
+          this.logger.warn(
+            `Failed to save game ${item.id}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
       }
 
       const durationMs = Date.now() - startedAt;
+      const failedCount = scraped.length - savedCount;
       await this.scrapeSourceHealthService.log({
         sourceName,
         targetUrl: SCHEDULE_SOURCE_URL,
         status: ScrapeStatus.SUCCESS,
         httpStatusCode: 200,
         durationMs,
-        itemsScraped: scraped.length,
-        errorMessage: null,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedCount > 0
+            ? `${failedCount}/${scraped.length} games failed to save (see server logs)`
+            : null,
         scrapedAt: now,
       });
-      return { itemsScraped: scraped.length, durationMs };
+      return { itemsScraped: savedCount, durationMs };
     } catch (error) {
       await this.logFailure(sourceName, SCHEDULE_SOURCE_URL, startedAt, error);
       throw error;
@@ -94,6 +109,9 @@ export class ScrapeService {
 
     try {
       const scraped = await this.standingsScraper.scrape();
+      if (scraped.length === 0) {
+        throw new Error('No standings scraped from source');
+      }
       const now = new Date();
       const standings = scraped.map(
         (item) =>
@@ -118,20 +136,34 @@ export class ScrapeService {
             updatedAt: now,
           }),
       );
-      await this.standingService.upsertMany(standings);
+      let savedCount = 0;
+      for (const standing of standings) {
+        try {
+          await this.standingService.upsert(standing);
+          savedCount++;
+        } catch (error) {
+          this.logger.warn(
+            `Failed to save standing for team ${standing.teamCode}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
 
       const durationMs = Date.now() - startedAt;
+      const failedCount = standings.length - savedCount;
       await this.scrapeSourceHealthService.log({
         sourceName,
         targetUrl: STANDINGS_SOURCE_URL,
         status: ScrapeStatus.SUCCESS,
         httpStatusCode: 200,
         durationMs,
-        itemsScraped: standings.length,
-        errorMessage: null,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedCount > 0
+            ? `${failedCount}/${standings.length} standings failed to save (see server logs)`
+            : null,
         scrapedAt: now,
       });
-      return { itemsScraped: standings.length, durationMs };
+      return { itemsScraped: savedCount, durationMs };
     } catch (error) {
       await this.logFailure(sourceName, STANDINGS_SOURCE_URL, startedAt, error);
       throw error;
@@ -145,6 +177,9 @@ export class ScrapeService {
 
     try {
       const scraped = await this.gameStatsScraper.scrape(gameId);
+      if (scraped.length === 0) {
+        throw new Error('No game stats scraped from source');
+      }
       const now = new Date();
       const stats = scraped.map(
         (item) =>
@@ -183,20 +218,34 @@ export class ScrapeService {
             updatedAt: now,
           }),
       );
-      await this.gameStatService.upsertMany(stats);
+      let savedCount = 0;
+      for (const stat of stats) {
+        try {
+          await this.gameStatService.upsert(stat);
+          savedCount++;
+        } catch (error) {
+          this.logger.warn(
+            `Failed to save game stat for ${stat.playerName} (team ${stat.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
 
       const durationMs = Date.now() - startedAt;
+      const failedCount = stats.length - savedCount;
       await this.scrapeSourceHealthService.log({
         sourceName,
         targetUrl,
         status: ScrapeStatus.SUCCESS,
         httpStatusCode: 200,
         durationMs,
-        itemsScraped: stats.length,
-        errorMessage: null,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedCount > 0
+            ? `${failedCount}/${stats.length} game stats failed to save (see server logs)`
+            : null,
         scrapedAt: now,
       });
-      return { itemsScraped: stats.length, durationMs };
+      return { itemsScraped: savedCount, durationMs };
     } catch (error) {
       await this.logFailure(sourceName, targetUrl, startedAt, error);
       throw error;
@@ -212,15 +261,21 @@ export class ScrapeService {
     const durationMs = Date.now() - startedAt;
     const errorMessage = error instanceof Error ? error.message : String(error);
     this.logger.error(`${sourceName} scrape failed: ${errorMessage}`);
-    await this.scrapeSourceHealthService.log({
-      sourceName,
-      targetUrl,
-      status: ScrapeStatus.FAILURE,
-      httpStatusCode: null,
-      durationMs,
-      itemsScraped: null,
-      errorMessage,
-      scrapedAt: new Date(),
-    });
+    try {
+      await this.scrapeSourceHealthService.log({
+        sourceName,
+        targetUrl,
+        status: ScrapeStatus.FAILURE,
+        httpStatusCode: null,
+        durationMs,
+        itemsScraped: null,
+        errorMessage,
+        scrapedAt: new Date(),
+      });
+    } catch (logError) {
+      this.logger.error(
+        `Failed to record scrape failure for ${sourceName}: ${logError instanceof Error ? logError.message : String(logError)}`,
+      );
+    }
   }
 }

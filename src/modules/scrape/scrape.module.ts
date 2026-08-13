@@ -4,6 +4,7 @@ import { GameModule } from '../game/game.module';
 import { ScrapeSourceHealthModule } from '../scrape-source-health/scrape-source-health.module';
 import { StandingsModule } from '../standings/standings.module';
 import { ScrapeController } from './application/scrape.controller';
+import { ScrapeScheduler } from './application/scrape.scheduler';
 import { ScrapeService } from './application/scrape.service';
 import { GameStatsScraper } from './infrastructure/scrapers/game-stats.scraper';
 import { GameScraper } from './infrastructure/scrapers/game.scraper';
@@ -17,6 +18,12 @@ import { StandingsScraper } from './infrastructure/scrapers/standings.scraper';
     ScrapeSourceHealthModule,
   ],
   controllers: [ScrapeController],
-  providers: [ScrapeService, GameScraper, StandingsScraper, GameStatsScraper],
+  providers: [
+    ScrapeService,
+    ScrapeScheduler,
+    GameScraper,
+    StandingsScraper,
+    GameStatsScraper,
+  ],
 })
 export class ScrapeModule {}
