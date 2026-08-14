@@ -51,6 +51,17 @@ export class ScrapeScheduler {
   }
 
   @Cron(EVENING_HOURLY_CRON, KST_CRON_OPTIONS)
+  async scrapeSeasonStats(): Promise<void> {
+    try {
+      await this.scrapeService.scrapeSeasonStats(new Date().getFullYear());
+    } catch (error) {
+      this.logger.error(
+        `scheduled season-stats scrape failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  @Cron(EVENING_HOURLY_CRON, KST_CRON_OPTIONS)
   async scrapeGameStats(): Promise<void> {
     const gameDate = new Date().toISOString().slice(0, 10);
     let todaysGames: Game[];

@@ -8,6 +8,10 @@ import { PlayerService } from '../../players/application/player.service';
 import { Player } from '../../players/domain/entities/player.entity';
 import { ScrapeSourceHealthService } from '../../scrape-source-health/application/scrape-source-health.service';
 import { ScrapeStatus } from '../../scrape-source-health/domain/entities/scrape-source-health.entity';
+import { SeasonBattingStatService } from '../../season-stats/application/season-batting-stat.service';
+import { SeasonPitchingStatService } from '../../season-stats/application/season-pitching-stat.service';
+import { SeasonBattingStat } from '../../season-stats/domain/entities/season-batting-stat.entity';
+import { SeasonPitchingStat } from '../../season-stats/domain/entities/season-pitching-stat.entity';
 import { StandingService } from '../../standings/application/standing.service';
 import { Standing } from '../../standings/domain/entities/standing.entity';
 import {
@@ -22,6 +26,11 @@ import {
   ROSTER_SOURCE_URL,
   RosterScraper,
 } from '../infrastructure/scrapers/roster.scraper';
+import {
+  SEASON_HITTER_SOURCE_URL,
+  SEASON_PITCHER_SOURCE_URL,
+  SeasonStatsScraper,
+} from '../infrastructure/scrapers/season-stats.scraper';
 import {
   STANDINGS_SOURCE_URL,
   StandingsScraper,
@@ -41,10 +50,13 @@ export class ScrapeService {
     private readonly standingsScraper: StandingsScraper,
     private readonly gameStatsScraper: GameStatsScraper,
     private readonly rosterScraper: RosterScraper,
+    private readonly seasonStatsScraper: SeasonStatsScraper,
     private readonly gameService: GameService,
     private readonly standingService: StandingService,
     private readonly gameStatService: GameStatService,
     private readonly playerService: PlayerService,
+    private readonly seasonBattingStatService: SeasonBattingStatService,
+    private readonly seasonPitchingStatService: SeasonPitchingStatService,
     private readonly scrapeSourceHealthService: ScrapeSourceHealthService,
   ) {}
 
@@ -175,6 +187,117 @@ export class ScrapeService {
       return { itemsScraped: savedCount, durationMs };
     } catch (error) {
       await this.logFailure(sourceName, STANDINGS_SOURCE_URL, startedAt, error);
+      throw error;
+    }
+  }
+
+  async scrapeSeasonStats(seasonYear: number): Promise<ScrapeSummary> {
+    const sourceName = 'kbo-season-stats';
+    const targetUrl = `${SEASON_HITTER_SOURCE_URL}, ${SEASON_PITCHER_SOURCE_URL}`;
+    const startedAt = Date.now();
+
+    try {
+      const [scrapedBatting, scrapedPitching] = await Promise.all([
+        this.seasonStatsScraper.scrapeBatting(),
+        this.seasonStatsScraper.scrapePitching(),
+      ]);
+      if (scrapedBatting.length === 0 && scrapedPitching.length === 0) {
+        throw new Error('No season stats scraped from source');
+      }
+      const now = new Date();
+
+      let savedCount = 0;
+      for (const item of scrapedBatting) {
+        try {
+          await this.seasonBattingStatService.upsert(
+            new SeasonBattingStat({
+              id: 0,
+              seasonYear,
+              teamCode: item.teamCode,
+              teamName: item.teamName,
+              playerName: item.playerName,
+              rank: item.rank,
+              battingAverage: item.battingAverage,
+              games: item.games,
+              plateAppearances: item.plateAppearances,
+              atBats: item.atBats,
+              runs: item.runs,
+              hits: item.hits,
+              doubles: item.doubles,
+              triples: item.triples,
+              homeRuns: item.homeRuns,
+              totalBases: item.totalBases,
+              rbi: item.rbi,
+              sacrificeHits: item.sacrificeHits,
+              sacrificeFlies: item.sacrificeFlies,
+              createdAt: now,
+              updatedAt: now,
+            }),
+          );
+          savedCount++;
+        } catch (error) {
+          this.logger.warn(
+            `Failed to save season batting stat for ${item.playerName} (team ${item.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
+      for (const item of scrapedPitching) {
+        try {
+          await this.seasonPitchingStatService.upsert(
+            new SeasonPitchingStat({
+              id: 0,
+              seasonYear,
+              teamCode: item.teamCode,
+              teamName: item.teamName,
+              playerName: item.playerName,
+              rank: item.rank,
+              era: item.era,
+              games: item.games,
+              wins: item.wins,
+              losses: item.losses,
+              saves: item.saves,
+              holds: item.holds,
+              winPct: item.winPct,
+              inningsPitched: item.inningsPitched,
+              hitsAllowed: item.hitsAllowed,
+              homeRunsAllowed: item.homeRunsAllowed,
+              walksAllowed: item.walksAllowed,
+              hitByPitch: item.hitByPitch,
+              strikeoutsPitched: item.strikeoutsPitched,
+              runsAllowed: item.runsAllowed,
+              earnedRuns: item.earnedRuns,
+              whip: item.whip,
+              createdAt: now,
+              updatedAt: now,
+            }),
+          );
+          savedCount++;
+        } catch (error) {
+          this.logger.warn(
+            `Failed to save season pitching stat for ${item.playerName} (team ${item.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
+
+      const durationMs = Date.now() - startedAt;
+      const totalScraped = scrapedBatting.length + scrapedPitching.length;
+      const failedCount = totalScraped - savedCount;
+      await this.scrapeSourceHealthService.log({
+        sourceName,
+        targetUrl,
+        status: ScrapeStatus.SUCCESS,
+        httpStatusCode: 200,
+        durationMs,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedCount > 0
+            ? `${failedCount}/${totalScraped} season stats failed to save (see server logs)`
+            : null,
+        scrapedAt: now,
+      });
+      return { itemsScraped: savedCount, durationMs };
+    } catch (error) {
+      await this.logFailure(sourceName, targetUrl, startedAt, error);
       throw error;
     }
   }
