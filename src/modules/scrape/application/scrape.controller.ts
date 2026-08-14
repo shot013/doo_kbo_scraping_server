@@ -22,6 +22,13 @@ export class ScrapeController {
     );
   }
 
+  @Post('season-stats')
+  scrapeSeasonStats(@Body() body: ScrapeRequestDto): Promise<ScrapeSummary> {
+    return this.scrapeService.scrapeSeasonStats(
+      body.seasonYear ?? new Date().getFullYear(),
+    );
+  }
+
   @Post('game-stats')
   scrapeGameStats(
     @Body() body: ScrapeGameStatsRequestDto,
