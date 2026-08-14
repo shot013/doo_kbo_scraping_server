@@ -9,6 +9,7 @@ import { GameModule } from './modules/game/game.module';
 import { GameStatsModule } from './modules/game-stats/game-stats.module';
 import { PlayersModule } from './modules/players/players.module';
 import { RecordsModule } from './modules/records/records.module';
+import { SeasonStatsModule } from './modules/season-stats/season-stats.module';
 import { StandingsModule } from './modules/standings/standings.module';
 import { TeamsModule } from './modules/teams/teams.module';
 import { ScrapeSourceHealthModule } from './modules/scrape-source-health/scrape-source-health.module';
@@ -26,6 +27,7 @@ import { ScrapeModule } from './modules/scrape/scrape.module';
     StandingsModule,
     TeamsModule,
     RecordsModule,
+    SeasonStatsModule,
     ScrapeSourceHealthModule,
     ScrapeModule,
   ],

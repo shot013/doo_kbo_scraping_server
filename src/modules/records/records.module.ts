@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { GameStatsModule } from '../game-stats/game-stats.module';
+import { SeasonStatsModule } from '../season-stats/season-stats.module';
 import { RecordsController } from './application/records.controller';
 import { RecordsService } from './application/records.service';
 
 @Module({
-  imports: [GameStatsModule],
+  imports: [SeasonStatsModule],
   controllers: [RecordsController],
   providers: [RecordsService],
 })

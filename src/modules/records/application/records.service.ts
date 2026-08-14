@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { resolveKboTeamByCode } from '../../../common/kbo/kbo-team';
-import { GameStatService } from '../../game-stats/application/game-stat.service';
+import { SeasonBattingStatService } from '../../season-stats/application/season-batting-stat.service';
+import { SeasonPitchingStatService } from '../../season-stats/application/season-pitching-stat.service';
 
 export interface BatterRecordResponse {
   rank: number;
@@ -29,18 +30,21 @@ const DEFAULT_LEADERBOARD_LIMIT = 20;
 
 @Injectable()
 export class RecordsService {
-  constructor(private readonly gameStatService: GameStatService) {}
+  constructor(
+    private readonly seasonBattingStatService: SeasonBattingStatService,
+    private readonly seasonPitchingStatService: SeasonPitchingStatService,
+  ) {}
 
   async getBatterLeaders(
     seasonYear: number,
     limit = DEFAULT_LEADERBOARD_LIMIT,
   ): Promise<BatterRecordResponse[]> {
-    const rows = await this.gameStatService.aggregateBatting({
+    const rows = await this.seasonBattingStatService.findBySeasonYear({
       seasonYear,
       limit,
     });
-    return rows.map((row, index) => ({
-      rank: index + 1,
+    return rows.map((row) => ({
+      rank: row.rank,
       playerName: row.playerName,
       teamCode: row.teamCode,
       teamName: resolveKboTeamByCode(row.teamCode).fullName,
@@ -55,12 +59,12 @@ export class RecordsService {
     seasonYear: number,
     limit = DEFAULT_LEADERBOARD_LIMIT,
   ): Promise<PitcherRecordResponse[]> {
-    const rows = await this.gameStatService.aggregatePitching({
+    const rows = await this.seasonPitchingStatService.findBySeasonYear({
       seasonYear,
       limit,
     });
-    return rows.map((row, index) => ({
-      rank: index + 1,
+    return rows.map((row) => ({
+      rank: row.rank,
       playerName: row.playerName,
       teamCode: row.teamCode,
       teamName: resolveKboTeamByCode(row.teamCode).fullName,
