@@ -29,8 +29,14 @@ export class SeasonBattingStatOrmEntity {
   @Column({ name: 'rank', type: 'smallint' })
   rank: number;
 
-  @Column({ name: 'batting_average', type: 'decimal', precision: 4, scale: 3 })
-  battingAverage: string;
+  @Column({
+    name: 'batting_average',
+    type: 'decimal',
+    precision: 4,
+    scale: 3,
+    nullable: true,
+  })
+  battingAverage: string | null;
 
   @Column({ name: 'games', type: 'smallint' })
   games: number;

@@ -29,8 +29,14 @@ export class SeasonPitchingStatOrmEntity {
   @Column({ name: 'rank', type: 'smallint' })
   rank: number;
 
-  @Column({ name: 'era', type: 'decimal', precision: 5, scale: 2 })
-  era: string;
+  @Column({
+    name: 'era',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    nullable: true,
+  })
+  era: string | null;
 
   @Column({ name: 'games', type: 'smallint' })
   games: number;
@@ -47,8 +53,14 @@ export class SeasonPitchingStatOrmEntity {
   @Column({ name: 'holds', type: 'smallint' })
   holds: number;
 
-  @Column({ name: 'win_pct', type: 'decimal', precision: 4, scale: 3 })
-  winPct: string;
+  @Column({
+    name: 'win_pct',
+    type: 'decimal',
+    precision: 4,
+    scale: 3,
+    nullable: true,
+  })
+  winPct: string | null;
 
   @Column({ name: 'innings_pitched', type: 'varchar', length: 16 })
   inningsPitched: string;
@@ -74,8 +86,14 @@ export class SeasonPitchingStatOrmEntity {
   @Column({ name: 'earned_runs', type: 'smallint' })
   earnedRuns: number;
 
-  @Column({ name: 'whip', type: 'decimal', precision: 4, scale: 2 })
-  whip: string;
+  @Column({
+    name: 'whip',
+    type: 'decimal',
+    precision: 4,
+    scale: 2,
+    nullable: true,
+  })
+  whip: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

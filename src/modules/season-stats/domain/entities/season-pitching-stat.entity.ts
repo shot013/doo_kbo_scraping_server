@@ -5,13 +5,13 @@ export interface SeasonPitchingStatProps {
   teamName: string;
   playerName: string;
   rank: number;
-  era: string;
+  era: string | null;
   games: number;
   wins: number;
   losses: number;
   saves: number;
   holds: number;
-  winPct: string;
+  winPct: string | null;
   inningsPitched: string;
   hitsAllowed: number;
   homeRunsAllowed: number;
@@ -20,7 +20,7 @@ export interface SeasonPitchingStatProps {
   strikeoutsPitched: number;
   runsAllowed: number;
   earnedRuns: number;
-  whip: string;
+  whip: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,13 +32,13 @@ export class SeasonPitchingStat {
   readonly teamName: string;
   readonly playerName: string;
   readonly rank: number;
-  readonly era: string;
+  readonly era: string | null;
   readonly games: number;
   readonly wins: number;
   readonly losses: number;
   readonly saves: number;
   readonly holds: number;
-  readonly winPct: string;
+  readonly winPct: string | null;
   readonly inningsPitched: string;
   readonly hitsAllowed: number;
   readonly homeRunsAllowed: number;
@@ -47,7 +47,7 @@ export class SeasonPitchingStat {
   readonly strikeoutsPitched: number;
   readonly runsAllowed: number;
   readonly earnedRuns: number;
-  readonly whip: string;
+  readonly whip: string | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 

@@ -5,7 +5,7 @@ export interface SeasonBattingStatProps {
   teamName: string;
   playerName: string;
   rank: number;
-  battingAverage: string;
+  battingAverage: string | null;
   games: number;
   plateAppearances: number;
   atBats: number;

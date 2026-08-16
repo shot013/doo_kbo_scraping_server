@@ -16,7 +16,7 @@ export interface ScrapedSeasonBattingStat {
   teamName: string;
   playerName: string;
   rank: number;
-  battingAverage: string;
+  battingAverage: string | null;
   games: number;
   plateAppearances: number;
   atBats: number;
@@ -36,13 +36,13 @@ export interface ScrapedSeasonPitchingStat {
   teamName: string;
   playerName: string;
   rank: number;
-  era: string;
+  era: string | null;
   games: number;
   wins: number;
   losses: number;
   saves: number;
   holds: number;
-  winPct: string;
+  winPct: string | null;
   inningsPitched: string;
   hitsAllowed: number;
   homeRunsAllowed: number;
@@ -51,7 +51,7 @@ export interface ScrapedSeasonPitchingStat {
   strikeoutsPitched: number;
   runsAllowed: number;
   earnedRuns: number;
-  whip: string;
+  whip: string | null;
 }
 
 /**
@@ -118,7 +118,7 @@ export class SeasonStatsScraper {
           teamName: team.fullName,
           playerName,
           rank: toStrictInt(rank, 'rank'),
-          battingAverage: avg,
+          battingAverage: toRateStatOrNull(avg),
           games: toStrictInt(games, 'games'),
           plateAppearances: toStrictInt(pa, 'plateAppearances'),
           atBats: toStrictInt(ab, 'atBats'),
@@ -199,13 +199,13 @@ export class SeasonStatsScraper {
           teamName: team.fullName,
           playerName,
           rank: toStrictInt(rank, 'rank'),
-          era,
+          era: toRateStatOrNull(era),
           games: toStrictInt(games, 'games'),
           wins: toStrictInt(wins, 'wins'),
           losses: toStrictInt(losses, 'losses'),
           saves: toStrictInt(saves, 'saves'),
           holds: toStrictInt(holds, 'holds'),
-          winPct,
+          winPct: toRateStatOrNull(winPct),
           inningsPitched,
           hitsAllowed: toStrictInt(hitsAllowed, 'hitsAllowed'),
           homeRunsAllowed: toStrictInt(homeRunsAllowed, 'homeRunsAllowed'),
@@ -217,7 +217,7 @@ export class SeasonStatsScraper {
           ),
           runsAllowed: toStrictInt(runsAllowed, 'runsAllowed'),
           earnedRuns: toStrictInt(earnedRuns, 'earnedRuns'),
-          whip,
+          whip: toRateStatOrNull(whip),
         });
       } catch (error) {
         this.logger.warn(
@@ -305,6 +305,14 @@ export class SeasonStatsScraper {
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * KBO는 이닝/타석이 없어 산출할 수 없는 비율 스탯(평균자책점, 승률, WHIP, 타율)을
+ * 숫자 대신 "-"로 표시한다. decimal 컬럼에 그대로 넣으면 DB 에러가 나므로 null로 정규화한다.
+ */
+function toRateStatOrNull(text: string): string | null {
+  return text === '-' || text === '' ? null : text;
 }
 
 function toStrictInt(text: string, field: string): number {
