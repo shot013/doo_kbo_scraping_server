@@ -8,7 +8,7 @@ export interface BatterRecordResponse {
   playerName: string;
   teamCode: string;
   teamName: string;
-  avg: string;
+  avg: string | null;
   games: number;
   homeRuns: number;
   rbi: number;
@@ -19,7 +19,7 @@ export interface PitcherRecordResponse {
   playerName: string;
   teamCode: string;
   teamName: string;
-  era: string;
+  era: string | null;
   games: number;
   wins: number;
   losses: number;
