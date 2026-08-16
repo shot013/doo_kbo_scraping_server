@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { ScrapeGameStatsRequestDto } from './dto/scrape-game-stats-request.dto';
 import { ScrapeRequestDto } from './dto/scrape-request.dto';
 import { ScrapeRosterRequestDto } from './dto/scrape-roster-request.dto';
@@ -9,35 +9,38 @@ export class ScrapeController {
   constructor(private readonly scrapeService: ScrapeService) {}
 
   @Post('games')
-  scrapeGames(@Body() body: ScrapeRequestDto): Promise<ScrapeSummary> {
+  scrapeGames(@Body() body?: ScrapeRequestDto): Promise<ScrapeSummary> {
     return this.scrapeService.scrapeGames(
-      body.seasonYear ?? new Date().getFullYear(),
+      body?.seasonYear ?? new Date().getFullYear(),
     );
   }
 
   @Post('standings')
-  scrapeStandings(@Body() body: ScrapeRequestDto): Promise<ScrapeSummary> {
+  scrapeStandings(@Body() body?: ScrapeRequestDto): Promise<ScrapeSummary> {
     return this.scrapeService.scrapeStandings(
-      body.seasonYear ?? new Date().getFullYear(),
+      body?.seasonYear ?? new Date().getFullYear(),
     );
   }
 
   @Post('season-stats')
-  scrapeSeasonStats(@Body() body: ScrapeRequestDto): Promise<ScrapeSummary> {
+  scrapeSeasonStats(@Body() body?: ScrapeRequestDto): Promise<ScrapeSummary> {
     return this.scrapeService.scrapeSeasonStats(
-      body.seasonYear ?? new Date().getFullYear(),
+      body?.seasonYear ?? new Date().getFullYear(),
     );
   }
 
   @Post('game-stats')
   scrapeGameStats(
-    @Body() body: ScrapeGameStatsRequestDto,
+    @Body() body?: ScrapeGameStatsRequestDto,
   ): Promise<ScrapeSummary> {
+    if (!body?.gameId) {
+      throw new BadRequestException('gameId is required');
+    }
     return this.scrapeService.scrapeGameStats(body.gameId);
   }
 
   @Post('roster')
-  scrapeRoster(@Body() body: ScrapeRosterRequestDto): Promise<ScrapeSummary> {
-    return this.scrapeService.scrapeRoster(body.teamCode);
+  scrapeRoster(@Body() body?: ScrapeRosterRequestDto): Promise<ScrapeSummary> {
+    return this.scrapeService.scrapeRoster(body?.teamCode);
   }
 }
