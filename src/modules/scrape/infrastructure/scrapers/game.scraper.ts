@@ -5,6 +5,18 @@ import { resolveKboTeam } from '../../../../common/kbo/kbo-team';
 
 export const SCHEDULE_SOURCE_URL =
   'https://www.koreabaseball.com/Schedule/Schedule.aspx';
+export const NAVER_SCHEDULE_URL =
+  'https://api-gw.sports.naver.com/schedule/games';
+
+interface NaverScheduleGame {
+  gameId: string;
+  homeTeamScore: number | null;
+  awayTeamScore: number | null;
+}
+
+interface NaverScheduleResponse {
+  result: { games: NaverScheduleGame[] };
+}
 
 interface KboScheduleCell {
   Text: string;
@@ -45,6 +57,7 @@ export class GameScraper {
 
   async scrape(seasonYear: number): Promise<ScrapedGame[]> {
     const browser = await chromium.launch();
+    let games: ScrapedGame[];
     try {
       const page = await browser.newPage();
       const responsePromise = page.waitForResponse((res) =>
@@ -61,11 +74,60 @@ export class GameScraper {
           'Unexpected KBO schedule response shape: rows is not an array',
         );
       }
-      const games = this.parseRows(data.rows, seasonYear);
+      games = this.parseRows(data.rows, seasonYear);
       this.logger.log(`Scraped ${games.length} games`);
-      return games;
     } finally {
       await browser.close();
+    }
+
+    await this.enrichLiveScores(games);
+    return games;
+  }
+
+  /**
+   * KBO 일정 페이지는 진행 중인 경기의 점수를 실시간으로 갱신하지 않고 0-0으로만
+   * 보여준다(경기 종료 후 최종 스코어만 정확). 진행 중인 경기는 네이버 스포츠에서
+   * 실시간 스코어를 가져와 덮어쓴다. 네이버 gameId는 KBO gameId 뒤에 연도를 붙인
+   * 형식이라 그 부분만 잘라내면 우리 gameId로 되돌릴 수 있다.
+   */
+  private async enrichLiveScores(games: ScrapedGame[]): Promise<void> {
+    const inProgressByDate = new Map<string, ScrapedGame[]>();
+    for (const game of games) {
+      if (game.status !== GameStatus.IN_PROGRESS) continue;
+      const list = inProgressByDate.get(game.gameDate) ?? [];
+      list.push(game);
+      inProgressByDate.set(game.gameDate, list);
+    }
+    if (inProgressByDate.size === 0) return;
+
+    for (const [gameDate, gamesOnDate] of inProgressByDate) {
+      try {
+        const url = `${NAVER_SCHEDULE_URL}?fields=basic,schedule,baseball&fromDate=${gameDate}&toDate=${gameDate}&size=20&categoryId=kbo`;
+        const response = await fetch(url, {
+          headers: { 'User-Agent': 'Mozilla/5.0' },
+        });
+        if (!response.ok) {
+          throw new Error(`Naver schedule request failed: ${response.status}`);
+        }
+        const body = (await response.json()) as NaverScheduleResponse;
+        const scoreById = new Map(
+          body.result.games.map((g) => [
+            g.gameId.slice(0, -4),
+            { home: g.homeTeamScore, away: g.awayTeamScore },
+          ]),
+        );
+        for (const game of gamesOnDate) {
+          const live = scoreById.get(game.id);
+          if (live) {
+            game.homeScore = live.home;
+            game.awayScore = live.away;
+          }
+        }
+      } catch (error) {
+        this.logger.warn(
+          `Failed to enrich live scores for ${gameDate}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
     }
   }
 
