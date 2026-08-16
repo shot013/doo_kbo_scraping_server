@@ -1,40 +1,44 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { chromium, Response } from 'playwright';
-import { parseInningsPitched } from '../../../../common/kbo/innings';
 import { PlayerStatType } from '../../../game-stats/domain/entities/game-stat.entity';
 
-export const GAME_CENTER_SOURCE_URL =
-  'https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx';
+export const NAVER_GAME_RECORD_URL =
+  'https://api-gw.sports.naver.com/schedule/games';
 
 const GAME_ID_PATTERN = /^\d{8}[A-Za-z]{2}[A-Za-z]{2}\d+$/;
+const DECISION_WIN = '승';
+const DECISION_LOSS = '패';
+const DECISION_SAVE = '세';
+const DECISION_HOLD = '홀드';
 
-interface KboCell {
-  Text: string;
+interface NaverBatterBox {
+  name: string;
+  ab: number;
+  hit: number;
+  rbi: number;
+  run: number;
+  hra: string;
 }
 
-interface KboRow {
-  row: KboCell[];
+interface NaverPitcherBox {
+  name: string;
+  inn: string;
+  hit: number;
+  hr: number;
+  bb: number;
+  kk: number;
+  er: number;
+  era: string;
+  wls: string;
 }
 
-interface KboTable {
-  headers?: KboRow[];
-  rows: KboRow[];
-  tfoot?: KboRow[];
+interface NaverGameRecord {
+  gameInfo: { aCode: string; hCode: string };
+  battersBoxscore: { away: NaverBatterBox[]; home: NaverBatterBox[] };
+  pitchersBoxscore: { away: NaverPitcherBox[]; home: NaverPitcherBox[] };
 }
 
-interface HitterBlock {
-  table1: string;
-  table3: string;
-}
-
-interface PitcherBlock {
-  table: string;
-}
-
-interface BoxScoreResponse {
-  arrHitter: HitterBlock[];
-  arrPitcher: PitcherBlock[];
-  code: string;
+interface NaverGameRecordResponse {
+  result: { recordData: NaverGameRecord | null };
 }
 
 export interface ScrapedGameStat {
@@ -60,9 +64,13 @@ export interface ScrapedGameStat {
   era: string | null;
 }
 
-const cellText = (row: KboRow, index: number): string =>
-  (row.row[index]?.Text ?? '').trim();
-
+/**
+ * KBO 공식 게임센터(koreabaseball.com)는 라이브 박스스코어 AJAX 응답이 느리거나
+ * 아예 오지 않는 경우가 있어(Playwright로 최대 15초 대기해도 못 받는 사례 확인됨),
+ * 더 안정적으로 응답하는 네이버 스포츠 API에서 같은 데이터를 가져온다.
+ * 네이버 gameId는 KBO gameId 뒤에 연도(gameId 앞 4자리)를 붙인 형식이다
+ * (예: "20260816OBHT0" -> "20260816OBHT02026").
+ */
 @Injectable()
 export class GameStatsScraper {
   private readonly logger = new Logger(GameStatsScraper.name);
@@ -71,167 +79,124 @@ export class GameStatsScraper {
     if (!GAME_ID_PATTERN.test(gameId)) {
       throw new Error(`Invalid gameId format: ${gameId}`);
     }
-    const gameDate = gameId.slice(0, 8);
-    const awayTeamCode = gameId.slice(8, 10);
-    const homeTeamCode = gameId.slice(10, 12);
-    const url = `${GAME_CENTER_SOURCE_URL}?gameDate=${gameDate}&gameId=${gameId}&section=REVIEW`;
+    const naverGameId = `${gameId}${gameId.slice(0, 4)}`;
+    const url = `${NAVER_GAME_RECORD_URL}/${naverGameId}/record`;
 
-    const browser = await chromium.launch();
-    try {
-      const page = await browser.newPage();
-      const responsePromise = page.waitForResponse(
-        (res) => res.url().includes('/ws/Schedule.asmx/GetBoxScoreScroll'),
-        { timeout: 15000 },
-      );
-      await page.goto(url, { waitUntil: 'domcontentloaded' });
-      let response: Response;
-      try {
-        response = await responsePromise;
-      } catch {
-        throw new Error(
-          `Box score not available for game ${gameId} (game may not have started yet)`,
-        );
-      }
-      if (!response.ok()) {
-        throw new Error(`KBO box score request failed: ${response.status()}`);
-      }
-      const data = (await response.json()) as BoxScoreResponse;
-      if (data.code !== '100') {
-        throw new Error(`KBO box score returned code ${data.code}`);
-      }
-      if (!Array.isArray(data.arrHitter) || !Array.isArray(data.arrPitcher)) {
-        throw new Error(
-          'Unexpected KBO box score response shape: arrHitter/arrPitcher is not an array',
-        );
-      }
-
-      const stats = [
-        ...this.parseHitters(
-          data.arrHitter,
-          gameId,
-          awayTeamCode,
-          homeTeamCode,
-        ),
-        ...this.parsePitchers(
-          data.arrPitcher,
-          gameId,
-          awayTeamCode,
-          homeTeamCode,
-        ),
-      ];
-      this.logger.log(`Scraped ${stats.length} game-stat rows for ${gameId}`);
-      return stats;
-    } finally {
-      await browser.close();
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+    });
+    if (!response.ok) {
+      throw new Error(`Naver box score request failed: ${response.status}`);
     }
+    const body = (await response.json()) as NaverGameRecordResponse;
+    const record = body.result.recordData;
+    if (!record) {
+      throw new Error(
+        `Box score not available for game ${gameId} (game may not have started yet)`,
+      );
+    }
+
+    const { aCode: awayTeamCode, hCode: homeTeamCode } = record.gameInfo;
+    const stats = [
+      ...this.parseBatters(
+        record.battersBoxscore,
+        gameId,
+        awayTeamCode,
+        homeTeamCode,
+      ),
+      ...this.parsePitchers(
+        record.pitchersBoxscore,
+        gameId,
+        awayTeamCode,
+        homeTeamCode,
+      ),
+    ];
+    this.logger.log(`Scraped ${stats.length} game-stat rows for ${gameId}`);
+    return stats;
   }
 
-  private parseHitters(
-    blocks: HitterBlock[],
+  private parseBatters(
+    box: { away: NaverBatterBox[]; home: NaverBatterBox[] },
     gameId: string,
     awayTeamCode: string,
     homeTeamCode: string,
   ): ScrapedGameStat[] {
-    const stats: ScrapedGameStat[] = [];
+    const teams: [string, NaverBatterBox[]][] = [
+      [awayTeamCode, box.away],
+      [homeTeamCode, box.home],
+    ];
 
-    blocks.forEach((block, teamIndex) => {
-      const teamCode = teamIndex === 0 ? awayTeamCode : homeTeamCode;
-      try {
-        const names = JSON.parse(block.table1) as KboTable;
-        const lines = JSON.parse(block.table3) as KboTable;
-
-        names.rows.forEach((nameRow, i) => {
-          const playerName = cellText(nameRow, 2);
-          const lineRow = lines.rows[i];
-          if (!playerName || !lineRow) return;
-
-          stats.push({
-            gameId,
-            teamCode,
-            playerName,
-            statType: PlayerStatType.BATTING,
-            atBats: toIntOrNull(cellText(lineRow, 0)),
-            hits: toIntOrNull(cellText(lineRow, 1)),
-            rbi: toIntOrNull(cellText(lineRow, 2)),
-            runs: toIntOrNull(cellText(lineRow, 3)),
-            battingAverage: cellText(lineRow, 4) || null,
-            inningsPitched: null,
-            hitsAllowed: null,
-            earnedRuns: null,
-            strikeoutsPitched: null,
-            walksAllowed: null,
-            homeRunsAllowed: null,
-            win: false,
-            loss: false,
-            save: false,
-            hold: false,
-            era: null,
-          });
-        });
-      } catch (error) {
-        this.logger.warn(
-          `Skipping malformed hitter block for team ${teamCode} in game ${gameId}: ${error instanceof Error ? error.message : String(error)}`,
-        );
-      }
-    });
-
-    return stats;
+    return teams.flatMap(([teamCode, players]) =>
+      players.map((player) => ({
+        gameId,
+        teamCode,
+        playerName: player.name,
+        statType: PlayerStatType.BATTING,
+        atBats: player.ab,
+        hits: player.hit,
+        rbi: player.rbi,
+        runs: player.run,
+        battingAverage: player.hra || null,
+        inningsPitched: null,
+        hitsAllowed: null,
+        earnedRuns: null,
+        strikeoutsPitched: null,
+        walksAllowed: null,
+        homeRunsAllowed: null,
+        win: false,
+        loss: false,
+        save: false,
+        hold: false,
+        era: null,
+      })),
+    );
   }
 
   private parsePitchers(
-    blocks: PitcherBlock[],
+    box: { away: NaverPitcherBox[]; home: NaverPitcherBox[] },
     gameId: string,
     awayTeamCode: string,
     homeTeamCode: string,
   ): ScrapedGameStat[] {
-    const stats: ScrapedGameStat[] = [];
+    const teams: [string, NaverPitcherBox[]][] = [
+      [awayTeamCode, box.away],
+      [homeTeamCode, box.home],
+    ];
 
-    blocks.forEach((block, teamIndex) => {
-      const teamCode = teamIndex === 0 ? awayTeamCode : homeTeamCode;
-      try {
-        const table = JSON.parse(block.table) as KboTable;
-
-        for (const row of table.rows) {
-          const playerName = cellText(row, 0);
-          if (!playerName) continue;
-          const result = cellText(row, 2);
-
-          stats.push({
-            gameId,
-            teamCode,
-            playerName,
-            statType: PlayerStatType.PITCHING,
-            atBats: null,
-            hits: null,
-            rbi: null,
-            runs: null,
-            battingAverage: null,
-            inningsPitched: parseInningsPitched(cellText(row, 6)),
-            hitsAllowed: toIntOrNull(cellText(row, 10)),
-            homeRunsAllowed: toIntOrNull(cellText(row, 11)),
-            walksAllowed: toIntOrNull(cellText(row, 12)),
-            strikeoutsPitched: toIntOrNull(cellText(row, 13)),
-            earnedRuns: toIntOrNull(cellText(row, 15)),
-            era: cellText(row, 16) || null,
-            win: result === '승',
-            loss: result === '패',
-            save: result === '세',
-            hold: result === '홀드',
-          });
-        }
-      } catch (error) {
-        this.logger.warn(
-          `Skipping malformed pitcher block for team ${teamCode} in game ${gameId}: ${error instanceof Error ? error.message : String(error)}`,
-        );
-      }
-    });
-
-    return stats;
+    return teams.flatMap(([teamCode, players]) =>
+      players.map((player) => ({
+        gameId,
+        teamCode,
+        playerName: player.name,
+        statType: PlayerStatType.PITCHING,
+        atBats: null,
+        hits: null,
+        rbi: null,
+        runs: null,
+        battingAverage: null,
+        inningsPitched: toInningsPitched(player.inn),
+        hitsAllowed: player.hit,
+        earnedRuns: player.er,
+        strikeoutsPitched: player.kk,
+        walksAllowed: player.bb,
+        homeRunsAllowed: player.hr,
+        win: player.wls === DECISION_WIN,
+        loss: player.wls === DECISION_LOSS,
+        save: player.wls === DECISION_SAVE,
+        hold: player.wls === DECISION_HOLD,
+        era: player.era || null,
+      })),
+    );
   }
 }
 
-function toIntOrNull(text: string): number | null {
-  if (text === '' || text === '&nbsp;') return null;
-  const value = Number(text);
-  return Number.isNaN(value) ? null : value;
+/**
+ * 네이버 API의 이닝 표기는 정수("6")거나 이미 우리 표기(N.1=1/3이닝, N.2=2/3이닝)와
+ * 같은 소수 형태("5.1")로 온다. 정수는 ".0"을 붙여 맞추고, 인식할 수 없는 값은 null로 둔다.
+ */
+function toInningsPitched(raw: string): string | null {
+  if (!raw) return null;
+  if (/^\d+\.\d$/.test(raw)) return raw;
+  if (/^\d+$/.test(raw)) return `${raw}.0`;
+  return null;
 }
