@@ -1,12 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import { parseInningsPitched } from '../../../../common/kbo/innings';
-import { resolveKboTeam } from '../../../../common/kbo/kbo-team';
+import { KBO_TEAMS, resolveKboTeam } from '../../../../common/kbo/kbo-team';
 
 export const SEASON_HITTER_SOURCE_URL =
   'https://www.koreabaseball.com/Record/Player/HitterBasic/Basic1.aspx';
 export const SEASON_PITCHER_SOURCE_URL =
   'https://www.koreabaseball.com/Record/Player/PitcherBasic/Basic1.aspx';
+
+const FORM_PREFIX = 'ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$';
+const FORM_ID_PREFIX = 'cphContents_cphContents_cphContents_';
 
 export interface ScrapedSeasonBattingStat {
   teamCode: string;
@@ -52,17 +55,36 @@ export interface ScrapedSeasonPitchingStat {
 }
 
 /**
- * KBO 공식 기록실(HitterBasic/PitcherBasic Basic1.aspx)은 정렬 기준 통계(타율/평균자책점)
- * 규정타석·규정이닝을 충족한 선수만 순위에 노출한다. 1페이지(약 30명)만 수집한다.
+ * KBO 공식 기록실(HitterBasic/PitcherBasic Basic1.aspx)은 필터 없이 GET 요청하면 정렬 기준
+ * 통계(타율/평균자책점) 규정타석·규정이닝을 충족한 선수만 노출해, 충족자가 없는 팀은 결과에서
+ * 통째로 빠진다(예: 시즌 초 규정이닝 미달 팀). 팀 선택 필터(ddlTeam)로 10개 구단을 순회하며
+ * POST 요청을 보내면 규정 충족 여부와 무관하게 해당 팀의 전체 선수 목록을 받을 수 있어,
+ * 이 방식으로 팀별 전체 로스터를 수집한다. 이 경우 `rank`는 리그 전체 순위가 아니라
+ * 각 팀 내에서의 나열 순서(평균자책점/타율 기준 오름차순)를 의미한다.
  */
 @Injectable()
 export class SeasonStatsScraper {
   private readonly logger = new Logger(SeasonStatsScraper.name);
 
   async scrapeBatting(): Promise<ScrapedSeasonBattingStat[]> {
-    const $ = await this.fetchTable(SEASON_HITTER_SOURCE_URL);
     const stats: ScrapedSeasonBattingStat[] = [];
 
+    for (const [index, team] of KBO_TEAMS.entries()) {
+      if (index > 0) {
+        await delay(500);
+      }
+      const $ = await this.fetchTeamTable(SEASON_HITTER_SOURCE_URL, team.code);
+      this.parseBattingRows($, stats);
+    }
+
+    this.logger.log(`Scraped ${stats.length} season batting stat rows`);
+    return stats;
+  }
+
+  private parseBattingRows(
+    $: cheerio.CheerioAPI,
+    stats: ScrapedSeasonBattingStat[],
+  ): void {
     $('table.tData01 tbody tr').each((_, row) => {
       const cells = $(row)
         .find('td')
@@ -116,15 +138,27 @@ export class SeasonStatsScraper {
         );
       }
     });
-
-    this.logger.log(`Scraped ${stats.length} season batting stat rows`);
-    return stats;
   }
 
   async scrapePitching(): Promise<ScrapedSeasonPitchingStat[]> {
-    const $ = await this.fetchTable(SEASON_PITCHER_SOURCE_URL);
     const stats: ScrapedSeasonPitchingStat[] = [];
 
+    for (const [index, team] of KBO_TEAMS.entries()) {
+      if (index > 0) {
+        await delay(500);
+      }
+      const $ = await this.fetchTeamTable(SEASON_PITCHER_SOURCE_URL, team.code);
+      this.parsePitchingRows($, stats);
+    }
+
+    this.logger.log(`Scraped ${stats.length} season pitching stat rows`);
+    return stats;
+  }
+
+  private parsePitchingRows(
+    $: cheerio.CheerioAPI,
+    stats: ScrapedSeasonPitchingStat[],
+  ): void {
     $('table.tData01 tbody tr').each((_, row) => {
       const cells = $(row)
         .find('td')
@@ -191,21 +225,86 @@ export class SeasonStatsScraper {
         );
       }
     });
-
-    this.logger.log(`Scraped ${stats.length} season pitching stat rows`);
-    return stats;
   }
 
-  private async fetchTable(url: string): Promise<cheerio.CheerioAPI> {
-    const response = await fetch(url, {
+  /**
+   * `ddlTeam` 필터를 특정 팀으로 선택한 뒤 postback(POST)해서, 규정 충족 여부와 무관하게
+   * 그 팀의 전체 선수 목록을 받아온다. 시즌/시리즈(정규시즌 등)는 KBO 사이트의 기본 선택값을
+   * 그대로 이어받는다.
+   */
+  private async fetchTeamTable(
+    url: string,
+    teamCode: string,
+  ): Promise<cheerio.CheerioAPI> {
+    const getResponse = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
-    if (!response.ok) {
-      throw new Error(`KBO season stats request failed: ${response.status}`);
+    if (!getResponse.ok) {
+      throw new Error(`KBO season stats request failed: ${getResponse.status}`);
     }
-    const html = await response.text();
-    return cheerio.load(html);
+    const getHtml = await getResponse.text();
+    const $get = cheerio.load(getHtml);
+    const viewState = $get('#__VIEWSTATE').val() as string | undefined;
+    const viewStateGenerator = $get('#__VIEWSTATEGENERATOR').val() as
+      string | undefined;
+    const eventValidation = $get('#__EVENTVALIDATION').val() as
+      string | undefined;
+    const sessionCookie = getResponse.headers.get('set-cookie');
+    if (!viewState || !eventValidation) {
+      throw new Error('KBO season stats page is missing ASP.NET form state');
+    }
+    const seasonValue =
+      $get(`#${FORM_ID_PREFIX}ddlSeason_ddlSeason option[selected]`).attr(
+        'value',
+      ) ?? '';
+    const seriesValue =
+      $get(`#${FORM_ID_PREFIX}ddlSeries_ddlSeries option[selected]`).attr(
+        'value',
+      ) ?? '0';
+    const hfPage = ($get(`#${FORM_ID_PREFIX}hfPage`).val() as string) ?? '1';
+    const hfOrderByCol =
+      ($get(`#${FORM_ID_PREFIX}hfOrderByCol`).val() as string) ?? '';
+    const hfOrderBy =
+      ($get(`#${FORM_ID_PREFIX}hfOrderBy`).val() as string) ?? '';
+
+    const form = new URLSearchParams();
+    form.set('__EVENTTARGET', `${FORM_PREFIX}ddlTeam$ddlTeam`);
+    form.set('__EVENTARGUMENT', '');
+    form.set('__LASTFOCUS', '');
+    form.set('__VIEWSTATE', viewState);
+    form.set('__VIEWSTATEGENERATOR', viewStateGenerator ?? '');
+    form.set('__EVENTVALIDATION', eventValidation);
+    form.set(`${FORM_PREFIX}ddlSeason$ddlSeason`, seasonValue);
+    form.set(`${FORM_PREFIX}ddlSeries$ddlSeries`, seriesValue);
+    form.set(`${FORM_PREFIX}ddlTeam$ddlTeam`, teamCode);
+    form.set(`${FORM_PREFIX}ddlSituation$ddlSituation`, '');
+    form.set(`${FORM_PREFIX}ddlSituationDetail$ddlSituationDetail`, '');
+    form.set(`${FORM_PREFIX}hfPage`, hfPage);
+    form.set(`${FORM_PREFIX}hfOrderByCol`, hfOrderByCol);
+    form.set(`${FORM_PREFIX}hfOrderBy`, hfOrderBy);
+
+    const postResponse = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'User-Agent': 'Mozilla/5.0',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Referer: url,
+        ...(sessionCookie ? { Cookie: sessionCookie.split(';')[0] } : {}),
+      },
+      body: form.toString(),
+    });
+    if (!postResponse.ok) {
+      throw new Error(
+        `KBO season stats team filter submit failed: ${postResponse.status}`,
+      );
+    }
+    const postHtml = await postResponse.text();
+    return cheerio.load(postHtml);
   }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function toStrictInt(text: string, field: string): number {
