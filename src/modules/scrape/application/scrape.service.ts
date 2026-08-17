@@ -15,7 +15,7 @@ import { SeasonPitchingStat } from '../../season-stats/domain/entities/season-pi
 import { StandingService } from '../../standings/application/standing.service';
 import { Standing } from '../../standings/domain/entities/standing.entity';
 import {
-  GAME_CENTER_SOURCE_URL,
+  NAVER_GAME_RECORD_URL,
   GameStatsScraper,
 } from '../infrastructure/scrapers/game-stats.scraper';
 import {
@@ -303,9 +303,9 @@ export class ScrapeService {
   }
 
   async scrapeGameStats(gameId: string): Promise<ScrapeSummary> {
-    const sourceName = 'kbo-box-score';
+    const sourceName = 'naver-box-score';
     const startedAt = Date.now();
-    const targetUrl = `${GAME_CENTER_SOURCE_URL}?gameId=${gameId}`;
+    const targetUrl = `${NAVER_GAME_RECORD_URL}/${gameId}${gameId.slice(0, 4)}/record`;
 
     try {
       const scraped = await this.gameStatsScraper.scrape(gameId);
