@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { chromium } from 'playwright';
 import { GameStatus } from '../../../game/domain/entities/game.entity';
 import { resolveKboTeam } from '../../../../common/kbo/kbo-team';
 
 export const SCHEDULE_SOURCE_URL =
   'https://www.koreabaseball.com/Schedule/Schedule.aspx';
+export const SCHEDULE_AJAX_URL =
+  'https://www.koreabaseball.com/ws/Schedule.asmx/GetScheduleList';
 export const NAVER_SCHEDULE_URL =
   'https://api-gw.sports.naver.com/schedule/games';
 
@@ -56,32 +57,51 @@ export class GameScraper {
   private readonly logger = new Logger(GameScraper.name);
 
   async scrape(seasonYear: number): Promise<ScrapedGame[]> {
-    const browser = await chromium.launch();
-    let games: ScrapedGame[];
-    try {
-      const page = await browser.newPage();
-      const responsePromise = page.waitForResponse((res) =>
-        res.url().includes('/ws/Schedule.asmx/GetScheduleList'),
-      );
-      await page.goto(SCHEDULE_SOURCE_URL, { waitUntil: 'domcontentloaded' });
-      const response = await responsePromise;
-      if (!response.ok()) {
-        throw new Error(`KBO schedule request failed: ${response.status()}`);
-      }
-      const data = (await response.json()) as KboScheduleResponse;
-      if (!Array.isArray(data.rows)) {
-        throw new Error(
-          'Unexpected KBO schedule response shape: rows is not an array',
-        );
-      }
-      games = this.parseRows(data.rows, seasonYear);
-      this.logger.log(`Scraped ${games.length} games`);
-    } finally {
-      await browser.close();
+    const gameMonth = this.resolveCurrentKstMonth();
+    const body = new URLSearchParams({
+      leId: '1',
+      srIdList: '0,9,6',
+      seasonId: String(seasonYear),
+      gameMonth,
+      teamId: '',
+    });
+
+    const response = await fetch(SCHEDULE_AJAX_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest',
+        Accept: 'application/json, text/javascript, */*; q=0.01',
+        Referer: SCHEDULE_SOURCE_URL,
+        'User-Agent': 'Mozilla/5.0',
+      },
+      body: body.toString(),
+    });
+    if (!response.ok) {
+      throw new Error(`KBO schedule request failed: ${response.status}`);
     }
+    const data = (await response.json()) as KboScheduleResponse;
+    if (!Array.isArray(data.rows)) {
+      throw new Error(
+        'Unexpected KBO schedule response shape: rows is not an array',
+      );
+    }
+    const games = this.parseRows(data.rows, seasonYear);
+    this.logger.log(`Scraped ${games.length} games`);
 
     await this.enrichLiveScores(games);
     return games;
+  }
+
+  /**
+   * KBO 일정 페이지가 브라우저에서 로드될 때 자동으로 요청하는 값(현재 KST 기준 월)을
+   * 그대로 재현한다. 서버 프로세스의 로컬 타임존과 무관하게 KST 기준으로 계산한다.
+   */
+  private resolveCurrentKstMonth(): string {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Seoul',
+      month: '2-digit',
+    }).format(new Date());
   }
 
   /**
