@@ -30,10 +30,21 @@ export interface ScrapedRosterPlayer {
   school: string | null;
 }
 
+interface FormState {
+  viewState: string;
+  viewStateGenerator: string | undefined;
+  eventValidation: string;
+}
+
 @Injectable()
 export class RosterScraper {
   private readonly logger = new Logger(RosterScraper.name);
 
+  /**
+   * KBO 선수 검색(Player/Search.aspx)은 팀당 결과를 페이지당 20명씩 ucPager(GridView 페이징
+   * 컨트롤)로 나눠서 보여준다. 첫 페이지만 읽으면 대부분의 팀에서 절반 이상의 선수가 누락되므로,
+   * 다음 페이지 버튼(`ucPager$btnNo{n+1}`)이 더 이상 없을 때까지 순회하며 전체 페이지를 수집한다.
+   */
   async scrape(teamCode: string): Promise<ScrapedRosterPlayer[]> {
     const team = resolveKboTeamByCode(teamCode);
 
@@ -47,42 +58,76 @@ export class RosterScraper {
     }
     const getHtml = await getResponse.text();
     const $get = cheerio.load(getHtml);
-    const viewState = $get('#__VIEWSTATE').val() as string | undefined;
-    const viewStateGenerator = $get('#__VIEWSTATEGENERATOR').val() as
-      string | undefined;
-    const eventValidation = $get('#__EVENTVALIDATION').val() as
-      string | undefined;
+    const initialState = extractFormState($get);
     const sessionCookie = getResponse.headers.get('set-cookie');
-    if (!viewState || !eventValidation) {
-      throw new Error('KBO player search page is missing ASP.NET form state');
+    const cookie = sessionCookie ? sessionCookie.split(';')[0] : undefined;
+
+    const searchForm = new URLSearchParams();
+    searchForm.set('__EVENTTARGET', '');
+    searchForm.set('__EVENTARGUMENT', '');
+    searchForm.set('__VIEWSTATE', initialState.viewState);
+    searchForm.set(
+      '__VIEWSTATEGENERATOR',
+      initialState.viewStateGenerator ?? '',
+    );
+    searchForm.set('__EVENTVALIDATION', initialState.eventValidation);
+    searchForm.set(`${FORM_PREFIX}ddlTeam`, team.code);
+    searchForm.set(`${FORM_PREFIX}ddlPosition`, '');
+    searchForm.set(`${FORM_PREFIX}btnSearch`, '검색');
+
+    let $ = await this.submitForm(searchForm, cookie);
+
+    const players: ScrapedRosterPlayer[] = [];
+    let pageNum = 1;
+    for (;;) {
+      players.push(...this.parsePlayerRows($, team.code));
+
+      const hasNextPage = $(`[id$="ucPager_btnNo${pageNum + 1}"]`).length > 0;
+      if (!hasNextPage) break;
+
+      await delay(300);
+      pageNum++;
+      const pageState = extractFormState($);
+      const pageForm = new URLSearchParams();
+      pageForm.set('__EVENTTARGET', `${FORM_PREFIX}ucPager$btnNo${pageNum}`);
+      pageForm.set('__EVENTARGUMENT', '');
+      pageForm.set('__VIEWSTATE', pageState.viewState);
+      pageForm.set('__VIEWSTATEGENERATOR', pageState.viewStateGenerator ?? '');
+      pageForm.set('__EVENTVALIDATION', pageState.eventValidation);
+      pageForm.set(`${FORM_PREFIX}ddlTeam`, team.code);
+      pageForm.set(`${FORM_PREFIX}ddlPosition`, '');
+
+      $ = await this.submitForm(pageForm, cookie);
     }
 
-    const form = new URLSearchParams();
-    form.set('__EVENTTARGET', '');
-    form.set('__EVENTARGUMENT', '');
-    form.set('__VIEWSTATE', viewState);
-    form.set('__VIEWSTATEGENERATOR', viewStateGenerator ?? '');
-    form.set('__EVENTVALIDATION', eventValidation);
-    form.set(`${FORM_PREFIX}ddlTeam`, team.code);
-    form.set(`${FORM_PREFIX}ddlPosition`, '');
-    form.set(`${FORM_PREFIX}btnSearch`, '검색');
+    this.logger.log(`Scraped ${players.length} roster rows for ${team.code}`);
+    return players;
+  }
 
-    const postResponse = await fetch(ROSTER_SOURCE_URL, {
+  private async submitForm(
+    form: URLSearchParams,
+    cookie: string | undefined,
+  ): Promise<cheerio.CheerioAPI> {
+    const response = await fetch(ROSTER_SOURCE_URL, {
       method: 'POST',
       headers: {
         'User-Agent': 'Mozilla/5.0',
         'Content-Type': 'application/x-www-form-urlencoded',
-        ...(sessionCookie ? { Cookie: sessionCookie.split(';')[0] } : {}),
+        Referer: ROSTER_SOURCE_URL,
+        ...(cookie ? { Cookie: cookie } : {}),
       },
       body: form.toString(),
     });
-    if (!postResponse.ok) {
-      throw new Error(
-        `KBO player search submit failed: ${postResponse.status}`,
-      );
+    if (!response.ok) {
+      throw new Error(`KBO player search submit failed: ${response.status}`);
     }
-    const postHtml = await postResponse.text();
-    const $ = cheerio.load(postHtml);
+    return cheerio.load(await response.text());
+  }
+
+  private parsePlayerRows(
+    $: cheerio.CheerioAPI,
+    teamCode: string,
+  ): ScrapedRosterPlayer[] {
     const players: ScrapedRosterPlayer[] = [];
 
     $('table.tEx tr').each((_, row) => {
@@ -102,7 +147,7 @@ export class RosterScraper {
       const position = POSITION_TEXT_MAP[positionText];
       if (!name || !idMatch || !position) {
         this.logger.warn(
-          `Skipping malformed roster row (team=${team.code}, name="${name}"): missing id or position`,
+          `Skipping malformed roster row (team=${teamCode}, name="${name}"): missing id or position`,
         );
         return;
       }
@@ -111,7 +156,7 @@ export class RosterScraper {
 
       players.push({
         id: Number(idMatch[1]),
-        teamCode: team.code,
+        teamCode,
         name,
         position,
         backNumber: toIntOrNull(backNumberText),
@@ -124,9 +169,23 @@ export class RosterScraper {
       });
     });
 
-    this.logger.log(`Scraped ${players.length} roster rows for ${team.code}`);
     return players;
   }
+}
+
+function extractFormState($: cheerio.CheerioAPI): FormState {
+  const viewState = $('#__VIEWSTATE').val() as string | undefined;
+  const viewStateGenerator = $('#__VIEWSTATEGENERATOR').val() as
+    string | undefined;
+  const eventValidation = $('#__EVENTVALIDATION').val() as string | undefined;
+  if (!viewState || !eventValidation) {
+    throw new Error('KBO player search page is missing ASP.NET form state');
+  }
+  return { viewState, viewStateGenerator, eventValidation };
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function toIntOrNull(text: string): number | null {
