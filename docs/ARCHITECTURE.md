@@ -6,7 +6,7 @@
 |---|---|
 | 프레임워크 / DI | Nest.js (Express 플랫폼), Nest container |
 | DB / ORM | PostgreSQL + TypeORM |
-| 스크래핑 | Playwright(동적 페이지), Cheerio(정적 HTML) |
+| 스크래핑 | fetch(HTTP 직접 호출), Cheerio(HTML 파싱) |
 | 아키텍처 패턴 | Modular Nest.js (도메인 모듈 + `domain`/`infrastructure`/`application` 계층 분리) |
 
 ## 폴더 구조
@@ -50,7 +50,7 @@ Controller (application)
 - `domain`은 Nest 프레임워크, `application`, `infrastructure`에 의존하지 않는 순수 TS 코드입니다.
 - infrastructure repository는 데이터 접근 결과(`null` 등)만 반환하고, `NotFoundException` 같은 Nest 예외로 변환하는 것은 `application/services`에서 처리합니다.
 - 목록 조회 API에 페이징이 필요하면 `common/pagination`의 `PaginatedResult<T>`/`normalizePagination`을 재사용하고, `sortBy`는 화이트리스트된 컬럼만 허용합니다 (`game`/`game-stats`/`standings` 참고).
-- 스크래핑 흐름은 `scrape` 모듈이 스크래퍼(Playwright/Cheerio) → 도메인 서비스(`upsert`/`upsertMany`) → `scrape-source-health` 로깅 순서로 오케스트레이션합니다.
+- 스크래핑 흐름은 `scrape` 모듈이 스크래퍼(fetch/Cheerio) → 도메인 서비스(`upsert`/`upsertMany`) → `scrape-source-health` 로깅 순서로 오케스트레이션합니다.
 
 ## 새 기능 추가 절차
 
