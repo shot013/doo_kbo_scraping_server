@@ -171,13 +171,13 @@ Controller (application/*.controller.ts)
 ScrapeController (application/scrape.controller.ts)
   → ScrapeService (application/scrape.service.ts)
     → Scraper (infrastructure/scrapers/*.scraper.ts)
-        Playwright로 KBO 사이트에 직접 접속해 내부 API 응답을 가로채 파싱
+        KBO/네이버 스포츠의 내부 API·페이지에 직접 fetch로 요청해 응답을 파싱
       → 파싱 결과를 Game/Standing/GameStat/Player 도메인 엔티티로 변환
         → 각 모듈의 Service.upsert()로 건별 저장 (개별 실패는 warn 로그 후 계속 진행)
     → ScrapeSourceHealthService.log()로 성공/실패·소요시간·저장 건수 기록
 ```
 
-- `POST /scrape/games`: `GameScraper`가 KBO 스케줄 페이지(`Schedule.aspx`)를 열어 `GetScheduleList` 응답을 파싱 → 경기별로 `GameService.upsert()`
+- `POST /scrape/games`: `GameScraper`가 KBO 스케줄 페이지(`Schedule.aspx`)가 내부적으로 호출하는 `GetScheduleList` 엔드포인트를 fetch로 직접 호출해 응답을 파싱 → 경기별로 `GameService.upsert()` (진행 중 경기는 네이버 스포츠 API로 실시간 스코어 보정)
 - `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
 - `POST /scrape/game-stats`: `GameStatsScraper`가 `body.gameId`로 박스스코어(`GetBoxScoreScroll`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남
 - `POST /scrape/roster`: `RosterScraper`가 `Player/Search.aspx` 폼 postback으로 팀별 선수 목록(포지션/등번호/출신교)을 요청·파싱 → `PlayerService.upsert()`. `body.teamCode` 미지정 시 전체 팀 순회
