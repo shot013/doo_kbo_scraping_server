@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PaginatedResult } from '../../../common/pagination/pagination';
-import { GameStatService } from '../../game-stats/application/game-stat.service';
+import { SeasonBattingStatService } from '../../season-stats/application/season-batting-stat.service';
+import { SeasonPitchingStatService } from '../../season-stats/application/season-pitching-stat.service';
 import { Player, PlayerPosition } from '../domain/entities/player.entity';
 import {
   PLAYER_REPOSITORY,
@@ -18,7 +19,8 @@ export class PlayerService {
   constructor(
     @Inject(PLAYER_REPOSITORY)
     private readonly playerRepository: PlayerRepository,
-    private readonly gameStatService: GameStatService,
+    private readonly seasonBattingStatService: SeasonBattingStatService,
+    private readonly seasonPitchingStatService: SeasonPitchingStatService,
   ) {}
 
   findAll(filter: PlayerFilter = {}): Promise<PaginatedResult<Player>> {
@@ -42,16 +44,19 @@ export class PlayerService {
   }
 
   /**
-   * 여러 선수의 대표 기록 한 줄(타율/평균자책)을 한 번의 시즌 집계 쿼리로 붙인다.
-   * 선수마다 개별 집계 쿼리를 날리지 않기 위해 시즌 전체 타자/투수 집계를 한 번씩만 가져와 매칭한다.
+   * 여러 선수의 대표 기록 한 줄(타율/평균자책)을 KBO 공식 시즌 누적 집계(season-stats)에서 붙인다.
+   * game-stats(경기별 박스스코어)는 최근 몇 경기치만 쌓여 있어 표본이 작을 땐 시즌 성적과
+   * 크게 어긋나므로(예: 4경기치로 계산하면 방어율이 실제 시즌 방어율과 다르게 나옴)
+   * season-stats를 대표 기록의 출처로 쓴다. 선수마다 개별 조회하지 않도록 시즌 전체
+   * 타자/투수 집계를 한 번씩만 가져와 팀코드+이름으로 매칭한다.
    */
   async attachPrimaryStats(
     players: Player[],
     seasonYear: number,
   ): Promise<Map<number, string>> {
     const [battingRows, pitchingRows] = await Promise.all([
-      this.gameStatService.aggregateBatting({ seasonYear }),
-      this.gameStatService.aggregatePitching({ seasonYear }),
+      this.seasonBattingStatService.findBySeasonYear({ seasonYear }),
+      this.seasonPitchingStatService.findBySeasonYear({ seasonYear }),
     ]);
     const battingByKey = new Map(
       battingRows.map((row) => [`${row.teamCode}|${row.playerName}`, row]),
@@ -64,11 +69,14 @@ export class PlayerService {
     for (const player of players) {
       const key = `${player.teamCode}|${player.name}`;
       if (player.position === PlayerPosition.PITCHER) {
-        const agg = pitchingByKey.get(key);
-        result.set(player.id, agg ? `평균자책 ${agg.era}` : '기록 없음');
+        const stat = pitchingByKey.get(key);
+        result.set(player.id, stat?.era ? `평균자책 ${stat.era}` : '기록 없음');
       } else {
-        const agg = battingByKey.get(key);
-        result.set(player.id, agg ? `타율 ${agg.battingAverage}` : '기록 없음');
+        const stat = battingByKey.get(key);
+        result.set(
+          player.id,
+          stat?.battingAverage ? `타율 ${stat.battingAverage}` : '기록 없음',
+        );
       }
     }
     return result;
@@ -79,34 +87,38 @@ export class PlayerService {
     seasonYear: number,
   ): Promise<PlayerStatLine[]> {
     if (player.position === PlayerPosition.PITCHER) {
-      const [agg] = await this.gameStatService.aggregatePitching({
+      const rows = await this.seasonPitchingStatService.findBySeasonYear({
         seasonYear,
-        teamCode: player.teamCode,
-        playerName: player.name,
       });
-      if (!agg) return [];
+      const stat = rows.find(
+        (row) =>
+          row.teamCode === player.teamCode && row.playerName === player.name,
+      );
+      if (!stat) return [];
       return [
-        { label: '평균자책', value: agg.era },
-        { label: '경기', value: String(agg.games) },
-        { label: '승', value: String(agg.wins) },
-        { label: '패', value: String(agg.losses) },
-        { label: '세이브', value: String(agg.saves) },
-        { label: '이닝', value: agg.inningsPitched },
-        { label: '탈삼진', value: String(agg.strikeoutsPitched) },
+        { label: '평균자책', value: stat.era ?? '-' },
+        { label: '경기', value: String(stat.games) },
+        { label: '승', value: String(stat.wins) },
+        { label: '패', value: String(stat.losses) },
+        { label: '세이브', value: String(stat.saves) },
+        { label: '이닝', value: stat.inningsPitched },
+        { label: '탈삼진', value: String(stat.strikeoutsPitched) },
       ];
     }
 
-    const [agg] = await this.gameStatService.aggregateBatting({
+    const rows = await this.seasonBattingStatService.findBySeasonYear({
       seasonYear,
-      teamCode: player.teamCode,
-      playerName: player.name,
     });
-    if (!agg) return [];
+    const stat = rows.find(
+      (row) =>
+        row.teamCode === player.teamCode && row.playerName === player.name,
+    );
+    if (!stat) return [];
     return [
-      { label: '타율', value: agg.battingAverage },
-      { label: '경기', value: String(agg.games) },
-      { label: '타점', value: String(agg.rbi) },
-      { label: '홈런', value: String(agg.homeRuns) },
+      { label: '타율', value: stat.battingAverage ?? '-' },
+      { label: '경기', value: String(stat.games) },
+      { label: '타점', value: String(stat.rbi) },
+      { label: '홈런', value: String(stat.homeRuns) },
     ];
   }
 }
