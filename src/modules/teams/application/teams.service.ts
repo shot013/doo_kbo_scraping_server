@@ -68,7 +68,7 @@ export class TeamsService {
     const roster = await this.playerService.findByTeamCode(teamCode);
     const [summary, primaryStats] = await Promise.all([
       this.toSummary(standing),
-      this.playerService.attachPrimaryStats(roster, seasonYear),
+      this.playerService.buildPrimaryStats(roster, seasonYear),
     ]);
 
     return {
@@ -80,7 +80,7 @@ export class TeamsService {
         teamName: player.teamName,
         position: player.position.toLowerCase(),
         backNumber: player.backNumber ?? 0,
-        primaryStat: primaryStats.get(player.id) ?? '기록 없음',
+        primaryStat: primaryStats.get(player.id)?.label ?? '기록 없음',
       })),
     };
   }

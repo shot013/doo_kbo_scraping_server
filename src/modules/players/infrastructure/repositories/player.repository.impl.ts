@@ -1,11 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import {
-  buildPaginatedResult,
-  normalizePagination,
-  PaginatedResult,
-} from '../../../../common/pagination/pagination';
 import { Player } from '../../domain/entities/player.entity';
 import {
   PlayerFilter,
@@ -20,26 +15,18 @@ export class PlayerRepositoryImpl implements PlayerRepository {
     private readonly ormRepository: Repository<PlayerOrmEntity>,
   ) {}
 
-  async findAll(filter: PlayerFilter = {}): Promise<PaginatedResult<Player>> {
+  async findAll(filter: PlayerFilter = {}): Promise<Player[]> {
     const where: Record<string, unknown> = {};
     if (filter.teamCode !== undefined) where.teamCode = filter.teamCode;
     if (filter.position !== undefined) where.position = filter.position;
     if (filter.search) where.name = ILike(`%${filter.search}%`);
 
-    const { page, limit, skip } = normalizePagination(filter);
-    const [rows, total] = await this.ormRepository.findAndCount({
+    const rows = await this.ormRepository.find({
       where,
       order: { teamCode: 'ASC', position: 'ASC', backNumber: 'ASC' },
-      skip,
-      take: limit,
     });
 
-    return buildPaginatedResult(
-      rows.map((row) => this.toDomain(row)),
-      total,
-      page,
-      limit,
-    );
+    return rows.map((row) => this.toDomain(row));
   }
 
   async findByTeamCode(teamCode: string): Promise<Player[]> {
