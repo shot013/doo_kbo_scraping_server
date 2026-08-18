@@ -19,8 +19,16 @@ export class SeasonBattingStatRepositoryImpl implements SeasonBattingStatReposit
     filter: SeasonBattingStatFilter,
   ): Promise<SeasonBattingStat[]> {
     const rows = await this.ormRepository.find({
-      where: { seasonYear: filter.seasonYear },
-      order: { rank: 'ASC' },
+      where: {
+        seasonYear: filter.seasonYear,
+        ...(filter.qualifiedOnly ? { qualified: true } : {}),
+      },
+      // rank는 팀별 순회 스크래핑에서 팀 내 나열 순서로 매겨져 리그 전체 순위가 아니다.
+      // 규정타석 충족자만 볼 때는 KBO가 이미 규정타석 기준으로 걸러준 목록이므로
+      // 타율 내림차순 자체가 곧 리그 순위가 된다.
+      order: filter.qualifiedOnly
+        ? { battingAverage: 'DESC' }
+        : { rank: 'ASC' },
       take: filter.limit,
     });
     return rows.map((row) => this.toDomain(row));

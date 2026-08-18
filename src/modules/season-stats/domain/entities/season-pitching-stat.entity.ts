@@ -5,6 +5,7 @@ export interface SeasonPitchingStatProps {
   teamName: string;
   playerName: string;
   rank: number;
+  qualified: boolean;
   era: string | null;
   games: number;
   wins: number;
@@ -32,6 +33,7 @@ export class SeasonPitchingStat {
   readonly teamName: string;
   readonly playerName: string;
   readonly rank: number;
+  readonly qualified: boolean;
   readonly era: string | null;
   readonly games: number;
   readonly wins: number;

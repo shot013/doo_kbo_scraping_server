@@ -140,6 +140,43 @@ export class SeasonStatsScraper {
     });
   }
 
+  /**
+   * 팀 필터 없이 기본 GET으로 받으면 KBO가 규정타석을 충족한 선수만 이미 타율순으로
+   * 정렬해 내려준다. /records 리더보드는 team별 순회 스크래핑(scrapeBatting)의
+   * team-local rank가 아니라 이 목록에 포함된 선수만 "규정타석 충족"으로 표시하기 위해
+   * teamCode+선수명 키만 뽑아 쓴다.
+   */
+  async scrapeQualifiedBattingKeys(): Promise<Set<string>> {
+    const $ = await this.fetchDefaultTable(SEASON_HITTER_SOURCE_URL);
+    const stats: ScrapedSeasonBattingStat[] = [];
+    this.parseBattingRows($, stats);
+    return new Set(
+      stats.map((stat) => toStatKey(stat.teamCode, stat.playerName)),
+    );
+  }
+
+  /**
+   * 규정이닝을 충족한 투수만 골라내는 pitching 버전. {@link scrapeQualifiedBattingKeys} 참고.
+   */
+  async scrapeQualifiedPitchingKeys(): Promise<Set<string>> {
+    const $ = await this.fetchDefaultTable(SEASON_PITCHER_SOURCE_URL);
+    const stats: ScrapedSeasonPitchingStat[] = [];
+    this.parsePitchingRows($, stats);
+    return new Set(
+      stats.map((stat) => toStatKey(stat.teamCode, stat.playerName)),
+    );
+  }
+
+  private async fetchDefaultTable(url: string): Promise<cheerio.CheerioAPI> {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+    });
+    if (!response.ok) {
+      throw new Error(`KBO season stats request failed: ${response.status}`);
+    }
+    return cheerio.load(await response.text());
+  }
+
   async scrapePitching(): Promise<ScrapedSeasonPitchingStat[]> {
     const stats: ScrapedSeasonPitchingStat[] = [];
 
@@ -305,6 +342,10 @@ export class SeasonStatsScraper {
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function toStatKey(teamCode: string, playerName: string): string {
+  return `${teamCode}|${playerName}`;
 }
 
 /**
