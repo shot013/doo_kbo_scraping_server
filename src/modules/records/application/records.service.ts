@@ -42,9 +42,10 @@ export class RecordsService {
     const rows = await this.seasonBattingStatService.findBySeasonYear({
       seasonYear,
       limit,
+      qualifiedOnly: true,
     });
-    return rows.map((row) => ({
-      rank: row.rank,
+    return rows.map((row, index) => ({
+      rank: index + 1,
       playerName: row.playerName,
       teamCode: row.teamCode,
       teamName: resolveKboTeamByCode(row.teamCode).fullName,
@@ -62,9 +63,10 @@ export class RecordsService {
     const rows = await this.seasonPitchingStatService.findBySeasonYear({
       seasonYear,
       limit,
+      qualifiedOnly: true,
     });
-    return rows.map((row) => ({
-      rank: row.rank,
+    return rows.map((row, index) => ({
+      rank: index + 1,
       playerName: row.playerName,
       teamCode: row.teamCode,
       teamName: resolveKboTeamByCode(row.teamCode).fullName,

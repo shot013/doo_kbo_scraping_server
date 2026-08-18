@@ -29,6 +29,9 @@ export class SeasonBattingStatOrmEntity {
   @Column({ name: 'rank', type: 'smallint' })
   rank: number;
 
+  @Column({ name: 'qualified', type: 'boolean', default: false })
+  qualified: boolean;
+
   @Column({
     name: 'batting_average',
     type: 'decimal',

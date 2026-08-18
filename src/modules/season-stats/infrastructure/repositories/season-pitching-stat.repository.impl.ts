@@ -19,8 +19,14 @@ export class SeasonPitchingStatRepositoryImpl implements SeasonPitchingStatRepos
     filter: SeasonPitchingStatFilter,
   ): Promise<SeasonPitchingStat[]> {
     const rows = await this.ormRepository.find({
-      where: { seasonYear: filter.seasonYear },
-      order: { rank: 'ASC' },
+      where: {
+        seasonYear: filter.seasonYear,
+        ...(filter.qualifiedOnly ? { qualified: true } : {}),
+      },
+      // rank는 팀별 순회 스크래핑에서 팀 내 나열 순서로 매겨져 리그 전체 순위가 아니다.
+      // 규정이닝 충족자만 볼 때는 KBO가 이미 규정이닝 기준으로 걸러준 목록이므로
+      // 평균자책 오름차순 자체가 곧 리그 순위가 된다.
+      order: filter.qualifiedOnly ? { era: 'ASC' } : { rank: 'ASC' },
       take: filter.limit,
     });
     return rows.map((row) => this.toDomain(row));

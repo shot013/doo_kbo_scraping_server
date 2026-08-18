@@ -7,6 +7,7 @@ export const SEASON_BATTING_STAT_REPOSITORY = Symbol(
 export interface SeasonBattingStatFilter {
   seasonYear: number;
   limit?: number;
+  qualifiedOnly?: boolean;
 }
 
 export interface SeasonBattingStatRepository {

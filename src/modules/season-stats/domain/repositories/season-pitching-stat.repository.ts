@@ -7,6 +7,7 @@ export const SEASON_PITCHING_STAT_REPOSITORY = Symbol(
 export interface SeasonPitchingStatFilter {
   seasonYear: number;
   limit?: number;
+  qualifiedOnly?: boolean;
 }
 
 export interface SeasonPitchingStatRepository {
