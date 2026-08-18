@@ -30,6 +30,7 @@ import {
   SEASON_HITTER_SOURCE_URL,
   SEASON_PITCHER_SOURCE_URL,
   SeasonStatsScraper,
+  toStatKey,
 } from '../infrastructure/scrapers/season-stats.scraper';
 import {
   STANDINGS_SOURCE_URL,
@@ -197,9 +198,16 @@ export class ScrapeService {
     const startedAt = Date.now();
 
     try {
-      const [scrapedBatting, scrapedPitching] = await Promise.all([
+      const [
+        scrapedBatting,
+        scrapedPitching,
+        qualifiedBattingKeys,
+        qualifiedPitchingKeys,
+      ] = await Promise.all([
         this.seasonStatsScraper.scrapeBatting(),
         this.seasonStatsScraper.scrapePitching(),
+        this.seasonStatsScraper.scrapeQualifiedBattingKeys(),
+        this.seasonStatsScraper.scrapeQualifiedPitchingKeys(),
       ]);
       if (scrapedBatting.length === 0 && scrapedPitching.length === 0) {
         throw new Error('No season stats scraped from source');
@@ -217,6 +225,9 @@ export class ScrapeService {
               teamName: item.teamName,
               playerName: item.playerName,
               rank: item.rank,
+              qualified: qualifiedBattingKeys.has(
+                toStatKey(item.teamCode, item.playerName),
+              ),
               battingAverage: item.battingAverage,
               games: item.games,
               plateAppearances: item.plateAppearances,
@@ -251,6 +262,9 @@ export class ScrapeService {
               teamName: item.teamName,
               playerName: item.playerName,
               rank: item.rank,
+              qualified: qualifiedPitchingKeys.has(
+                toStatKey(item.teamCode, item.playerName),
+              ),
               era: item.era,
               games: item.games,
               wins: item.wins,

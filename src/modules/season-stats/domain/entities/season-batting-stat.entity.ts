@@ -5,6 +5,7 @@ export interface SeasonBattingStatProps {
   teamName: string;
   playerName: string;
   rank: number;
+  qualified: boolean;
   battingAverage: string | null;
   games: number;
   plateAppearances: number;
@@ -29,6 +30,7 @@ export class SeasonBattingStat {
   readonly teamName: string;
   readonly playerName: string;
   readonly rank: number;
+  readonly qualified: boolean;
   readonly battingAverage: string;
   readonly games: number;
   readonly plateAppearances: number;
