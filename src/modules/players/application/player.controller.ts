@@ -37,24 +37,23 @@ export class PlayerController {
     const seasonYear = query.seasonYear
       ? Number(query.seasonYear)
       : new Date().getFullYear();
-    const result = await this.playerService.findAll({
-      teamCode: query.teamCode,
-      position: query.position
-        ? (query.position.toUpperCase() as PlayerPosition)
-        : undefined,
-      search: query.search,
-      page: query.page ? Number(query.page) : undefined,
-      limit: query.limit ? Number(query.limit) : undefined,
-    });
-    const primaryStats = await this.playerService.attachPrimaryStats(
-      result.data,
+    const result = await this.playerService.findAll(
+      {
+        teamCode: query.teamCode,
+        position: query.position
+          ? (query.position.toUpperCase() as PlayerPosition)
+          : undefined,
+        search: query.search,
+        page: query.page ? Number(query.page) : undefined,
+        limit: query.limit ? Number(query.limit) : undefined,
+      },
       seasonYear,
     );
 
     return {
       ...result,
-      data: result.data.map((player) =>
-        toSummaryResponse(player, primaryStats.get(player.id) ?? '기록 없음'),
+      data: result.data.map(({ player, primaryStat }) =>
+        toSummaryResponse(player, primaryStat),
       ),
     };
   }
