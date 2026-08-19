@@ -12,6 +12,7 @@ export class ScrapeController {
   scrapeGames(@Body() body?: ScrapeRequestDto): Promise<ScrapeSummary> {
     return this.scrapeService.scrapeGames(
       body?.seasonYear ?? new Date().getFullYear(),
+      body?.gameMonth,
     );
   }
 
