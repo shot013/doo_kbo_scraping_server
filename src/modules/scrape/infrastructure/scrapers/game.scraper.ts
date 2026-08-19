@@ -56,13 +56,18 @@ const GAME_ID_PATTERN = /gameId=([A-Za-z0-9]+)/;
 export class GameScraper {
   private readonly logger = new Logger(GameScraper.name);
 
-  async scrape(seasonYear: number): Promise<ScrapedGame[]> {
-    const gameMonth = this.resolveCurrentKstMonth();
+  /**
+   * gameMonth를 넘기지 않으면 KBO 일정 페이지가 브라우저에서 로드될 때 요청하는
+   * 기본값(현재 KST 기준 월)을 그대로 재현한다. 과거 달을 채워 넣고 싶을 때는
+   * gameMonth('01'~'12')를 직접 지정해서 호출한다.
+   */
+  async scrape(seasonYear: number, gameMonth?: string): Promise<ScrapedGame[]> {
+    const month = gameMonth ?? this.resolveCurrentKstMonth();
     const body = new URLSearchParams({
       leId: '1',
       srIdList: '0,9,6',
       seasonId: String(seasonYear),
-      gameMonth,
+      gameMonth: month,
       teamId: '',
     });
 
@@ -87,7 +92,7 @@ export class GameScraper {
       );
     }
     const games = this.parseRows(data.rows, seasonYear);
-    this.logger.log(`Scraped ${games.length} games`);
+    this.logger.log(`Scraped ${games.length} games for ${seasonYear}-${month}`);
 
     await this.enrichLiveScores(games);
     return games;
