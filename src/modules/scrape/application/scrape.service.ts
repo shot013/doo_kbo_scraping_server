@@ -61,12 +61,15 @@ export class ScrapeService {
     private readonly scrapeSourceHealthService: ScrapeSourceHealthService,
   ) {}
 
-  async scrapeGames(seasonYear: number): Promise<ScrapeSummary> {
+  async scrapeGames(
+    seasonYear: number,
+    gameMonth?: string,
+  ): Promise<ScrapeSummary> {
     const sourceName = 'kbo-schedule';
     const startedAt = Date.now();
 
     try {
-      const scraped = await this.gameScraper.scrape(seasonYear);
+      const scraped = await this.gameScraper.scrape(seasonYear, gameMonth);
       if (scraped.length === 0) {
         throw new Error('No games scraped from source');
       }
