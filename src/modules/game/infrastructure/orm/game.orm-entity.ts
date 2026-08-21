@@ -46,6 +46,22 @@ export class GameOrmEntity {
   awayScore: number | null;
 
   @Column({
+    name: 'home_starter_pitcher',
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+  })
+  homeStarterPitcher: string | null;
+
+  @Column({
+    name: 'away_starter_pitcher',
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+  })
+  awayStarterPitcher: string | null;
+
+  @Column({
     name: 'current_inning',
     type: 'varchar',
     length: 16,

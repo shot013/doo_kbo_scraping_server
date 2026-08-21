@@ -33,6 +33,10 @@ export class GameStatService {
     return this.gameStatRepository.upsert(stat);
   }
 
+  findByGameIds(gameIds: string[]): Promise<GameStat[]> {
+    return this.gameStatRepository.findByGameIds(gameIds);
+  }
+
   aggregateBatting(filter: StatAggregateFilter): Promise<BattingAggregate[]> {
     return this.gameStatRepository.aggregateBatting(filter);
   }

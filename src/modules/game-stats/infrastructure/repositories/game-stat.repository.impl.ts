@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsOrder, Repository } from 'typeorm';
+import { FindOptionsOrder, In, Repository } from 'typeorm';
 import {
   buildPaginatedResult,
   normalizePagination,
@@ -92,6 +92,15 @@ export class GameStatRepositoryImpl implements GameStatRepository {
       page,
       limit,
     );
+  }
+
+  async findByGameIds(gameIds: string[]): Promise<GameStat[]> {
+    if (gameIds.length === 0) return [];
+    const rows = await this.ormRepository.find({
+      where: { gameId: In(gameIds) },
+      order: { gameId: 'ASC', teamCode: 'ASC', id: 'ASC' },
+    });
+    return rows.map((row) => this.toDomain(row));
   }
 
   async findById(id: number): Promise<GameStat | null> {

@@ -66,4 +66,6 @@ export interface GameStatRepository {
   upsert(stat: GameStat): Promise<GameStat>;
   aggregateBatting(filter: StatAggregateFilter): Promise<BattingAggregate[]>;
   aggregatePitching(filter: StatAggregateFilter): Promise<PitchingAggregate[]>;
+  /** 여러 경기의 박스스코어 전체(타자+투수)를 한 번에 조회한다. */
+  findByGameIds(gameIds: string[]): Promise<GameStat[]>;
 }

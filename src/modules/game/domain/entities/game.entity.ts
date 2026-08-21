@@ -18,6 +18,8 @@ export interface GameProps {
   awayTeamName: string;
   homeScore: number | null;
   awayScore: number | null;
+  homeStarterPitcher: string | null;
+  awayStarterPitcher: string | null;
   currentInning: string | null;
   status: GameStatus;
   sourceUrl: string | null;
@@ -37,6 +39,8 @@ export class Game {
   readonly awayTeamName: string;
   readonly homeScore: number | null;
   readonly awayScore: number | null;
+  readonly homeStarterPitcher: string | null;
+  readonly awayStarterPitcher: string | null;
   readonly currentInning: string | null;
   readonly status: GameStatus;
   readonly sourceUrl: string | null;
@@ -55,6 +59,8 @@ export class Game {
     this.awayTeamName = props.awayTeamName;
     this.homeScore = props.homeScore;
     this.awayScore = props.awayScore;
+    this.homeStarterPitcher = props.homeStarterPitcher;
+    this.awayStarterPitcher = props.awayStarterPitcher;
     this.currentInning = props.currentInning;
     this.status = props.status;
     this.sourceUrl = props.sourceUrl;
