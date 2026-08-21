@@ -74,12 +74,23 @@ npm run test           # 전체 테스트
 | GET | `/games` | `seasonYear`, `gameDate`, `status`(`SCHEDULED`\|`IN_PROGRESS`\|`FINISHED`\|`CANCELLED`\|`POSTPONED`), `teamCode`, `page`, `limit`, `sortBy`(`scheduledAt`\|`gameDate`\|`seasonYear`\|`homeScore`\|`awayScore`), `sortOrder`(`ASC`\|`DESC`) | 경기 목록 조회 |
 | GET | `/games/:id` | - | 경기 단건 조회 |
 
+- 응답에 `homeStarterPitcher`/`awayStarterPitcher`(선발투수, 네이버 스포츠 일정 API로 보정) 포함. 선발 예고 전이면 `null`
+
 ### Game Stats (`src/modules/game-stats`)
 
 | Method | Path | Query/Body | 설명 |
 | --- | --- | --- | --- |
 | GET | `/game-stats` | `gameId`, `teamCode`, `statType`(`BATTING`\|`PITCHING`), `page`, `limit`, `sortBy`(`id`\|`teamCode`\|`playerName`\|`homeRuns`\|`rbi`\|`battingAverage`\|`era`), `sortOrder` | 경기별 선수 기록 목록 조회 |
 | GET | `/game-stats/:id` | - | 선수 기록 단건 조회 |
+
+### Game Results (`src/modules/game-results`)
+
+| Method | Path | Query | 설명 |
+| --- | --- | --- | --- |
+| GET | `/game-results/recent` | `date`(`YYYY-MM-DD`, 미지정 시 가장 최근에 종료 경기가 있는 날짜) | 특정 날짜의 종료 경기 결과 목록 조회 |
+
+- 경기별로 베스트 활약 타자(`bestPerformer`: 타점 → 안타 → 득점 순으로 비교해 선정, 홈런 데이터 미보유로 비교 기준에서 제외)와 승/패/세이브/홀드 투수 기록(`pitchers`)을 함께 반환
+- 해당 날짜에 `game-stats`가 아직 스크래핑되지 않은 경기는 `bestPerformer: null`, `pitchers: []`
 
 ### Standings (`src/modules/standings`)
 
@@ -157,13 +168,14 @@ Controller (application/*.controller.ts)
 
 예: `GET /games` → `GameController.findAll` → `GameService.findAll` → `GAME_REPOSITORY` 토큰으로 주입된 구현체가 쿼리 실행 → ORM 결과를 domain `Game` 엔티티로 변환해 페이지네이션 응답으로 반환. `Game Stats`/`Standings`/`Scrape Source Health` 조회도 동일한 구조입니다.
 
-### 조합 API — Teams / Players / Records
+### 조합 API — Teams / Players / Records / Game Results
 
-`Teams`/`Records`는 자체 domain/infrastructure 레이어 없이 다른 모듈의 Service를 조합해 응답을 만듭니다. `Players`만 자체 `PLAYER_REPOSITORY`를 가진 일반적인 조회 모듈입니다.
+`Teams`/`Records`/`Game Results`는 자체 domain/infrastructure 레이어 없이 다른 모듈의 Service를 조합해 응답을 만듭니다. `Players`만 자체 `PLAYER_REPOSITORY`를 가진 일반적인 조회 모듈입니다.
 
 - `GET /teams`, `GET /teams/:code`: `TeamsService`가 `StandingService`(순위/승패) + `GameService.getRecentForm()`(최근 5경기 폼) + `PlayerService`(로스터, 상세 조회 시)를 조합
 - `GET /players`, `GET /players/:id`: `PlayerService` → `PLAYER_REPOSITORY` 구현체가 조회, 시즌 대표 기록은 `GameStatService`를 통해 `game_stats`를 집계해 붙임
 - `GET /records/batters`, `GET /records/pitchers`: `RecordsService`가 `GameStatService`로 `game_stats`를 시즌 단위로 집계해 타자/투수 리더보드 생성
+- `GET /game-results/recent`: `GameResultService`가 `GameService`(해당 날짜 종료 경기 목록) + `GameStatService.findByGameIds()`(경기별 박스스코어)를 조합해 베스트 활약 타자·투수 기록을 계산
 
 ### 스크래핑 API — `POST /scrape/*`
 
