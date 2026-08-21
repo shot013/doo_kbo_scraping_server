@@ -9,14 +9,19 @@ export const SCHEDULE_AJAX_URL =
 export const NAVER_SCHEDULE_URL =
   'https://api-gw.sports.naver.com/schedule/games';
 
+/** 한 번에 한 달치 일정을 모두 받아오기 위한 페이지 크기 (한 달 최대 ~130경기). */
+const NAVER_SCHEDULE_PAGE_SIZE = 500;
+
 interface NaverScheduleGame {
   gameId: string;
   homeTeamScore: number | null;
   awayTeamScore: number | null;
+  homeStarterName: string | null;
+  awayStarterName: string | null;
 }
 
 interface NaverScheduleResponse {
-  result: { games: NaverScheduleGame[] };
+  result: { games: NaverScheduleGame[]; gameTotalCount: number };
 }
 
 interface KboScheduleCell {
@@ -42,6 +47,8 @@ export interface ScrapedGame {
   awayTeamName: string;
   homeScore: number | null;
   awayScore: number | null;
+  homeStarterPitcher: string | null;
+  awayStarterPitcher: string | null;
   status: GameStatus;
   sourceUrl: string;
 }
@@ -89,7 +96,7 @@ export class GameScraper {
     const games = this.parseRows(data.rows, seasonYear);
     this.logger.log(`Scraped ${games.length} games`);
 
-    await this.enrichLiveScores(games);
+    await this.enrichFromNaver(games);
     return games;
   }
 
@@ -105,49 +112,56 @@ export class GameScraper {
   }
 
   /**
-   * KBO 일정 페이지는 진행 중인 경기의 점수를 실시간으로 갱신하지 않고 0-0으로만
-   * 보여준다(경기 종료 후 최종 스코어만 정확). 진행 중인 경기는 네이버 스포츠에서
-   * 실시간 스코어를 가져와 덮어쓴다. 네이버 gameId는 KBO gameId 뒤에 연도를 붙인
-   * 형식이라 그 부분만 잘라내면 우리 gameId로 되돌릴 수 있다.
+   * KBO 일정 페이지에는 선발투수가 없고, 진행 중인 경기의 점수도 실시간으로 갱신되지
+   * 않는다(경기 종료 후 최종 스코어만 정확). 두 가지 모두 네이버 스포츠 일정 API에서
+   * 채운다. 네이버 gameId는 KBO gameId 뒤에 연도를 붙인 형식이라 그 부분만 잘라내면
+   * 우리 gameId로 되돌릴 수 있다.
+   *
+   * 스크래핑한 경기 전체 기간을 한 번의 요청으로 받아와 대상 사이트 부하를 최소화한다.
    */
-  private async enrichLiveScores(games: ScrapedGame[]): Promise<void> {
-    const inProgressByDate = new Map<string, ScrapedGame[]>();
-    for (const game of games) {
-      if (game.status !== GameStatus.IN_PROGRESS) continue;
-      const list = inProgressByDate.get(game.gameDate) ?? [];
-      list.push(game);
-      inProgressByDate.set(game.gameDate, list);
-    }
-    if (inProgressByDate.size === 0) return;
+  private async enrichFromNaver(games: ScrapedGame[]): Promise<void> {
+    if (games.length === 0) return;
 
-    for (const [gameDate, gamesOnDate] of inProgressByDate) {
-      try {
-        const url = `${NAVER_SCHEDULE_URL}?fields=basic,schedule,baseball&fromDate=${gameDate}&toDate=${gameDate}&size=20&categoryId=kbo`;
-        const response = await fetch(url, {
-          headers: { 'User-Agent': 'Mozilla/5.0' },
-        });
-        if (!response.ok) {
-          throw new Error(`Naver schedule request failed: ${response.status}`);
-        }
-        const body = (await response.json()) as NaverScheduleResponse;
-        const scoreById = new Map(
-          body.result.games.map((g) => [
-            g.gameId.slice(0, -4),
-            { home: g.homeTeamScore, away: g.awayTeamScore },
-          ]),
-        );
-        for (const game of gamesOnDate) {
-          const live = scoreById.get(game.id);
-          if (live) {
-            game.homeScore = live.home;
-            game.awayScore = live.away;
-          }
-        }
-      } catch (error) {
+    const gameDates = games.map((game) => game.gameDate).sort();
+    const fromDate = gameDates[0];
+    const toDate = gameDates[gameDates.length - 1];
+
+    try {
+      const url =
+        `${NAVER_SCHEDULE_URL}?fields=basic,schedule,baseball` +
+        `&fromDate=${fromDate}&toDate=${toDate}` +
+        `&size=${NAVER_SCHEDULE_PAGE_SIZE}&categoryId=kbo`;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+      });
+      if (!response.ok) {
+        throw new Error(`Naver schedule request failed: ${response.status}`);
+      }
+      const body = (await response.json()) as NaverScheduleResponse;
+      if (body.result.gameTotalCount > body.result.games.length) {
         this.logger.warn(
-          `Failed to enrich live scores for ${gameDate}: ${error instanceof Error ? error.message : String(error)}`,
+          `Naver schedule returned ${body.result.games.length}/${body.result.gameTotalCount} games for ${fromDate}~${toDate}; some games were not enriched`,
         );
       }
+      const naverById = new Map(
+        body.result.games.map((game) => [game.gameId.slice(0, -4), game]),
+      );
+
+      for (const game of games) {
+        const naverGame = naverById.get(game.id);
+        if (!naverGame) continue;
+        // 선발 예고 전인 경기는 선발투수가 빈 문자열로 내려온다.
+        game.homeStarterPitcher = naverGame.homeStarterName?.trim() || null;
+        game.awayStarterPitcher = naverGame.awayStarterName?.trim() || null;
+        if (game.status === GameStatus.IN_PROGRESS) {
+          game.homeScore = naverGame.homeTeamScore;
+          game.awayScore = naverGame.awayTeamScore;
+        }
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Failed to enrich games from Naver for ${fromDate}~${toDate}: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
@@ -267,6 +281,8 @@ export class GameScraper {
       awayTeamName: awayTeam.fullName,
       homeScore: homeScore ?? null,
       awayScore: awayScore ?? null,
+      homeStarterPitcher: null,
+      awayStarterPitcher: null,
       status,
       sourceUrl: SCHEDULE_SOURCE_URL,
     };

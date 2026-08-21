@@ -88,6 +88,8 @@ export class ScrapeService {
               awayTeamName: item.awayTeamName,
               homeScore: item.homeScore,
               awayScore: item.awayScore,
+              homeStarterPitcher: item.homeStarterPitcher,
+              awayStarterPitcher: item.awayStarterPitcher,
               currentInning: null,
               status: item.status,
               sourceUrl: item.sourceUrl,
