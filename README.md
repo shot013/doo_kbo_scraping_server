@@ -126,6 +126,7 @@ npm run test           # 전체 테스트
 | GET | `/records/pitchers` | `seasonYear`, `limit` | 투수 시즌 리더보드 |
 
 - `seasonYear` 미지정 시 현재 연도. `game-stats`를 시즌 단위로 집계해 만듦
+- 각 리더보드 항목에는 `playerId`가 포함됨(`players` 테이블에서 팀코드+이름으로 매칭; 매칭 실패 시 `null`)
 
 ### Scrape (`src/modules/scrape`)
 
@@ -174,7 +175,7 @@ Controller (application/*.controller.ts)
 
 - `GET /teams`, `GET /teams/:code`: `TeamsService`가 `StandingService`(순위/승패) + `GameService.getRecentForm()`(최근 5경기 폼) + `PlayerService`(로스터, 상세 조회 시)를 조합
 - `GET /players`, `GET /players/:id`: `PlayerService` → `PLAYER_REPOSITORY` 구현체가 조회, 시즌 대표 기록은 `GameStatService`를 통해 `game_stats`를 집계해 붙임
-- `GET /records/batters`, `GET /records/pitchers`: `RecordsService`가 `GameStatService`로 `game_stats`를 시즌 단위로 집계해 타자/투수 리더보드 생성
+- `GET /records/batters`, `GET /records/pitchers`: `RecordsService`가 `SeasonBattingStatService`/`SeasonPitchingStatService`로 시즌 집계 리더보드를 만들고, `PlayerService.findAllPlayers()`(팀코드+이름 매칭)로 각 항목에 `playerId`를 붙임
 - `GET /game-results/recent`: `GameResultService`가 `GameService`(해당 날짜 종료 경기 목록) + `GameStatService.findByGameIds()`(경기별 박스스코어)를 조합해 베스트 활약 타자·투수 기록을 계산
 
 ### 스크래핑 API — `POST /scrape/*`

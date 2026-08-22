@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { resolveKboTeamByCode } from '../../../common/kbo/kbo-team';
+import { PlayerService } from '../../players/application/player.service';
 import { SeasonBattingStatService } from '../../season-stats/application/season-batting-stat.service';
 import { SeasonPitchingStatService } from '../../season-stats/application/season-pitching-stat.service';
 
 export interface BatterRecordResponse {
   rank: number;
+  playerId: number | null;
   playerName: string;
   teamCode: string;
   teamName: string;
@@ -16,6 +18,7 @@ export interface BatterRecordResponse {
 
 export interface PitcherRecordResponse {
   rank: number;
+  playerId: number | null;
   playerName: string;
   teamCode: string;
   teamName: string;
@@ -33,19 +36,25 @@ export class RecordsService {
   constructor(
     private readonly seasonBattingStatService: SeasonBattingStatService,
     private readonly seasonPitchingStatService: SeasonPitchingStatService,
+    private readonly playerService: PlayerService,
   ) {}
 
   async getBatterLeaders(
     seasonYear: number,
     limit = DEFAULT_LEADERBOARD_LIMIT,
   ): Promise<BatterRecordResponse[]> {
-    const rows = await this.seasonBattingStatService.findBySeasonYear({
-      seasonYear,
-      limit,
-      qualifiedOnly: true,
-    });
+    const [rows, playerIdByKey] = await Promise.all([
+      this.seasonBattingStatService.findBySeasonYear({
+        seasonYear,
+        limit,
+        qualifiedOnly: true,
+      }),
+      this.buildPlayerIdByKey(),
+    ]);
     return rows.map((row, index) => ({
       rank: index + 1,
+      playerId:
+        playerIdByKey.get(playerKey(row.teamCode, row.playerName)) ?? null,
       playerName: row.playerName,
       teamCode: row.teamCode,
       teamName: resolveKboTeamByCode(row.teamCode).fullName,
@@ -60,13 +69,18 @@ export class RecordsService {
     seasonYear: number,
     limit = DEFAULT_LEADERBOARD_LIMIT,
   ): Promise<PitcherRecordResponse[]> {
-    const rows = await this.seasonPitchingStatService.findBySeasonYear({
-      seasonYear,
-      limit,
-      qualifiedOnly: true,
-    });
+    const [rows, playerIdByKey] = await Promise.all([
+      this.seasonPitchingStatService.findBySeasonYear({
+        seasonYear,
+        limit,
+        qualifiedOnly: true,
+      }),
+      this.buildPlayerIdByKey(),
+    ]);
     return rows.map((row, index) => ({
       rank: index + 1,
+      playerId:
+        playerIdByKey.get(playerKey(row.teamCode, row.playerName)) ?? null,
       playerName: row.playerName,
       teamCode: row.teamCode,
       teamName: resolveKboTeamByCode(row.teamCode).fullName,
@@ -77,4 +91,18 @@ export class RecordsService {
       saves: row.saves,
     }));
   }
+
+  private async buildPlayerIdByKey(): Promise<Map<string, number>> {
+    const players = await this.playerService.findAllPlayers();
+    return new Map(
+      players.map((player) => [
+        playerKey(player.teamCode, player.name),
+        player.id,
+      ]),
+    );
+  }
+}
+
+function playerKey(teamCode: string, playerName: string): string {
+  return `${teamCode}|${playerName}`;
 }
