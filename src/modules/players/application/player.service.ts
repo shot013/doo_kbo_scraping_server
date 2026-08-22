@@ -84,6 +84,10 @@ export class PlayerService {
     return this.playerRepository.findByTeamCode(teamCode);
   }
 
+  findAllPlayers(): Promise<Player[]> {
+    return this.playerRepository.findAll();
+  }
+
   async findById(id: number): Promise<Player> {
     const player = await this.playerRepository.findById(id);
     if (!player) {
