@@ -15,6 +15,10 @@ export interface TeamSummaryResponse {
   draws: number;
   winRate: string;
   gamesBehind: string;
+  battingAverage: string;
+  era: string;
+  runsScored: number;
+  runsAllowed: number;
   recentForm: Array<'W' | 'L' | 'D'>;
 }
 
@@ -99,6 +103,10 @@ export class TeamsService {
       draws: standing.draws,
       winRate: standing.winRate,
       gamesBehind: standing.gamesBehind ?? '0.0',
+      battingAverage: standing.battingAverage,
+      era: standing.era,
+      runsScored: standing.runsScored,
+      runsAllowed: standing.runsAllowed,
       recentForm,
     };
   }

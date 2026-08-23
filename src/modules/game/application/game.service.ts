@@ -4,6 +4,7 @@ import { Game } from '../domain/entities/game.entity';
 import {
   GAME_REPOSITORY,
   GameFilter,
+  TeamRunsAggregate,
 } from '../domain/repositories/game.repository';
 import type { GameRepository } from '../domain/repositories/game.repository';
 
@@ -27,6 +28,10 @@ export class GameService {
 
   upsert(game: Game): Promise<Game> {
     return this.gameRepository.upsert(game);
+  }
+
+  aggregateTeamRuns(seasonYear: number): Promise<TeamRunsAggregate[]> {
+    return this.gameRepository.aggregateTeamRuns(seasonYear);
   }
 
   /**

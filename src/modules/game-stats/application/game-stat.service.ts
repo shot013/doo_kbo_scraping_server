@@ -9,6 +9,8 @@ import {
   OpponentPitchingSplit,
   PitchingAggregate,
   StatAggregateFilter,
+  TeamBattingAggregate,
+  TeamPitchingAggregate,
 } from '../domain/repositories/game-stat.repository';
 import type { GameStatRepository } from '../domain/repositories/game-stat.repository';
 
@@ -45,6 +47,14 @@ export class GameStatService {
 
   aggregatePitching(filter: StatAggregateFilter): Promise<PitchingAggregate[]> {
     return this.gameStatRepository.aggregatePitching(filter);
+  }
+
+  aggregateTeamBatting(seasonYear: number): Promise<TeamBattingAggregate[]> {
+    return this.gameStatRepository.aggregateTeamBatting(seasonYear);
+  }
+
+  aggregateTeamPitching(seasonYear: number): Promise<TeamPitchingAggregate[]> {
+    return this.gameStatRepository.aggregateTeamPitching(seasonYear);
   }
 
   findOpponentBattingSplits(
