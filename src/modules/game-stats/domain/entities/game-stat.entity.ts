@@ -9,6 +9,7 @@ export interface GameStatProps {
   teamCode: string;
   playerName: string;
   playerNo: string | null;
+  playerId: number | null;
   statType: PlayerStatType;
   // batting
   atBats: number | null;
@@ -24,6 +25,7 @@ export interface GameStatProps {
   stolenBases: number | null;
   battingAverage: string | null;
   // pitching
+  atBatsAgainst: number | null;
   inningsPitched: string | null;
   hitsAllowed: number | null;
   earnedRuns: number | null;
@@ -46,6 +48,7 @@ export class GameStat {
   readonly teamCode: string;
   readonly playerName: string;
   readonly playerNo: string | null;
+  readonly playerId: number | null;
   readonly statType: PlayerStatType;
   readonly atBats: number | null;
   readonly hits: number | null;
@@ -59,6 +62,7 @@ export class GameStat {
   readonly strikeouts: number | null;
   readonly stolenBases: number | null;
   readonly battingAverage: string | null;
+  readonly atBatsAgainst: number | null;
   readonly inningsPitched: string | null;
   readonly hitsAllowed: number | null;
   readonly earnedRuns: number | null;
