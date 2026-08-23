@@ -14,6 +14,10 @@ export interface StandingProps {
   last10: string | null;
   homeRecord: string | null;
   awayRecord: string | null;
+  battingAverage: string;
+  era: string;
+  runsScored: number;
+  runsAllowed: number;
   calculatedAt: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -35,6 +39,10 @@ export class Standing {
   readonly last10: string | null;
   readonly homeRecord: string | null;
   readonly awayRecord: string | null;
+  readonly battingAverage: string;
+  readonly era: string;
+  readonly runsScored: number;
+  readonly runsAllowed: number;
   readonly calculatedAt: Date;
   readonly createdAt: Date;
   readonly updatedAt: Date;

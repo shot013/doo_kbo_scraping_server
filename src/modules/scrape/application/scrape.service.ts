@@ -143,6 +143,20 @@ export class ScrapeService {
         throw new Error('No standings scraped from source');
       }
       const now = new Date();
+
+      const [teamBatting, teamPitching, teamRuns] = await Promise.all([
+        this.gameStatService.aggregateTeamBatting(seasonYear),
+        this.gameStatService.aggregateTeamPitching(seasonYear),
+        this.gameService.aggregateTeamRuns(seasonYear),
+      ]);
+      const battingByTeam = new Map(
+        teamBatting.map((row) => [row.teamCode, row]),
+      );
+      const pitchingByTeam = new Map(
+        teamPitching.map((row) => [row.teamCode, row]),
+      );
+      const runsByTeam = new Map(teamRuns.map((row) => [row.teamCode, row]));
+
       const standings = scraped.map(
         (item) =>
           new Standing({
@@ -161,6 +175,11 @@ export class ScrapeService {
             last10: item.last10,
             homeRecord: item.homeRecord,
             awayRecord: item.awayRecord,
+            battingAverage:
+              battingByTeam.get(item.teamCode)?.battingAverage ?? '0.000',
+            era: pitchingByTeam.get(item.teamCode)?.era ?? '0.00',
+            runsScored: runsByTeam.get(item.teamCode)?.runsScored ?? 0,
+            runsAllowed: runsByTeam.get(item.teamCode)?.runsAllowed ?? 0,
             calculatedAt: now,
             createdAt: now,
             updatedAt: now,

@@ -62,6 +62,23 @@ export class StandingOrmEntity {
   @Column({ name: 'away_record', type: 'varchar', length: 32, nullable: true })
   awayRecord: string | null;
 
+  @Column({
+    name: 'batting_average',
+    type: 'decimal',
+    precision: 4,
+    scale: 3,
+  })
+  battingAverage: string;
+
+  @Column({ name: 'era', type: 'decimal', precision: 5, scale: 2 })
+  era: string;
+
+  @Column({ name: 'runs_scored', type: 'smallint' })
+  runsScored: number;
+
+  @Column({ name: 'runs_allowed', type: 'smallint' })
+  runsAllowed: number;
+
   @Column({ name: 'calculated_at', type: 'timestamptz' })
   calculatedAt: Date;
 
