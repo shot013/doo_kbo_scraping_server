@@ -42,6 +42,9 @@ export interface ScrapeSummary {
   durationMs: number;
 }
 
+/** 시즌 전체 백필은 수백 경기를 순회하므로 roster 스크랩(팀 10개, 500ms)보다 넉넉한 텀을 둔다. */
+const BACKFILL_DELAY_MS = 2000;
+
 @Injectable()
 export class ScrapeService {
   private readonly logger = new Logger(ScrapeService.name);
@@ -358,8 +361,9 @@ export class ScrapeService {
    * 시즌 전체 FINISHED 경기의 박스스코어를 재스크랩(upsert)한다. game_stats는 원래
    * 당일 경기만 스크랩하는 크론(scrapeGameStats)으로 채워져 시즌 전체를 커버하지 못하고,
    * player_id/at_bats_against 컬럼 추가 이전에 쌓인 행도 해당 값이 비어 있어 이미 있는
-   * 경기도 다시 스크랩해 보강한다. 시즌 전체를 순회하므로 몇 분 정도 걸릴 수 있는
-   * 일회성/수동 트리거 작업이라 스케줄러에는 등록하지 않는다.
+   * 경기도 다시 스크랩해 보강한다. 시즌 전체(수백 경기)를 순회하고 경기당
+   * BACKFILL_DELAY_MS 만큼 텀을 둬 네이버 API에 부담을 주지 않으므로 수십 분 정도
+   * 걸릴 수 있는 일회성/수동 트리거 작업이라 스케줄러에는 등록하지 않는다.
    */
   async scrapeGameStatsBackfill(seasonYear: number): Promise<ScrapeSummary> {
     const sourceName = 'naver-box-score-backfill';
@@ -380,7 +384,7 @@ export class ScrapeService {
 
       for (const [index, game] of finishedGames.entries()) {
         if (index > 0) {
-          await delay(500);
+          await delay(BACKFILL_DELAY_MS);
         }
         try {
           const { saved } = await this.scrapeAndSaveGameStats(game.id);
