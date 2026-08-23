@@ -116,7 +116,7 @@ npm run test           # 전체 테스트
 | GET | `/players/:id` | `seasonYear` | 선수 상세 조회 |
 
 - `position`: `PITCHER`\|`CATCHER`\|`INFIELDER`\|`OUTFIELDER` (대소문자 무관). `seasonYear` 미지정 시 현재 연도
-- 목록 응답의 각 선수에는 시즌 대표 기록(`primaryStat`, 없으면 `"기록 없음"`)이, 상세 응답에는 시즌 타/투 기록 라인(`statLines`)이 포함됨
+- 목록 응답의 각 선수에는 시즌 대표 기록(`primaryStat`, 없으면 `"기록 없음"`)이, 상세 응답에는 시즌 타/투 기록 라인(`statLines`)과 상대팀별 타율(타자)/피안타율(투수) 목록(`vsTeamStats`, 팀별 `teamCode`/`teamName`/`games`/`avg`)이 포함됨
 
 ### Records (`src/modules/records`)
 
@@ -175,7 +175,7 @@ Controller (application/*.controller.ts)
 `Teams`/`Records`/`Game Results`는 자체 domain/infrastructure 레이어 없이 다른 모듈의 Service를 조합해 응답을 만듭니다. `Players`만 자체 `PLAYER_REPOSITORY`를 가진 일반적인 조회 모듈입니다.
 
 - `GET /teams`, `GET /teams/:code`: `TeamsService`가 `StandingService`(순위/승패) + `GameService.getRecentForm()`(최근 5경기 폼) + `PlayerService`(로스터, 상세 조회 시)를 조합
-- `GET /players`, `GET /players/:id`: `PlayerService` → `PLAYER_REPOSITORY` 구현체가 조회, 시즌 대표 기록은 `GameStatService`를 통해 `game_stats`를 집계해 붙임
+- `GET /players`, `GET /players/:id`: `PlayerService` → `PLAYER_REPOSITORY` 구현체가 조회, 시즌 대표 기록은 `SeasonBattingStatService`/`SeasonPitchingStatService`(팀코드+이름 매칭)로 붙임. `GET /players/:id`의 `vsTeamStats`는 `GameStatService.findOpponentBattingSplits()`/`findOpponentPitchingSplits()`가 `game_stats.player_id`로 필터링해 `games` 테이블과 조인, 상대팀(`CASE WHEN gs.team_code = g.home_team_code THEN away ELSE home`)별로 GROUP BY 집계
 - `GET /records/batters`, `GET /records/pitchers`: `RecordsService`가 `SeasonBattingStatService`/`SeasonPitchingStatService`로 시즌 집계 리더보드를 만들고, `PlayerService.findAllPlayers()`(팀코드+이름 매칭)로 각 항목에 `playerId`를 붙임
 - `GET /game-results/recent`: `GameResultService`가 `GameService`(해당 날짜 종료 경기 목록) + `GameStatService.findByGameIds()`(경기별 박스스코어)를 조합해 베스트 활약 타자·투수 기록을 계산
 

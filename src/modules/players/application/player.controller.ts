@@ -2,7 +2,11 @@ import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { PaginatedResult } from '../../../common/pagination/pagination';
 import { Player, PlayerPosition } from '../domain/entities/player.entity';
 import { PlayerQueryDto } from './dto/player-query.dto';
-import { PlayerService, PlayerStatLine } from './player.service';
+import {
+  PlayerService,
+  PlayerStatLine,
+  PlayerVsTeamStat,
+} from './player.service';
 
 // KBO 선수 id는 숫자지만, 이 API를 쓰는 클라이언트(doo_kbo_app)의 선수 id 타입이
 // 문자열(팀 로스터/선수 목록 어디서든 동일 id로 라우팅)이라 문자열로 직렬화한다.
@@ -24,6 +28,7 @@ export interface PlayerDetailResponse {
   position: string;
   backNumber: number;
   statLines: PlayerStatLine[];
+  vsTeamStats: PlayerVsTeamStat[];
 }
 
 @Controller('players')
@@ -67,7 +72,10 @@ export class PlayerController {
       ? Number(seasonYearRaw)
       : new Date().getFullYear();
     const player = await this.playerService.findById(id);
-    const statLines = await this.playerService.getStatLines(player, seasonYear);
+    const [statLines, vsTeamStats] = await Promise.all([
+      this.playerService.getStatLines(player, seasonYear),
+      this.playerService.getVsTeamStats(player, seasonYear),
+    ]);
 
     return {
       id: String(player.id),
@@ -77,6 +85,7 @@ export class PlayerController {
       position: player.position.toLowerCase(),
       backNumber: player.backNumber ?? 0,
       statLines,
+      vsTeamStats,
     };
   }
 }
