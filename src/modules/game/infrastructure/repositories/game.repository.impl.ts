@@ -12,6 +12,7 @@ import {
   GameFilter,
   GameRepository,
   GameSortField,
+  TeamRunsAggregate,
 } from '../../domain/repositories/game.repository';
 import { GameOrmEntity } from '../orm/game.orm-entity';
 
@@ -22,6 +23,12 @@ const SORT_FIELD_MAP: Record<GameSortField, keyof GameOrmEntity> = {
   homeScore: 'homeScore',
   awayScore: 'awayScore',
 };
+
+interface RawTeamRunsAggregateRow {
+  teamCode: string;
+  runsScored: string | null;
+  runsAllowed: string | null;
+}
 
 @Injectable()
 export class GameRepositoryImpl implements GameRepository {
@@ -86,6 +93,32 @@ export class GameRepositoryImpl implements GameRepository {
       take: limit,
     });
     return rows.map((row) => this.toDomain(row));
+  }
+
+  async aggregateTeamRuns(seasonYear: number): Promise<TeamRunsAggregate[]> {
+    const sql = `
+      SELECT
+        team_code AS "teamCode",
+        SUM(runs_scored)::int AS "runsScored",
+        SUM(runs_allowed)::int AS "runsAllowed"
+      FROM (
+        SELECT home_team_code AS team_code, home_score AS runs_scored, away_score AS runs_allowed
+        FROM games WHERE season_year = $1 AND status = 'FINISHED'
+        UNION ALL
+        SELECT away_team_code AS team_code, away_score AS runs_scored, home_score AS runs_allowed
+        FROM games WHERE season_year = $1 AND status = 'FINISHED'
+      ) t
+      GROUP BY team_code
+    `;
+    const rows = await this.ormRepository.query<RawTeamRunsAggregateRow[]>(
+      sql,
+      [seasonYear],
+    );
+    return rows.map((row) => ({
+      teamCode: row.teamCode,
+      runsScored: Number(row.runsScored) || 0,
+      runsAllowed: Number(row.runsAllowed) || 0,
+    }));
   }
 
   private toDomain(row: GameOrmEntity): Game {

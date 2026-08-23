@@ -98,6 +98,8 @@ npm run test           # 전체 테스트
 | --- | --- | --- | --- |
 | GET | `/standings` | `seasonYear`(미지정 시 현재 연도), `page`, `limit`, `sortBy`(`rank`\|`winRate`\|`gamesBehind`\|`wins`\|`losses`\|`gamesPlayed`), `sortOrder` | 시즌 순위 목록 조회 |
 
+- 각 행에는 순위/승패/승률/게임차 외에 팀 타율(`battingAverage`), 팀 평균자책(`era`), 팀 득점(`runsScored`), 팀 실점(`runsAllowed`)이 포함됨. 이 값들은 `game-stats`/`game`을 집계해 순위 스크랩 시점에 함께 계산·저장됨(요청마다 재계산하지 않음)
+
 ### Teams (`src/modules/teams`)
 
 | Method | Path | Query | 설명 |
@@ -106,7 +108,7 @@ npm run test           # 전체 테스트
 | GET | `/teams/:code` | `seasonYear` | 팀 상세 조회 (요약 + 로스터) |
 
 - `seasonYear` 미지정 시 현재 연도. `:code`는 대문자로 정규화되어 조회됨
-- 요약에는 순위/승패/승률/게임차/최근 5경기 폼(`recentForm`)이 포함되며 `standings` + `game`(최근 폼)을 조합해 만듦
+- 요약에는 순위/승패/승률/게임차/팀 타율(`battingAverage`)/팀 평균자책(`era`)/팀 득점(`runsScored`)/팀 실점(`runsAllowed`)/최근 5경기 폼(`recentForm`)이 포함되며 `standings`(타율/평균자책/득점/실점 포함) + `game`(최근 폼)을 조합해 만듦
 
 ### Players (`src/modules/players`)
 

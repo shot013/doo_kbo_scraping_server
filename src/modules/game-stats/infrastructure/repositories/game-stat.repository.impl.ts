@@ -17,6 +17,8 @@ import {
   OpponentPitchingSplit,
   PitchingAggregate,
   StatAggregateFilter,
+  TeamBattingAggregate,
+  TeamPitchingAggregate,
 } from '../../domain/repositories/game-stat.repository';
 import { GameStatOrmEntity } from '../orm/game-stat.orm-entity';
 
@@ -54,6 +56,18 @@ interface RawOpponentPitchingRow {
   games: string;
   atBatsAgainst: string;
   hitsAllowed: string;
+}
+
+interface RawTeamBattingAggregateRow {
+  teamCode: string;
+  atBats: string | null;
+  hits: string | null;
+}
+
+interface RawTeamPitchingAggregateRow {
+  teamCode: string;
+  earnedRuns: string | null;
+  totalOuts: string | null;
 }
 
 /** KBO 이닝 아웃카운트(N.0/N.1/N.2)를 total outs로 변환하는 SQL 표현식. */
@@ -211,6 +225,66 @@ export class GameStatRepositoryImpl implements GameStatRepository {
         saves: Number(row.saves),
         earnedRuns,
         strikeoutsPitched: Number(row.strikeoutsPitched),
+        inningsPitched: `${whole}.${remainder}`,
+        era: (totalOuts > 0 ? (earnedRuns * 27) / totalOuts : 0).toFixed(2),
+      };
+    });
+  }
+
+  async aggregateTeamBatting(
+    seasonYear: number,
+  ): Promise<TeamBattingAggregate[]> {
+    const sql = `
+      SELECT
+        gs.team_code AS "teamCode",
+        SUM(gs.at_bats)::int AS "atBats",
+        SUM(gs.hits)::int AS hits
+      FROM game_stats gs
+      INNER JOIN games g ON g.id = gs.game_id
+      WHERE gs.stat_type = $1 AND g.season_year = $2 AND g.status = 'FINISHED'
+      GROUP BY gs.team_code
+    `;
+    const rows = await this.ormRepository.query<RawTeamBattingAggregateRow[]>(
+      sql,
+      ['BATTING', seasonYear],
+    );
+    return rows.map((row) => {
+      const atBats = Number(row.atBats) || 0;
+      const hits = Number(row.hits) || 0;
+      return {
+        teamCode: row.teamCode,
+        atBats,
+        hits,
+        battingAverage: (atBats > 0 ? hits / atBats : 0).toFixed(3),
+      };
+    });
+  }
+
+  async aggregateTeamPitching(
+    seasonYear: number,
+  ): Promise<TeamPitchingAggregate[]> {
+    const sql = `
+      SELECT
+        gs.team_code AS "teamCode",
+        SUM(gs.earned_runs)::int AS "earnedRuns",
+        SUM(${OUTS_EXPR})::int AS "totalOuts"
+      FROM game_stats gs
+      INNER JOIN games g ON g.id = gs.game_id
+      WHERE gs.stat_type = $1 AND g.season_year = $2 AND g.status = 'FINISHED'
+      GROUP BY gs.team_code
+    `;
+    const rows = await this.ormRepository.query<RawTeamPitchingAggregateRow[]>(
+      sql,
+      ['PITCHING', seasonYear],
+    );
+    return rows.map((row) => {
+      const earnedRuns = Number(row.earnedRuns) || 0;
+      const totalOuts = Number(row.totalOuts) || 0;
+      const whole = Math.floor(totalOuts / 3);
+      const remainder = totalOuts % 3;
+      return {
+        teamCode: row.teamCode,
+        earnedRuns,
         inningsPitched: `${whole}.${remainder}`,
         era: (totalOuts > 0 ? (earnedRuns * 27) / totalOuts : 0).toFixed(2),
       };
