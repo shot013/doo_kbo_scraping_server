@@ -28,6 +28,9 @@ export class GameStatOrmEntity {
   @Column({ name: 'player_no', type: 'varchar', length: 8, nullable: true })
   playerNo: string | null;
 
+  @Column({ name: 'player_id', type: 'int', nullable: true })
+  playerId: number | null;
+
   @Column({ name: 'stat_type', type: 'enum', enum: PlayerStatType })
   statType: PlayerStatType;
 
@@ -72,6 +75,9 @@ export class GameStatOrmEntity {
     nullable: true,
   })
   battingAverage: string | null;
+
+  @Column({ name: 'at_bats_against', type: 'smallint', nullable: true })
+  atBatsAgainst: number | null;
 
   @Column({
     name: 'innings_pitched',
