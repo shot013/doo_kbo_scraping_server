@@ -194,7 +194,7 @@ ScrapeController (application/scrape.controller.ts)
 - `POST /scrape/games`: `GameScraper`가 KBO 스케줄 페이지(`Schedule.aspx`)가 내부적으로 호출하는 `GetScheduleList` 엔드포인트를 fetch로 직접 호출해 응답을 파싱 → 경기별로 `GameService.upsert()` (진행 중 경기는 네이버 스포츠 API로 실시간 스코어 보정)
 - `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
 - `POST /scrape/game-stats`: `GameStatsScraper`가 `body.gameId`로 박스스코어(`GetBoxScoreScroll`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남
-- `POST /scrape/game-stats/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 조회해 팀당 500ms 텀을 두고 순회하며 `/scrape/game-stats`와 동일한 스크랩·저장 로직(`ScrapeService.scrapeAndSaveGameStats()`)을 재사용 — 이미 저장된 경기도 다시 스크랩해 `player_id`/`at_bats_against` 등 이후 추가된 필드를 보강한다. 경기 단위 실패는 warn 로그만 남기고 계속 진행(전체가 실패로 끝나지 않음)
+- `POST /scrape/game-stats/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 조회해 경기당 2초 텀을 두고 순회하며 `/scrape/game-stats`와 동일한 스크랩·저장 로직(`ScrapeService.scrapeAndSaveGameStats()`)을 재사용 — 이미 저장된 경기도 다시 스크랩해 `player_id`/`at_bats_against` 등 이후 추가된 필드를 보강한다. 경기 단위 실패는 warn 로그만 남기고 계속 진행(전체가 실패로 끝나지 않음)
 - `POST /scrape/roster`: `RosterScraper`가 `Player/Search.aspx` 폼 postback으로 팀별 선수 목록(포지션/등번호/출신교)을 요청·파싱 → `PlayerService.upsert()`. `body.teamCode` 미지정 시 전체 팀 순회
 
 `/scrape/game-stats/backfill`을 제외한 나머지 스크래핑 API는 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답). `/scrape/game-stats/backfill`은 대상 시즌에 `FINISHED` 경기가 하나도 없을 때만 이렇게 실패하고, 개별 경기 실패는 삼켜서 계속 진행합니다.
