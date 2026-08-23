@@ -5,6 +5,8 @@ import {
   BattingAggregate,
   GAME_STAT_REPOSITORY,
   GameStatFilter,
+  OpponentBattingSplit,
+  OpponentPitchingSplit,
   PitchingAggregate,
   StatAggregateFilter,
 } from '../domain/repositories/game-stat.repository';
@@ -43,5 +45,25 @@ export class GameStatService {
 
   aggregatePitching(filter: StatAggregateFilter): Promise<PitchingAggregate[]> {
     return this.gameStatRepository.aggregatePitching(filter);
+  }
+
+  findOpponentBattingSplits(
+    playerId: number,
+    seasonYear: number,
+  ): Promise<OpponentBattingSplit[]> {
+    return this.gameStatRepository.findOpponentBattingSplits(
+      playerId,
+      seasonYear,
+    );
+  }
+
+  findOpponentPitchingSplits(
+    playerId: number,
+    seasonYear: number,
+  ): Promise<OpponentPitchingSplit[]> {
+    return this.gameStatRepository.findOpponentPitchingSplits(
+      playerId,
+      seasonYear,
+    );
   }
 }

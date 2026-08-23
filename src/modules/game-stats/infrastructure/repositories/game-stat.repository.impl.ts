@@ -13,6 +13,8 @@ import {
   GameStatFilter,
   GameStatRepository,
   GameStatSortField,
+  OpponentBattingSplit,
+  OpponentPitchingSplit,
   PitchingAggregate,
   StatAggregateFilter,
 } from '../../domain/repositories/game-stat.repository';
@@ -38,6 +40,20 @@ interface RawPitchingAggregateRow {
   earnedRuns: string;
   strikeoutsPitched: string;
   totalOuts: string;
+}
+
+interface RawOpponentBattingRow {
+  opponentTeamCode: string;
+  games: string;
+  atBats: string;
+  hits: string;
+}
+
+interface RawOpponentPitchingRow {
+  opponentTeamCode: string;
+  games: string;
+  atBatsAgainst: string;
+  hitsAllowed: string;
 }
 
 /** KBO 이닝 아웃카운트(N.0/N.1/N.2)를 total outs로 변환하는 SQL 표현식. */
@@ -201,6 +217,68 @@ export class GameStatRepositoryImpl implements GameStatRepository {
     });
   }
 
+  async findOpponentBattingSplits(
+    playerId: number,
+    seasonYear: number,
+  ): Promise<OpponentBattingSplit[]> {
+    const { sql, params } = buildOpponentAggregateQuery({
+      statType: 'BATTING',
+      playerId,
+      seasonYear,
+      selectExtra: `SUM(gs.at_bats)::int AS "atBats", SUM(gs.hits)::int AS hits`,
+      havingExpr: 'SUM(gs.at_bats) > 0',
+      orderExpr: '(SUM(gs.hits)::decimal / NULLIF(SUM(gs.at_bats), 0)) DESC',
+    });
+    const rows = await this.ormRepository.query<RawOpponentBattingRow[]>(
+      sql,
+      params,
+    );
+    return rows.map((row) => {
+      const atBats = Number(row.atBats);
+      const hits = Number(row.hits);
+      return {
+        opponentTeamCode: row.opponentTeamCode,
+        games: Number(row.games),
+        atBats,
+        hits,
+        battingAverage: (atBats > 0 ? hits / atBats : 0).toFixed(3),
+      };
+    });
+  }
+
+  async findOpponentPitchingSplits(
+    playerId: number,
+    seasonYear: number,
+  ): Promise<OpponentPitchingSplit[]> {
+    const { sql, params } = buildOpponentAggregateQuery({
+      statType: 'PITCHING',
+      playerId,
+      seasonYear,
+      selectExtra: `SUM(gs.at_bats_against)::int AS "atBatsAgainst", SUM(gs.hits_allowed)::int AS "hitsAllowed"`,
+      havingExpr: 'SUM(gs.at_bats_against) > 0',
+      orderExpr:
+        '(SUM(gs.hits_allowed)::decimal / NULLIF(SUM(gs.at_bats_against), 0)) ASC',
+    });
+    const rows = await this.ormRepository.query<RawOpponentPitchingRow[]>(
+      sql,
+      params,
+    );
+    return rows.map((row) => {
+      const atBatsAgainst = Number(row.atBatsAgainst);
+      const hitsAllowed = Number(row.hitsAllowed);
+      return {
+        opponentTeamCode: row.opponentTeamCode,
+        games: Number(row.games),
+        atBatsAgainst,
+        hitsAllowed,
+        battingAverageAllowed: (atBatsAgainst > 0
+          ? hitsAllowed / atBatsAgainst
+          : 0
+        ).toFixed(3),
+      };
+    });
+  }
+
   private toDomain(row: GameStatOrmEntity): GameStat {
     return new GameStat({ ...row });
   }
@@ -253,6 +331,37 @@ function buildAggregateQuery(options: {
     HAVING ${havingExpr}
     ORDER BY ${orderExpr}
     ${limitClause}
+  `;
+
+  return { sql, params };
+}
+
+const OPPONENT_TEAM_CODE_EXPR =
+  'CASE WHEN gs.team_code = g.home_team_code THEN g.away_team_code ELSE g.home_team_code END';
+
+function buildOpponentAggregateQuery(options: {
+  statType: 'BATTING' | 'PITCHING';
+  playerId: number;
+  seasonYear: number;
+  selectExtra: string;
+  havingExpr: string;
+  orderExpr: string;
+}): { sql: string; params: unknown[] } {
+  const { statType, playerId, seasonYear, selectExtra, havingExpr, orderExpr } =
+    options;
+  const params: unknown[] = [statType, playerId, seasonYear];
+
+  const sql = `
+    SELECT
+      ${OPPONENT_TEAM_CODE_EXPR} AS "opponentTeamCode",
+      COUNT(DISTINCT gs.game_id)::int AS games,
+      ${selectExtra}
+    FROM game_stats gs
+    INNER JOIN games g ON g.id = gs.game_id
+    WHERE gs.stat_type = $1 AND gs.player_id = $2 AND g.season_year = $3 AND g.status = 'FINISHED'
+    GROUP BY 1
+    HAVING ${havingExpr}
+    ORDER BY ${orderExpr}
   `;
 
   return { sql, params };

@@ -1,9 +1,15 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { resolveKboTeamByCode } from '../../../common/kbo/kbo-team';
 import {
   buildPaginatedResult,
   normalizePagination,
   PaginatedResult,
 } from '../../../common/pagination/pagination';
+import { GameStatService } from '../../game-stats/application/game-stat.service';
+import {
+  OpponentBattingSplit,
+  OpponentPitchingSplit,
+} from '../../game-stats/domain/repositories/game-stat.repository';
 import { SeasonBattingStatService } from '../../season-stats/application/season-batting-stat.service';
 import { SeasonPitchingStatService } from '../../season-stats/application/season-pitching-stat.service';
 import { Player, PlayerPosition } from '../domain/entities/player.entity';
@@ -28,6 +34,13 @@ export interface PlayerWithPrimaryStat {
   primaryStat: string;
 }
 
+export interface PlayerVsTeamStat {
+  teamCode: string;
+  teamName: string;
+  games: number;
+  avg: string; // 타자: 상대팀 타율, 투수: 상대팀 피안타율
+}
+
 interface PrimaryStat {
   label: string;
   sortValue: number | null;
@@ -40,6 +53,7 @@ export class PlayerService {
     private readonly playerRepository: PlayerRepository,
     private readonly seasonBattingStatService: SeasonBattingStatService,
     private readonly seasonPitchingStatService: SeasonPitchingStatService,
+    private readonly gameStatService: GameStatService,
   ) {}
 
   /**
@@ -183,6 +197,43 @@ export class PlayerService {
       { label: '홈런', value: String(stat.homeRuns) },
     ];
   }
+
+  /**
+   * 상대팀별 타율(타자) / 피안타율(투수)을 game_stats + games 조인으로 집계한다.
+   * game_stats.player_id로 직접 필터링하므로 다른 곳과 달리 teamCode+이름 매칭이 필요 없다.
+   */
+  async getVsTeamStats(
+    player: Player,
+    seasonYear: number,
+  ): Promise<PlayerVsTeamStat[]> {
+    if (player.position === PlayerPosition.PITCHER) {
+      const splits = await this.gameStatService.findOpponentPitchingSplits(
+        player.id,
+        seasonYear,
+      );
+      return splits.map((split) =>
+        toVsTeamStat(split, split.battingAverageAllowed),
+      );
+    }
+
+    const splits = await this.gameStatService.findOpponentBattingSplits(
+      player.id,
+      seasonYear,
+    );
+    return splits.map((split) => toVsTeamStat(split, split.battingAverage));
+  }
+}
+
+function toVsTeamStat(
+  split: OpponentBattingSplit | OpponentPitchingSplit,
+  avg: string,
+): PlayerVsTeamStat {
+  return {
+    teamCode: split.opponentTeamCode,
+    teamName: resolveKboTeamByCode(split.opponentTeamCode).fullName,
+    games: split.games,
+    avg,
+  };
 }
 
 function sortByPrimaryStat(

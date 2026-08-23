@@ -41,6 +41,27 @@ export interface StatAggregateFilter {
   limit?: number;
 }
 
+/**
+ * 선수 한 명의 경기 기록을 상대팀 기준으로 GROUP BY 집계한 결과.
+ * `game_stats.player_id`(스크래핑 소스의 KBO 선수 고유 id)로 직접 필터링하므로
+ * `BattingAggregate`/`PitchingAggregate`와 달리 teamCode+playerName 매칭이 필요 없다.
+ */
+export interface OpponentBattingSplit {
+  opponentTeamCode: string;
+  games: number;
+  atBats: number;
+  hits: number;
+  battingAverage: string;
+}
+
+export interface OpponentPitchingSplit {
+  opponentTeamCode: string;
+  games: number;
+  atBatsAgainst: number;
+  hitsAllowed: number;
+  battingAverageAllowed: string;
+}
+
 export type GameStatSortField =
   | 'id'
   | 'teamCode'
@@ -68,4 +89,12 @@ export interface GameStatRepository {
   aggregatePitching(filter: StatAggregateFilter): Promise<PitchingAggregate[]>;
   /** 여러 경기의 박스스코어 전체(타자+투수)를 한 번에 조회한다. */
   findByGameIds(gameIds: string[]): Promise<GameStat[]>;
+  findOpponentBattingSplits(
+    playerId: number,
+    seasonYear: number,
+  ): Promise<OpponentBattingSplit[]>;
+  findOpponentPitchingSplits(
+    playerId: number,
+    seasonYear: number,
+  ): Promise<OpponentPitchingSplit[]>;
 }
