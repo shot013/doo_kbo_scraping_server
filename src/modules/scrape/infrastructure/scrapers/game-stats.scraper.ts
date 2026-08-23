@@ -12,6 +12,7 @@ const DECISION_HOLD = '홀드';
 
 interface NaverBatterBox {
   name: string;
+  playerCode: string;
   ab: number;
   hit: number;
   rbi: number;
@@ -21,6 +22,8 @@ interface NaverBatterBox {
 
 interface NaverPitcherBox {
   name: string;
+  pcode: string;
+  ab: number;
   inn: string;
   hit: number;
   hr: number;
@@ -45,12 +48,14 @@ export interface ScrapedGameStat {
   gameId: string;
   teamCode: string;
   playerName: string;
+  playerId: number | null;
   statType: PlayerStatType;
   atBats: number | null;
   hits: number | null;
   rbi: number | null;
   runs: number | null;
   battingAverage: string | null;
+  atBatsAgainst: number | null;
   inningsPitched: string | null;
   hitsAllowed: number | null;
   earnedRuns: number | null;
@@ -131,12 +136,14 @@ export class GameStatsScraper {
         gameId,
         teamCode,
         playerName: player.name,
+        playerId: Number(player.playerCode) || null,
         statType: PlayerStatType.BATTING,
         atBats: player.ab,
         hits: player.hit,
         rbi: player.rbi,
         runs: player.run,
         battingAverage: player.hra || null,
+        atBatsAgainst: null,
         inningsPitched: null,
         hitsAllowed: null,
         earnedRuns: null,
@@ -168,12 +175,14 @@ export class GameStatsScraper {
         gameId,
         teamCode,
         playerName: player.name,
+        playerId: Number(player.pcode) || null,
         statType: PlayerStatType.PITCHING,
         atBats: null,
         hits: null,
         rbi: null,
         runs: null,
         battingAverage: null,
+        atBatsAgainst: player.ab,
         inningsPitched: toInningsPitched(player.inn),
         hitsAllowed: player.hit,
         earnedRuns: player.er,

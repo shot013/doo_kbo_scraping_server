@@ -40,6 +40,15 @@ export class ScrapeController {
     return this.scrapeService.scrapeGameStats(body.gameId);
   }
 
+  @Post('game-stats/backfill')
+  scrapeGameStatsBackfill(
+    @Body() body?: ScrapeRequestDto,
+  ): Promise<ScrapeSummary> {
+    return this.scrapeService.scrapeGameStatsBackfill(
+      body?.seasonYear ?? new Date().getFullYear(),
+    );
+  }
+
   @Post('roster')
   scrapeRoster(@Body() body?: ScrapeRosterRequestDto): Promise<ScrapeSummary> {
     return this.scrapeService.scrapeRoster(body?.teamCode);

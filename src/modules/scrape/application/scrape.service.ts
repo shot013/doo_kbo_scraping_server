@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { resolveKboTeamByCode, KBO_TEAMS } from '../../../common/kbo/kbo-team';
 import { GameService } from '../../game/application/game.service';
-import { Game } from '../../game/domain/entities/game.entity';
+import { Game, GameStatus } from '../../game/domain/entities/game.entity';
 import { GameStatService } from '../../game-stats/application/game-stat.service';
 import { GameStat } from '../../game-stats/domain/entities/game-stat.entity';
 import { PlayerService } from '../../players/application/player.service';
@@ -327,80 +327,156 @@ export class ScrapeService {
     const targetUrl = `${NAVER_GAME_RECORD_URL}/${gameId}${gameId.slice(0, 4)}/record`;
 
     try {
-      const scraped = await this.gameStatsScraper.scrape(gameId);
-      if (scraped.length === 0) {
+      const { scraped, saved } = await this.scrapeAndSaveGameStats(gameId);
+      if (scraped === 0) {
         throw new Error('No game stats scraped from source');
-      }
-      const now = new Date();
-      const stats = scraped.map(
-        (item) =>
-          new GameStat({
-            id: 0,
-            gameId: item.gameId,
-            teamCode: item.teamCode,
-            playerName: item.playerName,
-            playerNo: null,
-            statType: item.statType,
-            atBats: item.atBats,
-            hits: item.hits,
-            doubles: null,
-            triples: null,
-            homeRuns: null,
-            rbi: item.rbi,
-            runs: item.runs,
-            walks: null,
-            hitByPitch: null,
-            strikeouts: null,
-            stolenBases: null,
-            battingAverage: item.battingAverage,
-            inningsPitched: item.inningsPitched,
-            hitsAllowed: item.hitsAllowed,
-            earnedRuns: item.earnedRuns,
-            strikeoutsPitched: item.strikeoutsPitched,
-            walksAllowed: item.walksAllowed,
-            homeRunsAllowed: item.homeRunsAllowed,
-            win: item.win,
-            loss: item.loss,
-            save: item.save,
-            hold: item.hold,
-            era: item.era,
-            rawStats: null,
-            createdAt: now,
-            updatedAt: now,
-          }),
-      );
-      let savedCount = 0;
-      for (const stat of stats) {
-        try {
-          await this.gameStatService.upsert(stat);
-          savedCount++;
-        } catch (error) {
-          this.logger.warn(
-            `Failed to save game stat for ${stat.playerName} (team ${stat.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
-          );
-        }
       }
 
       const durationMs = Date.now() - startedAt;
-      const failedCount = stats.length - savedCount;
+      const failedCount = scraped - saved;
       await this.scrapeSourceHealthService.log({
         sourceName,
         targetUrl,
         status: ScrapeStatus.SUCCESS,
         httpStatusCode: 200,
         durationMs,
-        itemsScraped: savedCount,
+        itemsScraped: saved,
         errorMessage:
           failedCount > 0
-            ? `${failedCount}/${stats.length} game stats failed to save (see server logs)`
+            ? `${failedCount}/${scraped} game stats failed to save (see server logs)`
             : null,
-        scrapedAt: now,
+        scrapedAt: new Date(),
       });
-      return { itemsScraped: savedCount, durationMs };
+      return { itemsScraped: saved, durationMs };
     } catch (error) {
       await this.logFailure(sourceName, targetUrl, startedAt, error);
       throw error;
     }
+  }
+
+  /**
+   * 시즌 전체 FINISHED 경기의 박스스코어를 재스크랩(upsert)한다. game_stats는 원래
+   * 당일 경기만 스크랩하는 크론(scrapeGameStats)으로 채워져 시즌 전체를 커버하지 못하고,
+   * player_id/at_bats_against 컬럼 추가 이전에 쌓인 행도 해당 값이 비어 있어 이미 있는
+   * 경기도 다시 스크랩해 보강한다. 시즌 전체를 순회하므로 몇 분 정도 걸릴 수 있는
+   * 일회성/수동 트리거 작업이라 스케줄러에는 등록하지 않는다.
+   */
+  async scrapeGameStatsBackfill(seasonYear: number): Promise<ScrapeSummary> {
+    const sourceName = 'naver-box-score-backfill';
+    const startedAt = Date.now();
+
+    try {
+      const { data: finishedGames } = await this.gameService.findAll({
+        seasonYear,
+        status: GameStatus.FINISHED,
+        limit: 1000,
+      });
+      if (finishedGames.length === 0) {
+        throw new Error(`No FINISHED games found for season ${seasonYear}`);
+      }
+
+      let savedCount = 0;
+      let failedGameCount = 0;
+
+      for (const [index, game] of finishedGames.entries()) {
+        if (index > 0) {
+          await delay(500);
+        }
+        try {
+          const { saved } = await this.scrapeAndSaveGameStats(game.id);
+          savedCount += saved;
+        } catch (error) {
+          failedGameCount++;
+          this.logger.warn(
+            `Failed to backfill game stats for ${game.id}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
+
+      const durationMs = Date.now() - startedAt;
+      await this.scrapeSourceHealthService.log({
+        sourceName,
+        targetUrl: NAVER_GAME_RECORD_URL,
+        status: ScrapeStatus.SUCCESS,
+        httpStatusCode: 200,
+        durationMs,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedGameCount > 0
+            ? `${failedGameCount}/${finishedGames.length} games failed to backfill (see server logs)`
+            : null,
+        scrapedAt: new Date(),
+      });
+      return { itemsScraped: savedCount, durationMs };
+    } catch (error) {
+      await this.logFailure(
+        sourceName,
+        NAVER_GAME_RECORD_URL,
+        startedAt,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  private async scrapeAndSaveGameStats(
+    gameId: string,
+  ): Promise<{ scraped: number; saved: number }> {
+    const scraped = await this.gameStatsScraper.scrape(gameId);
+    const now = new Date();
+    const stats = scraped.map(
+      (item) =>
+        new GameStat({
+          id: 0,
+          gameId: item.gameId,
+          teamCode: item.teamCode,
+          playerName: item.playerName,
+          playerNo: null,
+          playerId: item.playerId,
+          statType: item.statType,
+          atBats: item.atBats,
+          hits: item.hits,
+          doubles: null,
+          triples: null,
+          homeRuns: null,
+          rbi: item.rbi,
+          runs: item.runs,
+          walks: null,
+          hitByPitch: null,
+          strikeouts: null,
+          stolenBases: null,
+          battingAverage: item.battingAverage,
+          atBatsAgainst: item.atBatsAgainst,
+          inningsPitched: item.inningsPitched,
+          hitsAllowed: item.hitsAllowed,
+          earnedRuns: item.earnedRuns,
+          strikeoutsPitched: item.strikeoutsPitched,
+          walksAllowed: item.walksAllowed,
+          homeRunsAllowed: item.homeRunsAllowed,
+          win: item.win,
+          loss: item.loss,
+          save: item.save,
+          hold: item.hold,
+          era: item.era,
+          rawStats: null,
+          createdAt: now,
+          updatedAt: now,
+        }),
+    );
+
+    let savedCount = 0;
+    for (const stat of stats) {
+      try {
+        await this.gameStatService.upsert(stat);
+        savedCount++;
+      } catch (error) {
+        this.logger.warn(
+          `Failed to save game stat for ${stat.playerName} (team ${stat.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    return { scraped: stats.length, saved: savedCount };
   }
 
   /**
