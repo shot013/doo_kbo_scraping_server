@@ -69,6 +69,7 @@ cp .env.example .env
 | --- | --- |
 | `DB_PASSWORD` | `.env.example` 기본값(`postgres`) 그대로 두지 말 것 |
 | `DB_SYNCHRONIZE` | `false` 유지 (마이그레이션으로만 스키마 변경) |
+| `SENTRY_DSN` | Sentry 프로젝트의 DSN. `src/instrument.ts`가 `dotenv/config`로 직접 읽으므로 비어 있으면 Sentry가 이벤트를 전송하지 않음 |
 
 `DB_HOST`는 `docker-compose.prod.yml`이 `postgres`(compose 서비스명)로 덮어쓰므로 `.env`에서 신경 쓰지 않아도 됩니다.
 
@@ -107,6 +108,13 @@ curl http://localhost:3651/games
   docker compose -f docker-compose.prod.yml up -d app
   ```
 - **DB 데이터**: `postgres_data` named volume에 저장되므로 `docker compose down`으로 컨테이너를 내려도 유지됩니다. 볼륨까지 지우려면 `docker compose down -v` (주의).
+- **`.env` 값만 바꿀 때** (예: `SENTRY_DSN` 교체): 코드 변경이 없으므로 재빌드 없이 `.env`만 수정 후 `docker compose -f docker-compose.prod.yml up -d app`로 `app`만 재기동하면 됩니다. 로컬에서 SSH 한 줄로 원격 `.env`를 갱신할 수도 있습니다:
+  ```bash
+  ssh -i <pem경로> ubuntu@<EIP> \
+    "grep -q '^SENTRY_DSN=' ~/doo_kbo_scraping_server/.env \
+     && sed -i 's|^SENTRY_DSN=.*|SENTRY_DSN=<새 DSN>|' ~/doo_kbo_scraping_server/.env \
+     || echo 'SENTRY_DSN=<새 DSN>' >> ~/doo_kbo_scraping_server/.env"
+  ```
 
 ## 7. 정리 (teardown)
 
