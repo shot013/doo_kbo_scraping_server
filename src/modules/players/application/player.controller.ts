@@ -5,6 +5,8 @@ import { PlayerQueryDto } from './dto/player-query.dto';
 import {
   PlayerService,
   PlayerStatLine,
+  PlayerVsBatterStat,
+  PlayerVsPitcherStat,
   PlayerVsTeamStat,
 } from './player.service';
 
@@ -29,6 +31,8 @@ export interface PlayerDetailResponse {
   backNumber: number;
   statLines: PlayerStatLine[];
   vsTeamStats: PlayerVsTeamStat[];
+  vsPitcherStats: PlayerVsPitcherStat[];
+  vsBatterStats: PlayerVsBatterStat[];
 }
 
 @Controller('players')
@@ -72,10 +76,13 @@ export class PlayerController {
       ? Number(seasonYearRaw)
       : new Date().getFullYear();
     const player = await this.playerService.findById(id);
-    const [statLines, vsTeamStats] = await Promise.all([
-      this.playerService.getStatLines(player, seasonYear),
-      this.playerService.getVsTeamStats(player, seasonYear),
-    ]);
+    const [statLines, vsTeamStats, vsPitcherStats, vsBatterStats] =
+      await Promise.all([
+        this.playerService.getStatLines(player, seasonYear),
+        this.playerService.getVsTeamStats(player, seasonYear),
+        this.playerService.getVsPitcherStats(player, seasonYear),
+        this.playerService.getVsBatterStats(player, seasonYear),
+      ]);
 
     return {
       id: String(player.id),
@@ -86,6 +93,8 @@ export class PlayerController {
       backNumber: player.backNumber ?? 0,
       statLines,
       vsTeamStats,
+      vsPitcherStats,
+      vsBatterStats,
     };
   }
 }
