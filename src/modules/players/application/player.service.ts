@@ -10,6 +10,7 @@ import {
   OpponentBattingSplit,
   OpponentPitchingSplit,
 } from '../../game-stats/domain/repositories/game-stat.repository';
+import { PlateAppearanceService } from '../../plate-appearances/application/plate-appearance.service';
 import { SeasonBattingStatService } from '../../season-stats/application/season-batting-stat.service';
 import { SeasonPitchingStatService } from '../../season-stats/application/season-pitching-stat.service';
 import { Player, PlayerPosition } from '../domain/entities/player.entity';
@@ -41,6 +42,24 @@ export interface PlayerVsTeamStat {
   avg: string; // 타자: 상대팀 타율, 투수: 상대팀 피안타율
 }
 
+export interface PlayerVsPitcherStat {
+  pitcherId: number;
+  pitcherName: string;
+  pitcherTeamCode: string;
+  atBats: number;
+  hits: number;
+  avg: string;
+}
+
+export interface PlayerVsBatterStat {
+  batterId: number;
+  batterName: string;
+  batterTeamCode: string;
+  atBats: number;
+  strikeouts: number;
+  strikeoutRate: string;
+}
+
 interface PrimaryStat {
   label: string;
   sortValue: number | null;
@@ -54,6 +73,7 @@ export class PlayerService {
     private readonly seasonBattingStatService: SeasonBattingStatService,
     private readonly seasonPitchingStatService: SeasonPitchingStatService,
     private readonly gameStatService: GameStatService,
+    private readonly plateAppearanceService: PlateAppearanceService,
   ) {}
 
   /**
@@ -221,6 +241,46 @@ export class PlayerService {
       seasonYear,
     );
     return splits.map((split) => toVsTeamStat(split, split.battingAverage));
+  }
+
+  /** 타자 전용: 상대 투수별 안타율. 투수에게 호출하면 빈 배열을 반환한다. */
+  async getVsPitcherStats(
+    player: Player,
+    seasonYear: number,
+  ): Promise<PlayerVsPitcherStat[]> {
+    if (player.position === PlayerPosition.PITCHER) return [];
+    const splits = await this.plateAppearanceService.findBatterVsPitcherSplits(
+      player.id,
+      seasonYear,
+    );
+    return splits.map((split) => ({
+      pitcherId: split.pitcherId,
+      pitcherName: split.pitcherName,
+      pitcherTeamCode: split.pitcherTeamCode,
+      atBats: split.atBats,
+      hits: split.hits,
+      avg: split.battingAverage,
+    }));
+  }
+
+  /** 투수 전용: 상대 타자별 삼진율. 타자에게 호출하면 빈 배열을 반환한다. */
+  async getVsBatterStats(
+    player: Player,
+    seasonYear: number,
+  ): Promise<PlayerVsBatterStat[]> {
+    if (player.position !== PlayerPosition.PITCHER) return [];
+    const splits = await this.plateAppearanceService.findPitcherVsBatterSplits(
+      player.id,
+      seasonYear,
+    );
+    return splits.map((split) => ({
+      batterId: split.batterId,
+      batterName: split.batterName,
+      batterTeamCode: split.batterTeamCode,
+      atBats: split.atBats,
+      strikeouts: split.strikeouts,
+      strikeoutRate: split.strikeoutRate,
+    }));
   }
 }
 

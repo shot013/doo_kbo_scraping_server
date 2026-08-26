@@ -4,6 +4,8 @@ import { GameService } from '../../game/application/game.service';
 import { Game, GameStatus } from '../../game/domain/entities/game.entity';
 import { GameStatService } from '../../game-stats/application/game-stat.service';
 import { GameStat } from '../../game-stats/domain/entities/game-stat.entity';
+import { PlateAppearanceService } from '../../plate-appearances/application/plate-appearance.service';
+import { PlateAppearance } from '../../plate-appearances/domain/entities/plate-appearance.entity';
 import { PlayerService } from '../../players/application/player.service';
 import { Player } from '../../players/domain/entities/player.entity';
 import { ScrapeSourceHealthService } from '../../scrape-source-health/application/scrape-source-health.service';
@@ -22,6 +24,10 @@ import {
   GameScraper,
   SCHEDULE_SOURCE_URL,
 } from '../infrastructure/scrapers/game.scraper';
+import {
+  NAVER_RELAY_URL,
+  PlayByPlayScraper,
+} from '../infrastructure/scrapers/play-by-play.scraper';
 import {
   ROSTER_SOURCE_URL,
   RosterScraper,
@@ -53,11 +59,13 @@ export class ScrapeService {
     private readonly gameScraper: GameScraper,
     private readonly standingsScraper: StandingsScraper,
     private readonly gameStatsScraper: GameStatsScraper,
+    private readonly playByPlayScraper: PlayByPlayScraper,
     private readonly rosterScraper: RosterScraper,
     private readonly seasonStatsScraper: SeasonStatsScraper,
     private readonly gameService: GameService,
     private readonly standingService: StandingService,
     private readonly gameStatService: GameStatService,
+    private readonly plateAppearanceService: PlateAppearanceService,
     private readonly playerService: PlayerService,
     private readonly seasonBattingStatService: SeasonBattingStatService,
     private readonly seasonPitchingStatService: SeasonPitchingStatService,
@@ -442,6 +450,153 @@ export class ScrapeService {
     }
   }
 
+  async scrapePlayByPlay(gameId: string): Promise<ScrapeSummary> {
+    const sourceName = 'naver-play-by-play';
+    const startedAt = Date.now();
+    const targetUrl = `${NAVER_RELAY_URL}/${gameId}${gameId.slice(0, 4)}/relay`;
+
+    try {
+      const { scraped, saved } = await this.scrapeAndSavePlayByPlay(gameId);
+      if (scraped === 0) {
+        throw new Error('No plate appearances scraped from source');
+      }
+
+      const durationMs = Date.now() - startedAt;
+      const failedCount = scraped - saved;
+      await this.scrapeSourceHealthService.log({
+        sourceName,
+        targetUrl,
+        status: ScrapeStatus.SUCCESS,
+        httpStatusCode: 200,
+        durationMs,
+        itemsScraped: saved,
+        errorMessage:
+          failedCount > 0
+            ? `${failedCount}/${scraped} plate appearances failed to save (see server logs)`
+            : null,
+        scrapedAt: new Date(),
+      });
+      return { itemsScraped: saved, durationMs };
+    } catch (error) {
+      await this.logFailure(sourceName, targetUrl, startedAt, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 시즌 전체 FINISHED 경기의 타석 데이터를 스크랩한다. `scrapeGameStatsBackfill`과 같은 이유로
+   * (경기당 이닝 수만큼 요청이 늘어나 시즌 전체는 상당히 오래 걸림) 스케줄러에는 등록하지 않고
+   * 수동 트리거 전용으로 둔다.
+   */
+  async scrapePlayByPlayBackfill(seasonYear: number): Promise<ScrapeSummary> {
+    const sourceName = 'naver-play-by-play-backfill';
+    const startedAt = Date.now();
+
+    try {
+      const { data: finishedGames } = await this.gameService.findAll({
+        seasonYear,
+        status: GameStatus.FINISHED,
+        limit: 1000,
+      });
+      if (finishedGames.length === 0) {
+        throw new Error(`No FINISHED games found for season ${seasonYear}`);
+      }
+
+      let savedCount = 0;
+      let failedGameCount = 0;
+
+      for (const [index, game] of finishedGames.entries()) {
+        if (index > 0) {
+          await delay(BACKFILL_DELAY_MS);
+        }
+        try {
+          const { saved } = await this.scrapeAndSavePlayByPlay(game.id);
+          savedCount += saved;
+        } catch (error) {
+          failedGameCount++;
+          this.logger.warn(
+            `Failed to backfill plate appearances for ${game.id}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
+
+      const durationMs = Date.now() - startedAt;
+      await this.scrapeSourceHealthService.log({
+        sourceName,
+        targetUrl: NAVER_RELAY_URL,
+        status: ScrapeStatus.SUCCESS,
+        httpStatusCode: 200,
+        durationMs,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedGameCount > 0
+            ? `${failedGameCount}/${finishedGames.length} games failed to backfill (see server logs)`
+            : null,
+        scrapedAt: new Date(),
+      });
+      return { itemsScraped: savedCount, durationMs };
+    } catch (error) {
+      await this.logFailure(sourceName, NAVER_RELAY_URL, startedAt, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 타자/투수 이름은 relay 응답이 아니라 같은 경기의 `game_stats`(박스스코어)에서
+   * playerId로 매칭해 채운다 — `PlayByPlayScraper`의 클래스 doc 참고.
+   */
+  private async scrapeAndSavePlayByPlay(
+    gameId: string,
+  ): Promise<{ scraped: number; saved: number }> {
+    const game = await this.gameService.findById(gameId);
+    const scraped = await this.playByPlayScraper.scrape(
+      gameId,
+      game.homeTeamCode,
+      game.awayTeamCode,
+    );
+    const gameStats = await this.gameStatService.findByGameIds([gameId]);
+    const nameByPlayerId = new Map(
+      gameStats
+        .filter((stat) => stat.playerId !== null)
+        .map((stat) => [stat.playerId as number, stat.playerName]),
+    );
+    const now = new Date();
+
+    let savedCount = 0;
+    for (const item of scraped) {
+      try {
+        await this.plateAppearanceService.upsert(
+          new PlateAppearance({
+            id: 0,
+            gameId: item.gameId,
+            seasonYear: game.seasonYear,
+            inning: item.inning,
+            isTopInning: item.isTopInning,
+            sequenceNo: item.sequenceNo,
+            batterId: item.batterId,
+            batterName: resolvePlayerName(nameByPlayerId, item.batterId),
+            batterTeamCode: item.batterTeamCode,
+            pitcherId: item.pitcherId,
+            pitcherName: resolvePlayerName(nameByPlayerId, item.pitcherId),
+            pitcherTeamCode: item.pitcherTeamCode,
+            resultText: item.resultText,
+            result: item.result,
+            hitType: item.hitType,
+            isAtBat: item.isAtBat,
+            createdAt: now,
+          }),
+        );
+        savedCount++;
+      } catch (error) {
+        this.logger.warn(
+          `Failed to save plate appearance no=${item.sequenceNo} for game ${gameId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    return { scraped: scraped.length, saved: savedCount };
+  }
+
   private async scrapeAndSaveGameStats(
     gameId: string,
   ): Promise<{ scraped: number; saved: number }> {
@@ -607,4 +762,12 @@ export class ScrapeService {
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function resolvePlayerName(
+  nameByPlayerId: Map<number, string>,
+  playerId: number | null,
+): string {
+  if (playerId === null) return '';
+  return nameByPlayerId.get(playerId) ?? `#${playerId}`;
 }

@@ -9,6 +9,7 @@ import { ExampleModule } from './modules/example/example.module';
 import { GameModule } from './modules/game/game.module';
 import { GameResultsModule } from './modules/game-results/game-results.module';
 import { GameStatsModule } from './modules/game-stats/game-stats.module';
+import { PlateAppearancesModule } from './modules/plate-appearances/plate-appearances.module';
 import { PlayersModule } from './modules/players/players.module';
 import { RecordsModule } from './modules/records/records.module';
 import { SeasonStatsModule } from './modules/season-stats/season-stats.module';
@@ -27,6 +28,7 @@ import { ScrapeModule } from './modules/scrape/scrape.module';
     GameModule,
     GameStatsModule,
     GameResultsModule,
+    PlateAppearancesModule,
     PlayersModule,
     StandingsModule,
     TeamsModule,
