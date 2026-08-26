@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GameStatsModule } from '../game-stats/game-stats.module';
+import { PlateAppearancesModule } from '../plate-appearances/plate-appearances.module';
 import { SeasonStatsModule } from '../season-stats/season-stats.module';
 import { PlayerController } from './application/player.controller';
 import { PlayerService } from './application/player.service';
@@ -13,6 +14,7 @@ import { PlayerRepositoryImpl } from './infrastructure/repositories/player.repos
     TypeOrmModule.forFeature([PlayerOrmEntity]),
     SeasonStatsModule,
     GameStatsModule,
+    PlateAppearancesModule,
   ],
   controllers: [PlayerController],
   providers: [

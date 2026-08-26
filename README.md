@@ -119,6 +119,7 @@ npm run test           # 전체 테스트
 
 - `position`: `PITCHER`\|`CATCHER`\|`INFIELDER`\|`OUTFIELDER` (대소문자 무관). `seasonYear` 미지정 시 현재 연도
 - 목록 응답의 각 선수에는 시즌 대표 기록(`primaryStat`, 없으면 `"기록 없음"`)이, 상세 응답에는 시즌 타/투 기록 라인(`statLines`)과 상대팀별 타율(타자)/피안타율(투수) 목록(`vsTeamStats`, 팀별 `teamCode`/`teamName`/`games`/`avg`)이 포함됨
+- 상세 응답에는 추가로 타자 전용 `vsPitcherStats`(상대 투수별 안타율: `pitcherId`/`pitcherName`/`pitcherTeamCode`/`atBats`/`hits`/`avg`)와 투수 전용 `vsBatterStats`(상대 타자별 삼진율: `batterId`/`batterName`/`batterTeamCode`/`atBats`/`strikeouts`/`strikeoutRate`)가 포함됨(포지션에 맞지 않는 쪽은 빈 배열). `plate-appearances`(타석 단위 문자중계 스크랩)를 시즌 단위로 집계해 만듦
 
 ### Records (`src/modules/records`)
 
@@ -139,6 +140,8 @@ npm run test           # 전체 테스트
 | POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
 | POST | `/scrape/game-stats/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 박스스코어를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
 | POST | `/scrape/roster` | body: `teamCode`(미지정 시 전체 팀) | 팀 로스터(포지션/등번호/출신교) 스크래핑 실행 | O (매일 18:00 KST) |
+| POST | `/scrape/play-by-play` | body: `gameId`(필수) | 특정 경기의 타석 단위 문자중계(타자-투수 매치업/결과) 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `FINISHED` 상태만 자동 대상) |
+| POST | `/scrape/play-by-play/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 타석 데이터를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
 
 ### Scrape Source Health (`src/modules/scrape-source-health`)
 

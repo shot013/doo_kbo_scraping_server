@@ -53,4 +53,23 @@ export class ScrapeController {
   scrapeRoster(@Body() body?: ScrapeRosterRequestDto): Promise<ScrapeSummary> {
     return this.scrapeService.scrapeRoster(body?.teamCode);
   }
+
+  @Post('play-by-play')
+  scrapePlayByPlay(
+    @Body() body?: ScrapeGameStatsRequestDto,
+  ): Promise<ScrapeSummary> {
+    if (!body?.gameId) {
+      throw new BadRequestException('gameId is required');
+    }
+    return this.scrapeService.scrapePlayByPlay(body.gameId);
+  }
+
+  @Post('play-by-play/backfill')
+  scrapePlayByPlayBackfill(
+    @Body() body?: ScrapeRequestDto,
+  ): Promise<ScrapeSummary> {
+    return this.scrapeService.scrapePlayByPlayBackfill(
+      body?.seasonYear ?? new Date().getFullYear(),
+    );
+  }
 }
