@@ -65,6 +65,38 @@ interface PrimaryStat {
   sortValue: number | null;
 }
 
+/** KBO 정규시즌 개막월(3월)부터 시작해 경과 개월 수를 센다. */
+const SEASON_START_MONTH = 3;
+/** 정규시즌 종료월(10월) 이후로는 표본이 더 늘지 않으므로 경과 개월 수를 여기서 고정한다. */
+const SEASON_FULL_MONTHS = 8;
+/**
+ * 매치업(상대 투수/타자) 표본 최소 타수 기준.
+ * 선발은 로테이션·이닝 특성상 불펜보다 특정 상대와 더 자주 마주치지만, 선발이 1~2이닝만
+ * 던지고 조기 강판되는 경우도 있어 선발/불펜을 구분하지 않고 더 보수적인(낮은) 불펜 기준
+ * 하나로 통일한다: 상대팀과의 경기 빈도·불펜 등판 확률을 러프하게 추정하면 월 0.5타수 정도
+ * 쌓인다고 보고, 시즌 개막(3월) 이후 경과 개월 수에 비례해 기준을 올린다.
+ * 자세한 산출 근거는 docs/MATCHUP_SAMPLE_THRESHOLD.md 참고.
+ */
+const MIN_AT_BATS_PER_MONTH = 0.5;
+
+/**
+ * seasonYear 시즌 개막 이후 경과 개월 수(최소 1, 정규시즌 종료 이후엔 SEASON_FULL_MONTHS로 고정)를
+ * 기준으로 매치업 표본의 최소 타수를 계산한다. 시즌 시작 전에 조회하면 1개월 치(최소값)로 취급한다.
+ */
+export function computeMinAtBatsThreshold(
+  seasonYear: number,
+  referenceDate: Date = new Date(),
+): number {
+  const referenceYearMonth =
+    referenceDate.getFullYear() * 12 + referenceDate.getMonth();
+  const seasonStartYearMonth = seasonYear * 12 + (SEASON_START_MONTH - 1);
+  const monthsElapsed = Math.min(
+    Math.max(referenceYearMonth - seasonStartYearMonth + 1, 1),
+    SEASON_FULL_MONTHS,
+  );
+  return Math.max(1, Math.ceil(monthsElapsed * MIN_AT_BATS_PER_MONTH));
+}
+
 @Injectable()
 export class PlayerService {
   constructor(
@@ -253,14 +285,17 @@ export class PlayerService {
       player.id,
       seasonYear,
     );
-    return splits.map((split) => ({
-      pitcherId: split.pitcherId,
-      pitcherName: split.pitcherName,
-      pitcherTeamCode: split.pitcherTeamCode,
-      atBats: split.atBats,
-      hits: split.hits,
-      avg: split.battingAverage,
-    }));
+    const minAtBats = computeMinAtBatsThreshold(seasonYear);
+    return splits
+      .filter((split) => split.atBats >= minAtBats)
+      .map((split) => ({
+        pitcherId: split.pitcherId,
+        pitcherName: split.pitcherName,
+        pitcherTeamCode: split.pitcherTeamCode,
+        atBats: split.atBats,
+        hits: split.hits,
+        avg: split.battingAverage,
+      }));
   }
 
   /** 투수 전용: 상대 타자별 삼진율. 타자에게 호출하면 빈 배열을 반환한다. */
@@ -273,14 +308,17 @@ export class PlayerService {
       player.id,
       seasonYear,
     );
-    return splits.map((split) => ({
-      batterId: split.batterId,
-      batterName: split.batterName,
-      batterTeamCode: split.batterTeamCode,
-      atBats: split.atBats,
-      strikeouts: split.strikeouts,
-      strikeoutRate: split.strikeoutRate,
-    }));
+    const minAtBats = computeMinAtBatsThreshold(seasonYear);
+    return splits
+      .filter((split) => split.atBats >= minAtBats)
+      .map((split) => ({
+        batterId: split.batterId,
+        batterName: split.batterName,
+        batterTeamCode: split.batterTeamCode,
+        atBats: split.atBats,
+        strikeouts: split.strikeouts,
+        strikeoutRate: split.strikeoutRate,
+      }));
   }
 }
 
