@@ -7,8 +7,8 @@ import { StandingService } from '../../standings/application/standing.service';
 const TEAM_COUNT = 10;
 
 export interface TeamSummaryResponse {
-  code: string;
-  name: string;
+  teamCode: string;
+  teamName: string;
   rank: number;
   wins: number;
   losses: number;
@@ -95,8 +95,8 @@ export class TeamsService {
       5,
     );
     return {
-      code: standing.teamCode,
-      name: standing.teamName,
+      teamCode: standing.teamCode,
+      teamName: standing.teamName,
       rank: standing.rank,
       wins: standing.wins,
       losses: standing.losses,

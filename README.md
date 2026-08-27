@@ -108,7 +108,7 @@ npm run test           # 전체 테스트
 | GET | `/teams/:code` | `seasonYear` | 팀 상세 조회 (요약 + 로스터) |
 
 - `seasonYear` 미지정 시 현재 연도. `:code`는 대문자로 정규화되어 조회됨
-- 요약에는 순위/승패/승률/게임차/팀 타율(`battingAverage`)/팀 평균자책(`era`)/팀 득점(`runsScored`)/팀 실점(`runsAllowed`)/최근 5경기 폼(`recentForm`)이 포함되며 `standings`(타율/평균자책/득점/실점 포함) + `game`(최근 폼)을 조합해 만듦
+- 요약에는 팀 코드(`teamCode`)/팀명(`teamName`)/순위/승패/승률/게임차/팀 타율(`battingAverage`)/팀 평균자책(`era`)/팀 득점(`runsScored`)/팀 실점(`runsAllowed`)/최근 5경기 폼(`recentForm`)이 포함되며 `standings`(타율/평균자책/득점/실점 포함) + `game`(최근 폼)을 조합해 만듦
 
 ### Players (`src/modules/players`)
 
