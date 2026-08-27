@@ -120,6 +120,7 @@ npm run test           # 전체 테스트
 - `position`: `PITCHER`\|`CATCHER`\|`INFIELDER`\|`OUTFIELDER` (대소문자 무관). `seasonYear` 미지정 시 현재 연도
 - 목록 응답의 각 선수에는 시즌 대표 기록(`primaryStat`, 없으면 `"기록 없음"`)이, 상세 응답에는 시즌 타/투 기록 라인(`statLines`)과 상대팀별 타율(타자)/피안타율(투수) 목록(`vsTeamStats`, 팀별 `teamCode`/`teamName`/`games`/`avg`)이 포함됨
 - 상세 응답에는 추가로 타자 전용 `vsPitcherStats`(상대 투수별 안타율: `pitcherId`/`pitcherName`/`pitcherTeamCode`/`atBats`/`hits`/`avg`)와 투수 전용 `vsBatterStats`(상대 타자별 삼진율: `batterId`/`batterName`/`batterTeamCode`/`atBats`/`strikeouts`/`strikeoutRate`)가 포함됨(포지션에 맞지 않는 쪽은 빈 배열). `plate-appearances`(타석 단위 문자중계 스크랩)를 시즌 단위로 집계해 만듦
+- `vsPitcherStats`/`vsBatterStats`는 표본이 너무 적은 매치업(예: 1타수 1안타)을 걸러내기 위해 시즌 개막 이후 경과 개월 수에 비례하는 최소 타수 기준(`minAtBats`)을 만족하는 매치업만 포함함 — 자세한 산출 근거는 [`docs/MATCHUP_SAMPLE_THRESHOLD.md`](docs/MATCHUP_SAMPLE_THRESHOLD.md) 참고
 
 ### Records (`src/modules/records`)
 
