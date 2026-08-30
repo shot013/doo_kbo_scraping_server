@@ -86,36 +86,46 @@ export class ScrapeService {
       }
       const now = new Date();
 
+      const games = scraped.map(
+        (item) =>
+          new Game({
+            id: item.id,
+            seasonYear,
+            gameDate: item.gameDate,
+            scheduledAt: item.scheduledAt,
+            stadium: item.stadium,
+            homeTeamCode: item.homeTeamCode,
+            homeTeamName: item.homeTeamName,
+            awayTeamCode: item.awayTeamCode,
+            awayTeamName: item.awayTeamName,
+            homeScore: item.homeScore,
+            awayScore: item.awayScore,
+            homeStarterPitcher: item.homeStarterPitcher,
+            awayStarterPitcher: item.awayStarterPitcher,
+            currentInning: null,
+            status: item.status,
+            sourceUrl: item.sourceUrl,
+            createdAt: now,
+            updatedAt: now,
+          }),
+      );
       let savedCount = 0;
-      for (const item of scraped) {
-        try {
-          await this.gameService.upsert(
-            new Game({
-              id: item.id,
-              seasonYear,
-              gameDate: item.gameDate,
-              scheduledAt: item.scheduledAt,
-              stadium: item.stadium,
-              homeTeamCode: item.homeTeamCode,
-              homeTeamName: item.homeTeamName,
-              awayTeamCode: item.awayTeamCode,
-              awayTeamName: item.awayTeamName,
-              homeScore: item.homeScore,
-              awayScore: item.awayScore,
-              homeStarterPitcher: item.homeStarterPitcher,
-              awayStarterPitcher: item.awayStarterPitcher,
-              currentInning: null,
-              status: item.status,
-              sourceUrl: item.sourceUrl,
-              createdAt: now,
-              updatedAt: now,
-            }),
-          );
-          savedCount++;
-        } catch (error) {
-          this.logger.warn(
-            `Failed to save game ${item.id}: ${error instanceof Error ? error.message : String(error)}`,
-          );
+      try {
+        await this.gameService.upsertMany(games);
+        savedCount = games.length;
+      } catch (error) {
+        this.logger.warn(
+          `Batch upsert failed for games (${games.length} items), falling back to per-item save: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        for (const game of games) {
+          try {
+            await this.gameService.upsert(game);
+            savedCount++;
+          } catch (itemError) {
+            this.logger.warn(
+              `Failed to save game ${game.id}: ${itemError instanceof Error ? itemError.message : String(itemError)}`,
+            );
+          }
         }
       }
 
@@ -194,14 +204,22 @@ export class ScrapeService {
           }),
       );
       let savedCount = 0;
-      for (const standing of standings) {
-        try {
-          await this.standingService.upsert(standing);
-          savedCount++;
-        } catch (error) {
-          this.logger.warn(
-            `Failed to save standing for team ${standing.teamCode}: ${error instanceof Error ? error.message : String(error)}`,
-          );
+      try {
+        await this.standingService.upsertMany(standings);
+        savedCount = standings.length;
+      } catch (error) {
+        this.logger.warn(
+          `Batch upsert failed for standings (${standings.length} items), falling back to per-item save: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        for (const standing of standings) {
+          try {
+            await this.standingService.upsert(standing);
+            savedCount++;
+          } catch (itemError) {
+            this.logger.warn(
+              `Failed to save standing for team ${standing.teamCode}: ${itemError instanceof Error ? itemError.message : String(itemError)}`,
+            );
+          }
         }
       }
 
@@ -249,82 +267,103 @@ export class ScrapeService {
       }
       const now = new Date();
 
+      const battingStats = scrapedBatting.map(
+        (item) =>
+          new SeasonBattingStat({
+            id: 0,
+            seasonYear,
+            teamCode: item.teamCode,
+            teamName: item.teamName,
+            playerName: item.playerName,
+            rank: item.rank,
+            qualified: qualifiedBattingKeys.has(
+              toStatKey(item.teamCode, item.playerName),
+            ),
+            battingAverage: item.battingAverage,
+            games: item.games,
+            plateAppearances: item.plateAppearances,
+            atBats: item.atBats,
+            runs: item.runs,
+            hits: item.hits,
+            doubles: item.doubles,
+            triples: item.triples,
+            homeRuns: item.homeRuns,
+            totalBases: item.totalBases,
+            rbi: item.rbi,
+            sacrificeHits: item.sacrificeHits,
+            sacrificeFlies: item.sacrificeFlies,
+            createdAt: now,
+            updatedAt: now,
+          }),
+      );
+      const pitchingStats = scrapedPitching.map(
+        (item) =>
+          new SeasonPitchingStat({
+            id: 0,
+            seasonYear,
+            teamCode: item.teamCode,
+            teamName: item.teamName,
+            playerName: item.playerName,
+            rank: item.rank,
+            qualified: qualifiedPitchingKeys.has(
+              toStatKey(item.teamCode, item.playerName),
+            ),
+            era: item.era,
+            games: item.games,
+            wins: item.wins,
+            losses: item.losses,
+            saves: item.saves,
+            holds: item.holds,
+            winPct: item.winPct,
+            inningsPitched: item.inningsPitched,
+            hitsAllowed: item.hitsAllowed,
+            homeRunsAllowed: item.homeRunsAllowed,
+            walksAllowed: item.walksAllowed,
+            hitByPitch: item.hitByPitch,
+            strikeoutsPitched: item.strikeoutsPitched,
+            runsAllowed: item.runsAllowed,
+            earnedRuns: item.earnedRuns,
+            whip: item.whip,
+            createdAt: now,
+            updatedAt: now,
+          }),
+      );
+
       let savedCount = 0;
-      for (const item of scrapedBatting) {
-        try {
-          await this.seasonBattingStatService.upsert(
-            new SeasonBattingStat({
-              id: 0,
-              seasonYear,
-              teamCode: item.teamCode,
-              teamName: item.teamName,
-              playerName: item.playerName,
-              rank: item.rank,
-              qualified: qualifiedBattingKeys.has(
-                toStatKey(item.teamCode, item.playerName),
-              ),
-              battingAverage: item.battingAverage,
-              games: item.games,
-              plateAppearances: item.plateAppearances,
-              atBats: item.atBats,
-              runs: item.runs,
-              hits: item.hits,
-              doubles: item.doubles,
-              triples: item.triples,
-              homeRuns: item.homeRuns,
-              totalBases: item.totalBases,
-              rbi: item.rbi,
-              sacrificeHits: item.sacrificeHits,
-              sacrificeFlies: item.sacrificeFlies,
-              createdAt: now,
-              updatedAt: now,
-            }),
-          );
-          savedCount++;
-        } catch (error) {
-          this.logger.warn(
-            `Failed to save season batting stat for ${item.playerName} (team ${item.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
-          );
+      try {
+        await this.seasonBattingStatService.upsertMany(battingStats);
+        savedCount += battingStats.length;
+      } catch (error) {
+        this.logger.warn(
+          `Batch upsert failed for season batting stats (${battingStats.length} items), falling back to per-item save: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        for (const stat of battingStats) {
+          try {
+            await this.seasonBattingStatService.upsert(stat);
+            savedCount++;
+          } catch (itemError) {
+            this.logger.warn(
+              `Failed to save season batting stat for ${stat.playerName} (team ${stat.teamCode}): ${itemError instanceof Error ? itemError.message : String(itemError)}`,
+            );
+          }
         }
       }
-      for (const item of scrapedPitching) {
-        try {
-          await this.seasonPitchingStatService.upsert(
-            new SeasonPitchingStat({
-              id: 0,
-              seasonYear,
-              teamCode: item.teamCode,
-              teamName: item.teamName,
-              playerName: item.playerName,
-              rank: item.rank,
-              qualified: qualifiedPitchingKeys.has(
-                toStatKey(item.teamCode, item.playerName),
-              ),
-              era: item.era,
-              games: item.games,
-              wins: item.wins,
-              losses: item.losses,
-              saves: item.saves,
-              holds: item.holds,
-              winPct: item.winPct,
-              inningsPitched: item.inningsPitched,
-              hitsAllowed: item.hitsAllowed,
-              homeRunsAllowed: item.homeRunsAllowed,
-              walksAllowed: item.walksAllowed,
-              hitByPitch: item.hitByPitch,
-              strikeoutsPitched: item.strikeoutsPitched,
-              runsAllowed: item.runsAllowed,
-              earnedRuns: item.earnedRuns,
-              whip: item.whip,
-              createdAt: now,
-              updatedAt: now,
-            }),
-          );
-          savedCount++;
-        } catch (error) {
-          this.logger.warn(
-            `Failed to save season pitching stat for ${item.playerName} (team ${item.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
-          );
+      try {
+        await this.seasonPitchingStatService.upsertMany(pitchingStats);
+        savedCount += pitchingStats.length;
+      } catch (error) {
+        this.logger.warn(
+          `Batch upsert failed for season pitching stats (${pitchingStats.length} items), falling back to per-item save: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        for (const stat of pitchingStats) {
+          try {
+            await this.seasonPitchingStatService.upsert(stat);
+            savedCount++;
+          } catch (itemError) {
+            this.logger.warn(
+              `Failed to save season pitching stat for ${stat.playerName} (team ${stat.teamCode}): ${itemError instanceof Error ? itemError.message : String(itemError)}`,
+            );
+          }
         }
       }
 
@@ -562,35 +601,45 @@ export class ScrapeService {
     );
     const now = new Date();
 
+    const plateAppearances = scraped.map(
+      (item) =>
+        new PlateAppearance({
+          id: 0,
+          gameId: item.gameId,
+          seasonYear: game.seasonYear,
+          inning: item.inning,
+          isTopInning: item.isTopInning,
+          sequenceNo: item.sequenceNo,
+          batterId: item.batterId,
+          batterName: resolvePlayerName(nameByPlayerId, item.batterId),
+          batterTeamCode: item.batterTeamCode,
+          pitcherId: item.pitcherId,
+          pitcherName: resolvePlayerName(nameByPlayerId, item.pitcherId),
+          pitcherTeamCode: item.pitcherTeamCode,
+          resultText: item.resultText,
+          result: item.result,
+          hitType: item.hitType,
+          isAtBat: item.isAtBat,
+          createdAt: now,
+        }),
+    );
     let savedCount = 0;
-    for (const item of scraped) {
-      try {
-        await this.plateAppearanceService.upsert(
-          new PlateAppearance({
-            id: 0,
-            gameId: item.gameId,
-            seasonYear: game.seasonYear,
-            inning: item.inning,
-            isTopInning: item.isTopInning,
-            sequenceNo: item.sequenceNo,
-            batterId: item.batterId,
-            batterName: resolvePlayerName(nameByPlayerId, item.batterId),
-            batterTeamCode: item.batterTeamCode,
-            pitcherId: item.pitcherId,
-            pitcherName: resolvePlayerName(nameByPlayerId, item.pitcherId),
-            pitcherTeamCode: item.pitcherTeamCode,
-            resultText: item.resultText,
-            result: item.result,
-            hitType: item.hitType,
-            isAtBat: item.isAtBat,
-            createdAt: now,
-          }),
-        );
-        savedCount++;
-      } catch (error) {
-        this.logger.warn(
-          `Failed to save plate appearance no=${item.sequenceNo} for game ${gameId}: ${error instanceof Error ? error.message : String(error)}`,
-        );
+    try {
+      await this.plateAppearanceService.upsertMany(plateAppearances);
+      savedCount = plateAppearances.length;
+    } catch (error) {
+      this.logger.warn(
+        `Batch upsert failed for plate appearances in game ${gameId} (${plateAppearances.length} items), falling back to per-item save: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      for (const plateAppearance of plateAppearances) {
+        try {
+          await this.plateAppearanceService.upsert(plateAppearance);
+          savedCount++;
+        } catch (itemError) {
+          this.logger.warn(
+            `Failed to save plate appearance no=${plateAppearance.sequenceNo} for game ${gameId}: ${itemError instanceof Error ? itemError.message : String(itemError)}`,
+          );
+        }
       }
     }
 
@@ -643,14 +692,22 @@ export class ScrapeService {
     );
 
     let savedCount = 0;
-    for (const stat of stats) {
-      try {
-        await this.gameStatService.upsert(stat);
-        savedCount++;
-      } catch (error) {
-        this.logger.warn(
-          `Failed to save game stat for ${stat.playerName} (team ${stat.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
-        );
+    try {
+      await this.gameStatService.upsertMany(stats);
+      savedCount = stats.length;
+    } catch (error) {
+      this.logger.warn(
+        `Batch upsert failed for game stats in game ${gameId} (${stats.length} items), falling back to per-item save: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      for (const stat of stats) {
+        try {
+          await this.gameStatService.upsert(stat);
+          savedCount++;
+        } catch (itemError) {
+          this.logger.warn(
+            `Failed to save game stat for ${stat.playerName} (team ${stat.teamCode}): ${itemError instanceof Error ? itemError.message : String(itemError)}`,
+          );
+        }
       }
     }
 
@@ -679,29 +736,39 @@ export class ScrapeService {
         const scraped = await this.rosterScraper.scrape(team.code);
         scrapedCount += scraped.length;
 
-        for (const item of scraped) {
-          try {
-            await this.playerService.upsert(
-              new Player({
-                id: item.id,
-                teamCode: item.teamCode,
-                teamName: resolveKboTeamByCode(item.teamCode).fullName,
-                name: item.name,
-                position: item.position,
-                backNumber: item.backNumber,
-                birthDate: item.birthDate,
-                heightCm: item.heightCm,
-                weightKg: item.weightKg,
-                school: item.school,
-                createdAt: now,
-                updatedAt: now,
-              }),
-            );
-            savedCount++;
-          } catch (error) {
-            this.logger.warn(
-              `Failed to save player ${item.name} (${item.teamCode}): ${error instanceof Error ? error.message : String(error)}`,
-            );
+        const players = scraped.map(
+          (item) =>
+            new Player({
+              id: item.id,
+              teamCode: item.teamCode,
+              teamName: resolveKboTeamByCode(item.teamCode).fullName,
+              name: item.name,
+              position: item.position,
+              backNumber: item.backNumber,
+              birthDate: item.birthDate,
+              heightCm: item.heightCm,
+              weightKg: item.weightKg,
+              school: item.school,
+              createdAt: now,
+              updatedAt: now,
+            }),
+        );
+        try {
+          await this.playerService.upsertMany(players);
+          savedCount += players.length;
+        } catch (error) {
+          this.logger.warn(
+            `Batch upsert failed for roster team ${team.code} (${players.length} items), falling back to per-item save: ${error instanceof Error ? error.message : String(error)}`,
+          );
+          for (const player of players) {
+            try {
+              await this.playerService.upsert(player);
+              savedCount++;
+            } catch (itemError) {
+              this.logger.warn(
+                `Failed to save player ${player.name} (${player.teamCode}): ${itemError instanceof Error ? itemError.message : String(itemError)}`,
+              );
+            }
           }
         }
       }

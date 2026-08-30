@@ -30,6 +30,10 @@ export class GameService {
     return this.gameRepository.upsert(game);
   }
 
+  upsertMany(games: Game[]): Promise<void> {
+    return this.gameRepository.upsertMany(games);
+  }
+
   aggregateTeamRuns(seasonYear: number): Promise<TeamRunsAggregate[]> {
     return this.gameRepository.aggregateTeamRuns(seasonYear);
   }

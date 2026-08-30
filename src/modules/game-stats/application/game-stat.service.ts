@@ -37,6 +37,10 @@ export class GameStatService {
     return this.gameStatRepository.upsert(stat);
   }
 
+  upsertMany(stats: GameStat[]): Promise<void> {
+    return this.gameStatRepository.upsertMany(stats);
+  }
+
   findByGameIds(gameIds: string[]): Promise<GameStat[]> {
     return this.gameStatRepository.findByGameIds(gameIds);
   }

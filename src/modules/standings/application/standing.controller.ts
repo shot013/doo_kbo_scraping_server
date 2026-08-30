@@ -1,10 +1,12 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { PaginatedResult } from '../../../common/pagination/pagination';
 import { Standing } from '../domain/entities/standing.entity';
 import { StandingSortField } from '../domain/repositories/standing.repository';
 import { StandingQueryDto } from './dto/standing-query.dto';
 import { StandingService } from './standing.service';
 
+@UseInterceptors(CacheInterceptor)
 @Controller('standings')
 export class StandingController {
   constructor(private readonly standingService: StandingService) {}

@@ -31,6 +31,7 @@ export interface GameRepository {
   findAll(filter?: GameFilter): Promise<PaginatedResult<Game>>;
   findById(id: string): Promise<Game | null>;
   upsert(game: Game): Promise<Game>;
+  upsertMany(games: Game[]): Promise<void>;
   /** 특정 팀의 최근 종료 경기를 최신순으로 조회한다. */
   findRecentFinished(teamCode: string, limit: number): Promise<Game[]>;
   aggregateTeamRuns(seasonYear: number): Promise<TeamRunsAggregate[]>;
