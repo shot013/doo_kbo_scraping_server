@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SentryModule } from '@sentry/nestjs/setup';
-import { ConfigModule } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -23,6 +24,14 @@ import { ScrapeModule } from './modules/scrape/scrape.module';
     SentryModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        ttl: config.get<number>('CACHE_TTL_MS', 300000),
+      }),
+    }),
     DatabaseModule,
     ExampleModule,
     GameModule,

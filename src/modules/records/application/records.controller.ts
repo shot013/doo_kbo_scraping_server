@@ -1,4 +1,5 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { RecordQueryDto } from './dto/record-query.dto';
 import {
   BatterRecordResponse,
@@ -6,6 +7,7 @@ import {
   RecordsService,
 } from './records.service';
 
+@UseInterceptors(CacheInterceptor)
 @Controller('records')
 export class RecordsController {
   constructor(private readonly recordsService: RecordsService) {}
