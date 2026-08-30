@@ -83,6 +83,14 @@ export class GameRepositoryImpl implements GameRepository {
     return this.toDomain(saved);
   }
 
+  async upsertMany(games: Game[]): Promise<void> {
+    if (games.length === 0) return;
+    await this.ormRepository.upsert(
+      games.map((game) => this.toOrm(game)),
+      { conflictPaths: ['id'] },
+    );
+  }
+
   async findRecentFinished(teamCode: string, limit: number): Promise<Game[]> {
     const rows = await this.ormRepository.find({
       where: [

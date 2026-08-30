@@ -47,6 +47,14 @@ export class PlayerRepositoryImpl implements PlayerRepository {
     return this.toDomain(saved);
   }
 
+  async upsertMany(players: Player[]): Promise<void> {
+    if (players.length === 0) return;
+    await this.ormRepository.upsert(
+      players.map((player) => this.toOrm(player)),
+      { conflictPaths: ['id'] },
+    );
+  }
+
   private toDomain(row: PlayerOrmEntity): Player {
     return new Player({ ...row });
   }

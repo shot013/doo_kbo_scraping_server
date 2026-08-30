@@ -22,4 +22,8 @@ export class SeasonPitchingStatService {
   upsert(stat: SeasonPitchingStat): Promise<SeasonPitchingStat> {
     return this.seasonPitchingStatRepository.upsert(stat);
   }
+
+  upsertMany(stats: SeasonPitchingStat[]): Promise<void> {
+    return this.seasonPitchingStatRepository.upsertMany(stats);
+  }
 }

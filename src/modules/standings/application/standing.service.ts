@@ -21,4 +21,8 @@ export class StandingService {
   upsert(standing: Standing): Promise<Standing> {
     return this.standingRepository.upsert(standing);
   }
+
+  upsertMany(standings: Standing[]): Promise<void> {
+    return this.standingRepository.upsertMany(standings);
+  }
 }

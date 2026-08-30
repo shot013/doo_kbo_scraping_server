@@ -18,6 +18,10 @@ export class PlateAppearanceService {
     return this.plateAppearanceRepository.upsert(plateAppearance);
   }
 
+  upsertMany(plateAppearances: PlateAppearance[]): Promise<void> {
+    return this.plateAppearanceRepository.upsertMany(plateAppearances);
+  }
+
   findBatterVsPitcherSplits(
     batterId: number,
     seasonYear: number,

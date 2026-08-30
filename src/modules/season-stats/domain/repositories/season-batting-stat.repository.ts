@@ -15,4 +15,5 @@ export interface SeasonBattingStatRepository {
     filter: SeasonBattingStatFilter,
   ): Promise<SeasonBattingStat[]>;
   upsert(stat: SeasonBattingStat): Promise<SeasonBattingStat>;
+  upsertMany(stats: SeasonBattingStat[]): Promise<void>;
 }
