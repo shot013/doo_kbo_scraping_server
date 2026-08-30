@@ -47,6 +47,14 @@ export class PlateAppearanceRepositoryImpl implements PlateAppearanceRepository 
     return this.toDomain(saved);
   }
 
+  async upsertMany(plateAppearances: PlateAppearance[]): Promise<void> {
+    if (plateAppearances.length === 0) return;
+    await this.ormRepository.upsert(
+      plateAppearances.map((plateAppearance) => this.toOrm(plateAppearance)),
+      { conflictPaths: ['gameId', 'sequenceNo'] },
+    );
+  }
+
   async findBatterVsPitcherSplits(
     batterId: number,
     seasonYear: number,

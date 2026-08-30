@@ -100,6 +100,7 @@ export interface GameStatRepository {
   findAll(filter?: GameStatFilter): Promise<PaginatedResult<GameStat>>;
   findById(id: number): Promise<GameStat | null>;
   upsert(stat: GameStat): Promise<GameStat>;
+  upsertMany(stats: GameStat[]): Promise<void>;
   aggregateBatting(filter: StatAggregateFilter): Promise<BattingAggregate[]>;
   aggregatePitching(filter: StatAggregateFilter): Promise<PitchingAggregate[]>;
   aggregateTeamBatting(seasonYear: number): Promise<TeamBattingAggregate[]>;

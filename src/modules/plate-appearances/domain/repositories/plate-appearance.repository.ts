@@ -26,6 +26,7 @@ export interface PitcherVsBatterSplit {
 
 export interface PlateAppearanceRepository {
   upsert(plateAppearance: PlateAppearance): Promise<PlateAppearance>;
+  upsertMany(plateAppearances: PlateAppearance[]): Promise<void>;
   findBatterVsPitcherSplits(
     batterId: number,
     seasonYear: number,

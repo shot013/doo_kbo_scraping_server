@@ -48,6 +48,14 @@ export class SeasonPitchingStatRepositoryImpl implements SeasonPitchingStatRepos
     return this.toDomain(saved);
   }
 
+  async upsertMany(stats: SeasonPitchingStat[]): Promise<void> {
+    if (stats.length === 0) return;
+    await this.ormRepository.upsert(
+      stats.map((stat) => this.toOrm(stat)),
+      { conflictPaths: ['seasonYear', 'teamCode', 'playerName'] },
+    );
+  }
+
   private toDomain(row: SeasonPitchingStatOrmEntity): SeasonPitchingStat {
     return new SeasonPitchingStat({ ...row });
   }

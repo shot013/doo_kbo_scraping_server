@@ -166,6 +166,10 @@ export class PlayerService {
     return this.playerRepository.upsert(player);
   }
 
+  upsertMany(players: Player[]): Promise<void> {
+    return this.playerRepository.upsertMany(players);
+  }
+
   /**
    * 선수의 대표 기록 한 줄(타율/평균자책)을 KBO 공식 시즌 누적 집계(season-stats)에서 붙인다.
    * game-stats(경기별 박스스코어)는 최근 몇 경기치만 쌓여 있어 표본이 작을 땐 시즌 성적과

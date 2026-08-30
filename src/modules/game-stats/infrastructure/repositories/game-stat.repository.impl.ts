@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsOrder, In, Repository } from 'typeorm';
+import {
+  FindOptionsOrder,
+  In,
+  QueryDeepPartialEntity,
+  Repository,
+} from 'typeorm';
 import {
   buildPaginatedResult,
   normalizePagination,
@@ -153,6 +158,16 @@ export class GameStatRepositoryImpl implements GameStatRepository {
     }
     const saved = await this.ormRepository.save(orm);
     return this.toDomain(saved);
+  }
+
+  async upsertMany(stats: GameStat[]): Promise<void> {
+    if (stats.length === 0) return;
+    await this.ormRepository.upsert(
+      stats.map(
+        (stat) => this.toOrm(stat) as QueryDeepPartialEntity<GameStatOrmEntity>,
+      ),
+      { conflictPaths: ['gameId', 'teamCode', 'playerName', 'statType'] },
+    );
   }
 
   async aggregateBatting(

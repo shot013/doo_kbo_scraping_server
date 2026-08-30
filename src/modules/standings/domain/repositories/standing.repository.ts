@@ -20,4 +20,5 @@ export interface StandingFilter {
 export interface StandingRepository {
   findBySeasonYear(filter: StandingFilter): Promise<PaginatedResult<Standing>>;
   upsert(standing: Standing): Promise<Standing>;
+  upsertMany(standings: Standing[]): Promise<void>;
 }

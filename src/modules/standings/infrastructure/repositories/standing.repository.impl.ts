@@ -72,6 +72,14 @@ export class StandingRepositoryImpl implements StandingRepository {
     return this.toDomain(saved);
   }
 
+  async upsertMany(standings: Standing[]): Promise<void> {
+    if (standings.length === 0) return;
+    await this.ormRepository.upsert(
+      standings.map((standing) => this.toOrm(standing)),
+      { conflictPaths: ['seasonYear', 'teamCode'] },
+    );
+  }
+
   private toDomain(row: StandingOrmEntity): Standing {
     return new Standing({ ...row });
   }

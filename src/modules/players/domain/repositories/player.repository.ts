@@ -13,4 +13,5 @@ export interface PlayerRepository {
   findByTeamCode(teamCode: string): Promise<Player[]>;
   findById(id: number): Promise<Player | null>;
   upsert(player: Player): Promise<Player>;
+  upsertMany(players: Player[]): Promise<void>;
 }
