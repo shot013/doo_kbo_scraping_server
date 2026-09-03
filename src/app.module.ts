@@ -6,6 +6,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './common/database/database.module';
+import { ActionLogModule } from './modules/action-log/action-log.module';
 import { ExampleModule } from './modules/example/example.module';
 import { GameModule } from './modules/game/game.module';
 import { GameResultsModule } from './modules/game-results/game-results.module';
@@ -33,6 +34,7 @@ import { ScrapeModule } from './modules/scrape/scrape.module';
       }),
     }),
     DatabaseModule,
+    ActionLogModule,
     ExampleModule,
     GameModule,
     GameStatsModule,
