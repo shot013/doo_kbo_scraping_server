@@ -24,7 +24,7 @@ export class ActionLogRepositoryImpl implements ActionLogRepository {
 
   async log(entry: LogActionInput): Promise<ActionLog> {
     const saved = await this.ormRepository.save(
-      this.ormRepository.create(entry),
+      Object.assign(new ActionLogOrmEntity(), entry),
     );
     return this.toDomain(saved);
   }
