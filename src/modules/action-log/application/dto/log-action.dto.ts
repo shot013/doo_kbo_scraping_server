@@ -4,5 +4,10 @@ export class LogActionDto {
   previousRoute?: string;
   params?: Record<string, unknown>;
   platform?: string;
+  osVersion?: string;
   occurredAt?: string;
+}
+
+export class LogActionsRequestDto {
+  logs?: LogActionDto[];
 }

@@ -22,11 +22,11 @@ export class ActionLogRepositoryImpl implements ActionLogRepository {
     private readonly ormRepository: Repository<ActionLogOrmEntity>,
   ) {}
 
-  async log(entry: LogActionInput): Promise<ActionLog> {
+  async logMany(entries: LogActionInput[]): Promise<ActionLog[]> {
     const saved = await this.ormRepository.save(
-      Object.assign(new ActionLogOrmEntity(), entry),
+      entries.map((entry) => Object.assign(new ActionLogOrmEntity(), entry)),
     );
-    return this.toDomain(saved);
+    return saved.map((row) => this.toDomain(row));
   }
 
   async findAll(

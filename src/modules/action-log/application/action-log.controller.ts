@@ -9,7 +9,7 @@ import {
 import { PaginatedResult } from '../../../common/pagination/pagination';
 import { ActionLog } from '../domain/entities/action-log.entity';
 import { ActionLogQueryDto } from './dto/action-log-query.dto';
-import { LogActionDto } from './dto/log-action.dto';
+import { LogActionsRequestDto } from './dto/log-action.dto';
 import { ActionLogService } from './action-log.service';
 
 @Controller('action-logs')
@@ -17,18 +17,26 @@ export class ActionLogController {
   constructor(private readonly actionLogService: ActionLogService) {}
 
   @Post()
-  log(@Body() body?: LogActionDto): Promise<ActionLog> {
-    if (!body?.userId || !body?.route) {
-      throw new BadRequestException('userId and route are required');
+  logMany(@Body() body?: LogActionsRequestDto): Promise<ActionLog[]> {
+    const logs = body?.logs ?? [];
+    if (logs.length === 0) {
+      throw new BadRequestException('logs must not be empty');
     }
-    return this.actionLogService.log({
-      userId: body.userId,
-      route: body.route,
-      previousRoute: body.previousRoute ?? null,
-      params: body.params ?? null,
-      platform: body.platform ?? null,
-      occurredAt: body.occurredAt ? new Date(body.occurredAt) : new Date(),
-    });
+    if (logs.some((entry) => !entry.route)) {
+      throw new BadRequestException('route is required for every log');
+    }
+
+    return this.actionLogService.logMany(
+      logs.map((entry) => ({
+        userId: entry.userId ?? null,
+        route: entry.route as string,
+        previousRoute: entry.previousRoute ?? null,
+        params: entry.params ?? null,
+        platform: entry.platform ?? null,
+        osVersion: entry.osVersion ?? null,
+        occurredAt: entry.occurredAt ? new Date(entry.occurredAt) : new Date(),
+      })),
+    );
   }
 
   @Get()

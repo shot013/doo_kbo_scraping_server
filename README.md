@@ -148,8 +148,11 @@ npm run test           # 전체 테스트
 
 | Method | Path | Query/Body | 설명 |
 | --- | --- | --- | --- |
-| POST | `/action-logs` | body: `userId`(필수), `route`(필수), `previousRoute`, `params`, `platform`, `occurredAt`(미지정 시 서버 수신 시각) | 앱에서 발생한 유저 라우트 이동 기록 |
+| POST | `/action-logs` | body: `logs`(배열, 필수, 각 항목 `route`만 필수 — `userId`(회원 기능 미도입으로 선택), `previousRoute`, `params`, `platform`, `osVersion`, `occurredAt`(미지정 시 서버 수신 시각)) | 앱이 일정 주기로 모아 보낸 라우트 이동 로그를 일괄 저장 |
 | GET | `/action-logs` | `userId`, `route`, `page`, `limit`, `sortOrder`(`ASC`\|`DESC`, 기본 `DESC`) | 액션 로그 목록 조회 (기본적으로 최신순) |
+
+- `route`는 앱 화면 경로 문자열(예: `/home/my`)
+- 클릭마다 전송하지 않고 클라이언트가 일정 시간 동안 모은 로그를 배열로 묶어 전송하는 것을 전제로 함
 
 ### Scrape Source Health (`src/modules/scrape-source-health`)
 
@@ -183,7 +186,7 @@ Controller (application/*.controller.ts)
 
 예: `GET /games` → `GameController.findAll` → `GameService.findAll` → `GAME_REPOSITORY` 토큰으로 주입된 구현체가 쿼리 실행 → ORM 결과를 domain `Game` 엔티티로 변환해 페이지네이션 응답으로 반환. `Game Stats`/`Standings`/`Scrape Source Health`/`Action Logs` 조회도 동일한 구조입니다.
 
-- `POST /action-logs`는 스크랩 파이프라인이 아니라 앱 클라이언트가 직접 호출하는 쓰기 API입니다. `ActionLogController.log` → `ActionLogService.log` → `ACTION_LOG_REPOSITORY` 구현체가 그대로 insert (스크래핑 API처럼 실패 시 별도 상태 기록 없이 예외가 그대로 전파됨)
+- `POST /action-logs`는 스크랩 파이프라인이 아니라 앱 클라이언트가 직접 호출하는 쓰기 API입니다. 클라이언트가 일정 주기로 모아 보낸 로그 배열(`body.logs`)을 `ActionLogController.logMany` → `ActionLogService.logMany` → `ACTION_LOG_REPOSITORY` 구현체가 한 번에 insert (스크래핑 API처럼 실패 시 별도 상태 기록 없이 예외가 그대로 전파됨)
 
 ### 조합 API — Teams / Players / Records / Game Results
 

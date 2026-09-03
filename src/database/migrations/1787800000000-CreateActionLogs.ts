@@ -7,11 +7,12 @@ export class CreateActionLogs1787800000000 implements MigrationInterface {
     await queryRunner.query(`
       CREATE TABLE "action_logs" (
         "id" SERIAL NOT NULL,
-        "user_id" character varying(64) NOT NULL,
+        "user_id" character varying(64),
         "route" character varying(255) NOT NULL,
         "previous_route" character varying(255),
         "params" jsonb,
         "platform" character varying(32),
+        "os_version" character varying(32),
         "occurred_at" TIMESTAMP WITH TIME ZONE NOT NULL,
         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         CONSTRAINT "PK_action_logs" PRIMARY KEY ("id")

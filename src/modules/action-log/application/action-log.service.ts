@@ -15,8 +15,8 @@ export class ActionLogService {
     private readonly repository: ActionLogRepository,
   ) {}
 
-  log(entry: LogActionInput): Promise<ActionLog> {
-    return this.repository.log(entry);
+  logMany(entries: LogActionInput[]): Promise<ActionLog[]> {
+    return this.repository.logMany(entries);
   }
 
   findAll(filter: ActionLogFilter = {}): Promise<PaginatedResult<ActionLog>> {

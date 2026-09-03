@@ -13,8 +13,8 @@ export class ActionLogOrmEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'user_id', type: 'varchar', length: 64 })
-  userId: string;
+  @Column({ name: 'user_id', type: 'varchar', length: 64, nullable: true })
+  userId: string | null;
 
   @Column({ name: 'route', type: 'varchar', length: 255 })
   route: string;
@@ -32,6 +32,9 @@ export class ActionLogOrmEntity {
 
   @Column({ name: 'platform', type: 'varchar', length: 32, nullable: true })
   platform: string | null;
+
+  @Column({ name: 'os_version', type: 'varchar', length: 32, nullable: true })
+  osVersion: string | null;
 
   @Column({ name: 'occurred_at', type: 'timestamptz' })
   occurredAt: Date;
