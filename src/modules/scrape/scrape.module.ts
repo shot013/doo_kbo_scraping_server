@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { GamePreviewModule } from '../game-preview/game-preview.module';
 import { GameStatsModule } from '../game-stats/game-stats.module';
 import { GameModule } from '../game/game.module';
 import { PlateAppearancesModule } from '../plate-appearances/plate-appearances.module';
@@ -9,6 +10,7 @@ import { StandingsModule } from '../standings/standings.module';
 import { ScrapeController } from './application/scrape.controller';
 import { ScrapeScheduler } from './application/scrape.scheduler';
 import { ScrapeService } from './application/scrape.service';
+import { GamePreviewScraper } from './infrastructure/scrapers/game-preview.scraper';
 import { GameStatsScraper } from './infrastructure/scrapers/game-stats.scraper';
 import { GameScraper } from './infrastructure/scrapers/game.scraper';
 import { PlayByPlayScraper } from './infrastructure/scrapers/play-by-play.scraper';
@@ -19,6 +21,7 @@ import { StandingsScraper } from './infrastructure/scrapers/standings.scraper';
 @Module({
   imports: [
     GameModule,
+    GamePreviewModule,
     GameStatsModule,
     PlateAppearancesModule,
     PlayersModule,
@@ -31,6 +34,7 @@ import { StandingsScraper } from './infrastructure/scrapers/standings.scraper';
     ScrapeService,
     ScrapeScheduler,
     GameScraper,
+    GamePreviewScraper,
     StandingsScraper,
     GameStatsScraper,
     PlayByPlayScraper,

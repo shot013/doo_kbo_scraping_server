@@ -75,6 +75,13 @@ npm run test           # 전체 테스트
 | GET | `/games/:id` | - | 경기 단건 조회 |
 
 - 응답에 `homeStarterPitcher`/`awayStarterPitcher`(선발투수, 네이버 스포츠 일정 API로 보정) 포함. 선발 예고 전이면 `null`
+- 응답에 `preview`(경기 시작 전에만 값이 채워짐, 그 외 상태는 `null`) 포함: KBO GameCenter 프리뷰 탭에서 스크랩한 `away`/`home`별 `team`(`record`/`recentForm`/`era`/`battingAverage`/`avgRunsScored`/`avgRunsAllowed`)과 `pitcher`(`style`/`seasonRecord`/`headToHeadRecord`/`era`/`war`/`games`/`avgInnings`/`qualityStarts`/`whip`), `scrapedAt`으로 구성됨(출처: `game-preview` 모듈)
+
+### Game Previews (`src/modules/game-preview`)
+
+| Method | Path | Query/Body | 설명 |
+| --- | --- | --- | --- |
+| GET | `/game-previews/:gameId` | - | 경기 프리뷰(팀 전력비교/선발투수 매치업) 단건 조회. 없으면 404 |
 
 ### Game Stats (`src/modules/game-stats`)
 
@@ -137,6 +144,7 @@ npm run test           # 전체 테스트
 | Method | Path | Query/Body | 설명 | 스케줄러 등록 |
 | --- | --- | --- | --- | --- |
 | POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도) | 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
+| POST | `/scrape/game-previews` | body: `gameDate`(`YYYY-MM-DD`, 미지정 시 오늘) | 경기 시작 전(GAME_STATE_SC=1)인 경기의 프리뷰(팀 전력비교/선발투수 매치업) 스크래핑 실행 | O (매일 09:00 KST) |
 | POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
 | POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
 | POST | `/scrape/game-stats/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 박스스코어를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
