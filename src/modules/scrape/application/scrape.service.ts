@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { resolveKboTeamByCode, KBO_TEAMS } from '../../../common/kbo/kbo-team';
 import { GameService } from '../../game/application/game.service';
 import { Game, GameStatus } from '../../game/domain/entities/game.entity';
+import { GamePreviewService } from '../../game-preview/application/game-preview.service';
+import { GamePreview } from '../../game-preview/domain/entities/game-preview.entity';
 import { GameStatService } from '../../game-stats/application/game-stat.service';
 import { GameStat } from '../../game-stats/domain/entities/game-stat.entity';
 import { PlateAppearanceService } from '../../plate-appearances/application/plate-appearance.service';
@@ -16,6 +18,10 @@ import { SeasonBattingStat } from '../../season-stats/domain/entities/season-bat
 import { SeasonPitchingStat } from '../../season-stats/domain/entities/season-pitching-stat.entity';
 import { StandingService } from '../../standings/application/standing.service';
 import { Standing } from '../../standings/domain/entities/standing.entity';
+import {
+  GAME_CENTER_SOURCE_URL,
+  GamePreviewScraper,
+} from '../infrastructure/scrapers/game-preview.scraper';
 import {
   NAVER_GAME_RECORD_URL,
   GameStatsScraper,
@@ -57,12 +63,14 @@ export class ScrapeService {
 
   constructor(
     private readonly gameScraper: GameScraper,
+    private readonly gamePreviewScraper: GamePreviewScraper,
     private readonly standingsScraper: StandingsScraper,
     private readonly gameStatsScraper: GameStatsScraper,
     private readonly playByPlayScraper: PlayByPlayScraper,
     private readonly rosterScraper: RosterScraper,
     private readonly seasonStatsScraper: SeasonStatsScraper,
     private readonly gameService: GameService,
+    private readonly gamePreviewService: GamePreviewService,
     private readonly standingService: StandingService,
     private readonly gameStatService: GameStatService,
     private readonly plateAppearanceService: PlateAppearanceService,
@@ -147,6 +155,109 @@ export class ScrapeService {
       return { itemsScraped: savedCount, durationMs };
     } catch (error) {
       await this.logFailure(sourceName, SCHEDULE_SOURCE_URL, startedAt, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 경기 시작 전(GAME_STATE_SC=1)인 오늘 경기의 프리뷰(팀 전력비교/선발투수 매치업)를
+   * 스크랩한다. 이미 시작했거나 대상 경기가 없는 날은 정상적인 상태이므로(예: 크론이
+   * 이미 경기가 다 시작된 이후에 실행됨) 0건을 실패로 취급하지 않는다.
+   */
+  async scrapeGamePreviews(gameDate?: string): Promise<ScrapeSummary> {
+    const sourceName = 'kbo-game-preview';
+    const startedAt = Date.now();
+    const date = gameDate ?? new Date().toISOString().slice(0, 10);
+
+    try {
+      const scraped = await this.gamePreviewScraper.scrape(date);
+      const now = new Date();
+
+      const previews = scraped.map(
+        (item) =>
+          new GamePreview({
+            gameId: item.gameId,
+            awayTeamRecord: item.awayTeam.record,
+            awayRecentForm: item.awayTeam.recentForm,
+            awayTeamEra: item.awayTeam.era,
+            awayTeamBattingAverage: item.awayTeam.battingAverage,
+            awayTeamAvgRunsScored: item.awayTeam.avgRunsScored,
+            awayTeamAvgRunsAllowed: item.awayTeam.avgRunsAllowed,
+            homeTeamRecord: item.homeTeam.record,
+            homeRecentForm: item.homeTeam.recentForm,
+            homeTeamEra: item.homeTeam.era,
+            homeTeamBattingAverage: item.homeTeam.battingAverage,
+            homeTeamAvgRunsScored: item.homeTeam.avgRunsScored,
+            homeTeamAvgRunsAllowed: item.homeTeam.avgRunsAllowed,
+            awayPitcherStyle: item.awayPitcher?.style ?? null,
+            awayPitcherSeasonRecord: item.awayPitcher?.seasonRecord ?? null,
+            awayPitcherHeadToHeadRecord:
+              item.awayPitcher?.headToHeadRecord ?? null,
+            awayPitcherEra: item.awayPitcher?.era ?? null,
+            awayPitcherWar: item.awayPitcher?.war ?? null,
+            awayPitcherGames: item.awayPitcher?.games ?? null,
+            awayPitcherAvgInnings: item.awayPitcher?.avgInnings ?? null,
+            awayPitcherQualityStarts: item.awayPitcher?.qualityStarts ?? null,
+            awayPitcherWhip: item.awayPitcher?.whip ?? null,
+            homePitcherStyle: item.homePitcher?.style ?? null,
+            homePitcherSeasonRecord: item.homePitcher?.seasonRecord ?? null,
+            homePitcherHeadToHeadRecord:
+              item.homePitcher?.headToHeadRecord ?? null,
+            homePitcherEra: item.homePitcher?.era ?? null,
+            homePitcherWar: item.homePitcher?.war ?? null,
+            homePitcherGames: item.homePitcher?.games ?? null,
+            homePitcherAvgInnings: item.homePitcher?.avgInnings ?? null,
+            homePitcherQualityStarts: item.homePitcher?.qualityStarts ?? null,
+            homePitcherWhip: item.homePitcher?.whip ?? null,
+            scrapedAt: now,
+            createdAt: now,
+            updatedAt: now,
+          }),
+      );
+
+      let savedCount = 0;
+      try {
+        await this.gamePreviewService.upsertMany(previews);
+        savedCount = previews.length;
+      } catch (error) {
+        this.logger.warn(
+          `Batch upsert failed for game previews (${previews.length} items), falling back to per-item save: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        for (const preview of previews) {
+          try {
+            await this.gamePreviewService.upsert(preview);
+            savedCount++;
+          } catch (itemError) {
+            this.logger.warn(
+              `Failed to save game preview for ${preview.gameId}: ${itemError instanceof Error ? itemError.message : String(itemError)}`,
+            );
+          }
+        }
+      }
+
+      const durationMs = Date.now() - startedAt;
+      const failedCount = previews.length - savedCount;
+      await this.scrapeSourceHealthService.log({
+        sourceName,
+        targetUrl: GAME_CENTER_SOURCE_URL,
+        status: ScrapeStatus.SUCCESS,
+        httpStatusCode: 200,
+        durationMs,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedCount > 0
+            ? `${failedCount}/${previews.length} game previews failed to save (see server logs)`
+            : null,
+        scrapedAt: now,
+      });
+      return { itemsScraped: savedCount, durationMs };
+    } catch (error) {
+      await this.logFailure(
+        sourceName,
+        GAME_CENTER_SOURCE_URL,
+        startedAt,
+        error,
+      );
       throw error;
     }
   }

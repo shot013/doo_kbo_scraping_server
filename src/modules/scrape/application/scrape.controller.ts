@@ -1,4 +1,5 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import { ScrapeGamePreviewRequestDto } from './dto/scrape-game-preview-request.dto';
 import { ScrapeGameStatsRequestDto } from './dto/scrape-game-stats-request.dto';
 import { ScrapeRequestDto } from './dto/scrape-request.dto';
 import { ScrapeRosterRequestDto } from './dto/scrape-roster-request.dto';
@@ -14,6 +15,13 @@ export class ScrapeController {
       body?.seasonYear ?? new Date().getFullYear(),
       body?.gameMonth,
     );
+  }
+
+  @Post('game-previews')
+  scrapeGamePreviews(
+    @Body() body?: ScrapeGamePreviewRequestDto,
+  ): Promise<ScrapeSummary> {
+    return this.scrapeService.scrapeGamePreviews(body?.gameDate);
   }
 
   @Post('standings')

@@ -6,6 +6,8 @@ import { ScrapeService } from './scrape.service';
 
 const EVENING_HOURLY_CRON = '0 17-23,0,1 * * *';
 const DAILY_ROSTER_CRON = '0 18 * * *';
+/** 가장 이른 경기(14시)보다 앞서 프리뷰(경기 시작 전 데이터)를 미리 받아온다. */
+const DAILY_PREVIEW_CRON = '0 9 * * *';
 const KST_CRON_OPTIONS = { timeZone: 'Asia/Seoul' };
 
 @Injectable()
@@ -24,6 +26,18 @@ export class ScrapeScheduler {
     } catch (error) {
       this.logger.error(
         `scheduled games scrape failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  @Cron(DAILY_PREVIEW_CRON, KST_CRON_OPTIONS)
+  async scrapeGamePreviews(): Promise<void> {
+    const gameDate = new Date().toISOString().slice(0, 10);
+    try {
+      await this.scrapeService.scrapeGamePreviews(gameDate);
+    } catch (error) {
+      this.logger.error(
+        `scheduled game-preview scrape failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
