@@ -22,7 +22,9 @@ interface KboGameListGame {
   AWAY_ID: string;
   HOME_ID: string;
   T_PIT_P_ID: number | null;
+  T_PIT_P_NM: string;
   B_PIT_P_ID: number | null;
+  B_PIT_P_NM: string;
 }
 
 interface KboGameListResponse {
@@ -52,6 +54,7 @@ export interface ScrapedTeamRecord {
 }
 
 export interface ScrapedPitcherMatchup {
+  name: string | null;
   style: string | null;
   seasonRecord: string | null;
   headToHeadRecord: string | null;
@@ -130,7 +133,11 @@ export class GamePreviewScraper {
         homePitId: String(game.B_PIT_P_ID),
         groupSc: 'SEASON',
       });
-      [awayPitcher, homePitcher] = this.parsePitcherRows(pitcherRows);
+      [awayPitcher, homePitcher] = this.parsePitcherRows(
+        pitcherRows,
+        game.T_PIT_P_NM,
+        game.B_PIT_P_NM,
+      );
     }
 
     return { gameId: game.G_ID, awayTeam, homeTeam, awayPitcher, homePitcher };
@@ -218,13 +225,19 @@ export class GamePreviewScraper {
 
   private parsePitcherRows(
     rows: KboTableRow[],
+    awayPitcherName: string,
+    homePitcherName: string,
   ): [ScrapedPitcherMatchup | null, ScrapedPitcherMatchup | null] {
     const [away, home] = rows;
-    return [this.toPitcherMatchup(away), this.toPitcherMatchup(home)];
+    return [
+      this.toPitcherMatchup(away, awayPitcherName),
+      this.toPitcherMatchup(home, homePitcherName),
+    ];
   }
 
   private toPitcherMatchup(
     row: KboTableRow | undefined,
+    pitcherName: string,
   ): ScrapedPitcherMatchup | null {
     if (!row) return null;
     const cells = row.row.map((cell) => cell.Text);
@@ -238,6 +251,7 @@ export class GamePreviewScraper {
       .map((part) => toTextOrNull(part.trim()));
 
     return {
+      name: toTextOrNull(pitcherName),
       style: toTextOrNull(STYLE_PATTERN.exec(pitcherCell)?.[1]),
       seasonRecord: seasonRecord ?? null,
       headToHeadRecord: headToHeadRecord ?? null,

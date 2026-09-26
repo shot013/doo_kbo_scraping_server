@@ -108,6 +108,14 @@ export class GamePreviewOrmEntity {
   homeTeamAvgRunsAllowed: string | null;
 
   @Column({
+    name: 'away_pitcher_name',
+    type: 'varchar',
+    length: 32,
+    nullable: true,
+  })
+  awayPitcherName: string | null;
+
+  @Column({
     name: 'away_pitcher_style',
     type: 'varchar',
     length: 16,
@@ -178,6 +186,14 @@ export class GamePreviewOrmEntity {
     nullable: true,
   })
   awayPitcherWhip: string | null;
+
+  @Column({
+    name: 'home_pitcher_name',
+    type: 'varchar',
+    length: 32,
+    nullable: true,
+  })
+  homePitcherName: string | null;
 
   @Column({
     name: 'home_pitcher_style',
