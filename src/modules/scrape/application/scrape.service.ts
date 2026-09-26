@@ -189,6 +189,7 @@ export class ScrapeService {
             homeTeamBattingAverage: item.homeTeam.battingAverage,
             homeTeamAvgRunsScored: item.homeTeam.avgRunsScored,
             homeTeamAvgRunsAllowed: item.homeTeam.avgRunsAllowed,
+            awayPitcherName: item.awayPitcher?.name ?? null,
             awayPitcherStyle: item.awayPitcher?.style ?? null,
             awayPitcherSeasonRecord: item.awayPitcher?.seasonRecord ?? null,
             awayPitcherHeadToHeadRecord:
@@ -199,6 +200,7 @@ export class ScrapeService {
             awayPitcherAvgInnings: item.awayPitcher?.avgInnings ?? null,
             awayPitcherQualityStarts: item.awayPitcher?.qualityStarts ?? null,
             awayPitcherWhip: item.awayPitcher?.whip ?? null,
+            homePitcherName: item.homePitcher?.name ?? null,
             homePitcherStyle: item.homePitcher?.style ?? null,
             homePitcherSeasonRecord: item.homePitcher?.seasonRecord ?? null,
             homePitcherHeadToHeadRecord:

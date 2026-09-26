@@ -16,6 +16,7 @@ export interface GamePreviewTeamResponse {
 }
 
 export interface GamePreviewPitcherResponse {
+  name: string | null;
   style: string | null;
   seasonRecord: string | null;
   headToHeadRecord: string | null;
@@ -125,6 +126,7 @@ function toGamePreviewResponse(preview: GamePreview): GamePreviewResponse {
         avgRunsAllowed: preview.awayTeamAvgRunsAllowed,
       },
       pitcher: {
+        name: preview.awayPitcherName,
         style: preview.awayPitcherStyle,
         seasonRecord: preview.awayPitcherSeasonRecord,
         headToHeadRecord: preview.awayPitcherHeadToHeadRecord,
@@ -146,6 +148,7 @@ function toGamePreviewResponse(preview: GamePreview): GamePreviewResponse {
         avgRunsAllowed: preview.homeTeamAvgRunsAllowed,
       },
       pitcher: {
+        name: preview.homePitcherName,
         style: preview.homePitcherStyle,
         seasonRecord: preview.homePitcherSeasonRecord,
         headToHeadRecord: preview.homePitcherHeadToHeadRecord,

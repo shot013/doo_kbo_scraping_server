@@ -12,6 +12,7 @@ export interface GamePreviewProps {
   homeTeamBattingAverage: string | null;
   homeTeamAvgRunsScored: string | null;
   homeTeamAvgRunsAllowed: string | null;
+  awayPitcherName: string | null;
   awayPitcherStyle: string | null;
   awayPitcherSeasonRecord: string | null;
   awayPitcherHeadToHeadRecord: string | null;
@@ -21,6 +22,7 @@ export interface GamePreviewProps {
   awayPitcherAvgInnings: string | null;
   awayPitcherQualityStarts: string | null;
   awayPitcherWhip: string | null;
+  homePitcherName: string | null;
   homePitcherStyle: string | null;
   homePitcherSeasonRecord: string | null;
   homePitcherHeadToHeadRecord: string | null;
@@ -53,6 +55,7 @@ export class GamePreview {
   readonly homeTeamBattingAverage: string | null;
   readonly homeTeamAvgRunsScored: string | null;
   readonly homeTeamAvgRunsAllowed: string | null;
+  readonly awayPitcherName: string | null;
   readonly awayPitcherStyle: string | null;
   readonly awayPitcherSeasonRecord: string | null;
   readonly awayPitcherHeadToHeadRecord: string | null;
@@ -62,6 +65,7 @@ export class GamePreview {
   readonly awayPitcherAvgInnings: string | null;
   readonly awayPitcherQualityStarts: string | null;
   readonly awayPitcherWhip: string | null;
+  readonly homePitcherName: string | null;
   readonly homePitcherStyle: string | null;
   readonly homePitcherSeasonRecord: string | null;
   readonly homePitcherHeadToHeadRecord: string | null;
@@ -89,6 +93,7 @@ export class GamePreview {
     this.homeTeamBattingAverage = props.homeTeamBattingAverage;
     this.homeTeamAvgRunsScored = props.homeTeamAvgRunsScored;
     this.homeTeamAvgRunsAllowed = props.homeTeamAvgRunsAllowed;
+    this.awayPitcherName = props.awayPitcherName;
     this.awayPitcherStyle = props.awayPitcherStyle;
     this.awayPitcherSeasonRecord = props.awayPitcherSeasonRecord;
     this.awayPitcherHeadToHeadRecord = props.awayPitcherHeadToHeadRecord;
@@ -98,6 +103,7 @@ export class GamePreview {
     this.awayPitcherAvgInnings = props.awayPitcherAvgInnings;
     this.awayPitcherQualityStarts = props.awayPitcherQualityStarts;
     this.awayPitcherWhip = props.awayPitcherWhip;
+    this.homePitcherName = props.homePitcherName;
     this.homePitcherStyle = props.homePitcherStyle;
     this.homePitcherSeasonRecord = props.homePitcherSeasonRecord;
     this.homePitcherHeadToHeadRecord = props.homePitcherHeadToHeadRecord;

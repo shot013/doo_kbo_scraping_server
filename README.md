@@ -75,7 +75,7 @@ npm run test           # 전체 테스트
 | GET | `/games/:id` | - | 경기 단건 조회 |
 
 - 응답에 `homeStarterPitcher`/`awayStarterPitcher`(선발투수, 네이버 스포츠 일정 API로 보정) 포함. 선발 예고 전이면 `null`
-- 응답에 `preview`(경기 시작 전에만 값이 채워짐, 그 외 상태는 `null`) 포함: KBO GameCenter 프리뷰 탭에서 스크랩한 `away`/`home`별 `team`(`record`/`recentForm`/`era`/`battingAverage`/`avgRunsScored`/`avgRunsAllowed`)과 `pitcher`(`style`/`seasonRecord`/`headToHeadRecord`/`era`/`war`/`games`/`avgInnings`/`qualityStarts`/`whip`), `scrapedAt`으로 구성됨(출처: `game-preview` 모듈)
+- 응답에 `preview`(경기 시작 전에만 값이 채워짐, 그 외 상태는 `null`) 포함: KBO GameCenter 프리뷰 탭에서 스크랩한 `away`/`home`별 `team`(`record`/`recentForm`/`era`/`battingAverage`/`avgRunsScored`/`avgRunsAllowed`)과 `pitcher`(`name`/`style`/`seasonRecord`/`headToHeadRecord`/`era`/`war`/`games`/`avgInnings`/`qualityStarts`/`whip`), `scrapedAt`으로 구성됨(출처: `game-preview` 모듈)
 
 ### Game Previews (`src/modules/game-preview`)
 
