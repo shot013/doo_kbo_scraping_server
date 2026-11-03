@@ -71,8 +71,10 @@ npm run test           # 전체 테스트
 
 | Method | Path | Query/Body | 설명 |
 | --- | --- | --- | --- |
-| GET | `/games` | `seasonYear`, `gameDate`, `status`(`SCHEDULED`\|`IN_PROGRESS`\|`FINISHED`\|`CANCELLED`\|`POSTPONED`), `teamCode`, `page`, `limit`, `sortBy`(`scheduledAt`\|`gameDate`\|`seasonYear`\|`homeScore`\|`awayScore`), `sortOrder`(`ASC`\|`DESC`) | 경기 목록 조회 |
+| GET | `/games` | `seasonYear`, `gameDate`, `status`(`SCHEDULED`\|`IN_PROGRESS`\|`FINISHED`\|`CANCELLED`\|`POSTPONED`), `series`(`REGULAR`\|`WILDCARD`\|`SEMI_PLAYOFF`\|`PLAYOFF`\|`KOREAN_SERIES`), `teamCode`, `page`, `limit`, `sortBy`(`scheduledAt`\|`gameDate`\|`seasonYear`\|`homeScore`\|`awayScore`), `sortOrder`(`ASC`\|`DESC`) | 경기 목록 조회 (정규시즌 + 포스트시즌) |
 | GET | `/games/:id` | - | 경기 단건 조회 |
+
+- 응답에 `series`(정규시즌 `REGULAR`, 포스트시즌 `WILDCARD`/`SEMI_PLAYOFF`/`PLAYOFF`/`KOREAN_SERIES`)와 `seriesGameNumber`(포스트시즌 차전, 예: KS 3차전 → `3`. 정규시즌은 `null`) 포함
 
 - 응답에 `homeStarterPitcher`/`awayStarterPitcher`(선발투수, 네이버 스포츠 일정 API로 보정) 포함. 선발 예고 전이면 `null`
 - 응답에 `preview`(경기 시작 전에만 값이 채워짐, 그 외 상태는 `null`) 포함: KBO GameCenter 프리뷰 탭에서 스크랩한 `away`/`home`별 `team`(`record`/`recentForm`/`era`/`battingAverage`/`avgRunsScored`/`avgRunsAllowed`)과 `pitcher`(`name`/`style`/`seasonRecord`/`headToHeadRecord`/`era`/`war`/`games`/`avgInnings`/`qualityStarts`/`whip`), `scrapedAt`으로 구성됨(출처: `game-preview` 모듈)
@@ -98,6 +100,7 @@ npm run test           # 전체 테스트
 
 - 경기별로 베스트 활약 타자(`bestPerformer`: 타점 → 안타 → 득점 순으로 비교해 선정, 홈런 데이터 미보유로 비교 기준에서 제외)와 승/패/세이브/홀드 투수 기록(`pitchers`)을 함께 반환
 - 해당 날짜에 `game-stats`가 아직 스크래핑되지 않은 경기는 `bestPerformer: null`, `pitchers: []`
+- 포스트시즌 경기도 포함됨 (다른 시즌 단위 집계와 달리 정규시즌으로 거르지 않음)
 
 ### Standings (`src/modules/standings`)
 
@@ -105,7 +108,7 @@ npm run test           # 전체 테스트
 | --- | --- | --- | --- |
 | GET | `/standings` | `seasonYear`(미지정 시 현재 연도), `page`, `limit`, `sortBy`(`rank`\|`winRate`\|`gamesBehind`\|`wins`\|`losses`\|`gamesPlayed`), `sortOrder` | 시즌 순위 목록 조회 |
 
-- 각 행에는 순위/승패/승률/게임차 외에 팀 타율(`battingAverage`), 팀 평균자책(`era`), 팀 득점(`runsScored`), 팀 실점(`runsAllowed`)이 포함됨. 이 값들은 `game-stats`/`game`을 집계해 순위 스크랩 시점에 함께 계산·저장됨(요청마다 재계산하지 않음)
+- 각 행에는 순위/승패/승률/게임차 외에 팀 타율(`battingAverage`), 팀 평균자책(`era`), 팀 득점(`runsScored`), 팀 실점(`runsAllowed`)이 포함됨. 이 값들은 `game-stats`/`game`의 **정규시즌** 종료 경기만 집계해 순위 스크랩 시점에 함께 계산·저장됨(요청마다 재계산하지 않음, 포스트시즌 제외)
 
 ### Teams (`src/modules/teams`)
 
@@ -115,7 +118,7 @@ npm run test           # 전체 테스트
 | GET | `/teams/:code` | `seasonYear` | 팀 상세 조회 (요약 + 로스터) |
 
 - `seasonYear` 미지정 시 현재 연도. `:code`는 대문자로 정규화되어 조회됨
-- 요약에는 팀 코드(`teamCode`)/팀명(`teamName`)/순위/승패/승률/게임차/팀 타율(`battingAverage`)/팀 평균자책(`era`)/팀 득점(`runsScored`)/팀 실점(`runsAllowed`)/최근 5경기 폼(`recentForm`)이 포함되며 `standings`(타율/평균자책/득점/실점 포함) + `game`(최근 폼)을 조합해 만듦
+- 요약에는 팀 코드(`teamCode`)/팀명(`teamName`)/순위/승패/승률/게임차/팀 타율(`battingAverage`)/팀 평균자책(`era`)/팀 득점(`runsScored`)/팀 실점(`runsAllowed`)/최근 5경기 폼(`recentForm`, 정규시즌 경기 기준)이 포함되며 `standings`(타율/평균자책/득점/실점 포함) + `game`(최근 폼)을 조합해 만듦
 
 ### Players (`src/modules/players`)
 
@@ -127,6 +130,7 @@ npm run test           # 전체 테스트
 - `position`: `PITCHER`\|`CATCHER`\|`INFIELDER`\|`OUTFIELDER` (대소문자 무관). `seasonYear` 미지정 시 현재 연도
 - 목록 응답의 각 선수에는 시즌 대표 기록(`primaryStat`, 없으면 `"기록 없음"`)이, 상세 응답에는 시즌 타/투 기록 라인(`statLines`)과 상대팀별 타율(타자)/피안타율(투수) 목록(`vsTeamStats`, 팀별 `teamCode`/`teamName`/`games`/`avg`)이 포함됨
 - 상세 응답에는 추가로 타자 전용 `vsPitcherStats`(상대 투수별 안타율: `pitcherId`/`pitcherName`/`pitcherTeamCode`/`atBats`/`hits`/`avg`)와 투수 전용 `vsBatterStats`(상대 타자별 삼진율: `batterId`/`batterName`/`batterTeamCode`/`atBats`/`strikeouts`/`strikeoutRate`)가 포함됨(포지션에 맞지 않는 쪽은 빈 배열). `plate-appearances`(타석 단위 문자중계 스크랩)를 시즌 단위로 집계해 만듦
+- `vsTeamStats`/`vsPitcherStats`/`vsBatterStats`는 정규시즌 경기만 집계함 (포스트시즌 제외)
 - `vsPitcherStats`/`vsBatterStats`는 표본이 너무 적은 매치업(예: 1타수 1안타)을 걸러내기 위해 시즌 개막 이후 경과 개월 수에 비례하는 최소 타수 기준(`minAtBats`)을 만족하는 매치업만 포함함 — 자세한 산출 근거는 [`docs/MATCHUP_SAMPLE_THRESHOLD.md`](docs/MATCHUP_SAMPLE_THRESHOLD.md) 참고
 
 ### Records (`src/modules/records`)
@@ -143,7 +147,7 @@ npm run test           # 전체 테스트
 
 | Method | Path | Query/Body | 설명 | 스케줄러 등록 |
 | --- | --- | --- | --- | --- |
-| POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도) | 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
+| POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도), `gameMonth`(`01`~`12`, 미지정 시 현재 KST 월) | 해당 월의 정규시즌·포스트시즌 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 현재 월만) |
 | POST | `/scrape/game-previews` | body: `gameDate`(`YYYY-MM-DD`, 미지정 시 오늘) | 경기 시작 전(GAME_STATE_SC=1)인 경기의 프리뷰(팀 전력비교/선발투수 매치업) 스크래핑 실행 | O (매일 09:00 KST) |
 | POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
 | POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
@@ -217,7 +221,7 @@ ScrapeController (application/scrape.controller.ts)
     → ScrapeSourceHealthService.log()로 성공/실패·소요시간·저장 건수 기록
 ```
 
-- `POST /scrape/games`: `GameScraper`가 KBO 스케줄 페이지(`Schedule.aspx`)가 내부적으로 호출하는 `GetScheduleList` 엔드포인트를 fetch로 직접 호출해 응답을 파싱 → 경기별로 `GameService.upsert()` (진행 중 경기는 네이버 스포츠 API로 실시간 스코어 보정)
+- `POST /scrape/games`: `GameScraper`가 KBO 스케줄 페이지(`Schedule.aspx`)가 내부적으로 호출하는 `GetScheduleList` 엔드포인트를 정규시즌(`srIdList=0,9,6`)과 포스트시즌(`srIdList=3,4,5,7`) 목록으로 0.5초 간격을 두고 한 번씩 호출해 응답을 파싱 → `GameService.upsertMany()` (진행 중 경기는 네이버 스포츠 API로 실시간 스코어 보정). 포스트시즌 행은 비고 칸의 "WC/준PO/PO/KS N차전"에서 `series`/`seriesGameNumber`를 읽고, 시리즈를 알 수 없는 포스트시즌 행은 건너뜀
 - `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
 - `POST /scrape/game-stats`: `GameStatsScraper`가 `body.gameId`로 박스스코어(`GetBoxScoreScroll`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남
 - `POST /scrape/game-stats/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 조회해 경기당 2초 텀을 두고 순회하며 `/scrape/game-stats`와 동일한 스크랩·저장 로직(`ScrapeService.scrapeAndSaveGameStats()`)을 재사용 — 이미 저장된 경기도 다시 스크랩해 `player_id`/`at_bats_against` 등 이후 추가된 필드를 보강한다. 경기 단위 실패는 warn 로그만 남기고 계속 진행(전체가 실패로 끝나지 않음)

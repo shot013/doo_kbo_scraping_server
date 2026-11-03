@@ -7,7 +7,11 @@ import {
   normalizeSortOrder,
   PaginatedResult,
 } from '../../../../common/pagination/pagination';
-import { Game, GameStatus } from '../../domain/entities/game.entity';
+import {
+  Game,
+  GameSeries,
+  GameStatus,
+} from '../../domain/entities/game.entity';
 import {
   GameFilter,
   GameRepository,
@@ -43,6 +47,7 @@ export class GameRepositoryImpl implements GameRepository {
       baseWhere.seasonYear = filter.seasonYear;
     if (filter.gameDate !== undefined) baseWhere.gameDate = filter.gameDate;
     if (filter.status !== undefined) baseWhere.status = filter.status;
+    if (filter.series !== undefined) baseWhere.series = filter.series;
 
     const where:
       FindOptionsWhere<GameOrmEntity> | FindOptionsWhere<GameOrmEntity>[] =
@@ -94,8 +99,16 @@ export class GameRepositoryImpl implements GameRepository {
   async findRecentFinished(teamCode: string, limit: number): Promise<Game[]> {
     const rows = await this.ormRepository.find({
       where: [
-        { homeTeamCode: teamCode, status: GameStatus.FINISHED },
-        { awayTeamCode: teamCode, status: GameStatus.FINISHED },
+        {
+          homeTeamCode: teamCode,
+          status: GameStatus.FINISHED,
+          series: GameSeries.REGULAR,
+        },
+        {
+          awayTeamCode: teamCode,
+          status: GameStatus.FINISHED,
+          series: GameSeries.REGULAR,
+        },
       ],
       order: { scheduledAt: 'DESC' },
       take: limit,
@@ -111,10 +124,10 @@ export class GameRepositoryImpl implements GameRepository {
         SUM(runs_allowed)::int AS "runsAllowed"
       FROM (
         SELECT home_team_code AS team_code, home_score AS runs_scored, away_score AS runs_allowed
-        FROM games WHERE season_year = $1 AND status = 'FINISHED'
+        FROM games WHERE season_year = $1 AND status = 'FINISHED' AND series = 'REGULAR'
         UNION ALL
         SELECT away_team_code AS team_code, away_score AS runs_scored, home_score AS runs_allowed
-        FROM games WHERE season_year = $1 AND status = 'FINISHED'
+        FROM games WHERE season_year = $1 AND status = 'FINISHED' AND series = 'REGULAR'
       ) t
       GROUP BY team_code
     `;
