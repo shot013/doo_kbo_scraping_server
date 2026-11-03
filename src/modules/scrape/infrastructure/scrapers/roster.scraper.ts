@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import { resolveKboTeamByCode } from '../../../../common/kbo/kbo-team';
 import { PlayerPosition } from '../../../players/domain/entities/player.entity';
+import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const ROSTER_SOURCE_URL =
   'https://www.koreabaseball.com/Player/Search.aspx';
@@ -49,6 +50,7 @@ export class RosterScraper {
     const team = resolveKboTeamByCode(teamCode);
 
     const getResponse = await fetch(ROSTER_SOURCE_URL, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     if (!getResponse.ok) {
@@ -109,6 +111,7 @@ export class RosterScraper {
     cookie: string | undefined,
   ): Promise<cheerio.CheerioAPI> {
     const response = await fetch(ROSTER_SOURCE_URL, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       method: 'POST',
       headers: {
         'User-Agent': 'Mozilla/5.0',

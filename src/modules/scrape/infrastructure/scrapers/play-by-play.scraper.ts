@@ -3,6 +3,7 @@ import {
   HitType,
   PlateAppearanceResult,
 } from '../../../plate-appearances/domain/entities/plate-appearance.entity';
+import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const NAVER_RELAY_URL = 'https://api-gw.sports.naver.com/schedule/games';
 
@@ -112,6 +113,7 @@ export class PlayByPlayScraper {
   ): Promise<NaverTextRelayItem[]> {
     const url = `${NAVER_RELAY_URL}/${naverGameId}/relay?inning=${inning}`;
     const response = await fetch(url, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     if (!response.ok) {

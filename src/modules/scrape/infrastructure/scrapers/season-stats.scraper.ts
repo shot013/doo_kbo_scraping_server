@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import { parseInningsPitched } from '../../../../common/kbo/innings';
 import { KBO_TEAMS, resolveKboTeam } from '../../../../common/kbo/kbo-team';
+import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const SEASON_HITTER_SOURCE_URL =
   'https://www.koreabaseball.com/Record/Player/HitterBasic/Basic1.aspx';
@@ -169,6 +170,7 @@ export class SeasonStatsScraper {
 
   private async fetchDefaultTable(url: string): Promise<cheerio.CheerioAPI> {
     const response = await fetch(url, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     if (!response.ok) {
@@ -274,6 +276,7 @@ export class SeasonStatsScraper {
     teamCode: string,
   ): Promise<cheerio.CheerioAPI> {
     const getResponse = await fetch(url, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     if (!getResponse.ok) {
@@ -321,6 +324,7 @@ export class SeasonStatsScraper {
     form.set(`${FORM_PREFIX}hfOrderBy`, hfOrderBy);
 
     const postResponse = await fetch(url, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       method: 'POST',
       headers: {
         'User-Agent': 'Mozilla/5.0',
