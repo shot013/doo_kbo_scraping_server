@@ -112,6 +112,8 @@ export class ScrapeService {
             awayStarterPitcher: item.awayStarterPitcher,
             currentInning: null,
             status: item.status,
+            series: item.series,
+            seriesGameNumber: item.seriesGameNumber,
             sourceUrl: item.sourceUrl,
             createdAt: now,
             updatedAt: now,

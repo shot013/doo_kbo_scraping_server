@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PaginatedResult } from '../../../common/pagination/pagination';
 import { GamePreview } from '../../game-preview/domain/entities/game-preview.entity';
-import { Game, GameStatus } from '../domain/entities/game.entity';
+import { Game, GameSeries, GameStatus } from '../domain/entities/game.entity';
 import { GameSortField } from '../domain/repositories/game.repository';
 import { GameQueryDto } from './dto/game-query.dto';
 import { GameService } from './game.service';
@@ -50,6 +50,8 @@ export interface GameResponse {
   awayStarterPitcher: string | null;
   currentInning: string | null;
   status: GameStatus;
+  series: GameSeries;
+  seriesGameNumber: number | null;
   sourceUrl: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -68,6 +70,7 @@ export class GameController {
       seasonYear: query.seasonYear ? Number(query.seasonYear) : undefined,
       gameDate: query.gameDate,
       status: query.status,
+      series: query.series,
       teamCode: query.teamCode,
       page: query.page ? Number(query.page) : undefined,
       limit: query.limit ? Number(query.limit) : undefined,
@@ -107,6 +110,8 @@ function toGameResponse(game: Game, preview: GamePreview | null): GameResponse {
     awayStarterPitcher: game.awayStarterPitcher,
     currentInning: game.currentInning,
     status: game.status,
+    series: game.series,
+    seriesGameNumber: game.seriesGameNumber,
     sourceUrl: game.sourceUrl,
     createdAt: game.createdAt,
     updatedAt: game.updatedAt,
