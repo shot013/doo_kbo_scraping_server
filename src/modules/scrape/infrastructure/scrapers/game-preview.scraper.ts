@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const GAME_CENTER_SOURCE_URL =
   'https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx';
@@ -177,6 +178,7 @@ export class GamePreviewScraper {
     params: Record<string, string>,
   ): Promise<Response> {
     const response = await fetch(url, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PlayerStatType } from '../../../game-stats/domain/entities/game-stat.entity';
+import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const NAVER_GAME_RECORD_URL =
   'https://api-gw.sports.naver.com/schedule/games';
@@ -88,6 +89,7 @@ export class GameStatsScraper {
     const url = `${NAVER_GAME_RECORD_URL}/${naverGameId}/record`;
 
     const response = await fetch(url, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     if (!response.ok) {

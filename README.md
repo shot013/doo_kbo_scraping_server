@@ -147,7 +147,7 @@ npm run test           # 전체 테스트
 
 | Method | Path | Query/Body | 설명 | 스케줄러 등록 |
 | --- | --- | --- | --- | --- |
-| POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도), `gameMonth`(`01`~`12`, 미지정 시 현재 KST 월) | 해당 월의 정규시즌·포스트시즌 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 현재 월만) |
+| POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도), `gameMonth`(`01`~`12`, 미지정 시 현재 KST 월) | 해당 월의 정규시즌·포스트시즌 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시 매 정시 — 현재 월. 추가로 경기 시간대에는 5분 간격 — 아래 참고) |
 | POST | `/scrape/game-previews` | body: `gameDate`(`YYYY-MM-DD`, 미지정 시 오늘) | 경기 시작 전(GAME_STATE_SC=1)인 경기의 프리뷰(팀 전력비교/선발투수 매치업) 스크래핑 실행 | O (매일 09:00 KST) |
 | POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
 | POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
@@ -155,6 +155,11 @@ npm run test           # 전체 테스트
 | POST | `/scrape/roster` | body: `teamCode`(미지정 시 전체 팀) | 팀 로스터(포지션/등번호/출신교) 스크래핑 실행 | O (매일 18:00 KST) |
 | POST | `/scrape/play-by-play` | body: `gameId`(필수) | 특정 경기의 타석 단위 문자중계(타자-투수 매치업/결과) 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `FINISHED` 상태만 자동 대상) |
 | POST | `/scrape/play-by-play/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 타석 데이터를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
+
+- `/scrape/games` 스케줄러는 5분마다 깨어나 아래 경우에만 실제로 스크랩함 (`scrape.scheduler.ts`, `scrape-schedule.ts`). 이전 회차가 아직 끝나지 않았으면 그 회차는 건너뜀
+  - 17시~다음날 1시 정각: 이번 달 (경기가 없는 날의 기본 주기)
+  - 경기 시간대: 오늘·어제(KST) 경기 중 시작 10분 전부터 `FINISHED`가 될 때까지(취소·연기 제외, 시작 후 최대 6시간)인 경기가 있으면 그 경기가 속한 달. 자정을 넘겨 끝나는 월말 경기도 해당 월로 갱신됨
+- 모든 스크래핑 외부 요청에는 15초 타임아웃이 걸려 있음 (`scrape-request.ts`)
 
 ### Action Logs (`src/modules/action-log`)
 

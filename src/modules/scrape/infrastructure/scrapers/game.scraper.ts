@@ -4,6 +4,7 @@ import {
   GameStatus,
 } from '../../../game/domain/entities/game.entity';
 import { resolveKboTeam } from '../../../../common/kbo/kbo-team';
+import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const SCHEDULE_SOURCE_URL =
   'https://www.koreabaseball.com/Schedule/Schedule.aspx';
@@ -132,6 +133,7 @@ export class GameScraper {
     });
 
     const response = await fetch(SCHEDULE_AJAX_URL, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -188,6 +190,7 @@ export class GameScraper {
         `&fromDate=${fromDate}&toDate=${toDate}` +
         `&size=${NAVER_SCHEDULE_PAGE_SIZE}&categoryId=kbo`;
       const response = await fetch(url, {
+        signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
         headers: { 'User-Agent': 'Mozilla/5.0' },
       });
       if (!response.ok) {
