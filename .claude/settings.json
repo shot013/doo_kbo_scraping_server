@@ -2,14 +2,33 @@
   "permissions": {
     "allow": [
       "Bash(npm install)",
-      "Bash(git init *)",
+      "Bash(npm run format)",
       "Bash(npm run format:check)",
       "Bash(npm run lint)",
+      "Bash(npm run lint:check)",
       "Bash(npm run test)",
-      "Bash(npm run start:dev)"
+      "Bash(npm run test -- *)",
+      "Bash(npm run start:dev)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git fetch origin)",
+      "Bash(git merge-tree *)"
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-kit.sh\""
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
@@ -17,6 +36,19 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-generated-edit.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-edit.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-git.sh\""
           }
         ]
       }
