@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import { resolveKboTeam } from '../../../../common/kbo/kbo-team';
+import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const STANDINGS_SOURCE_URL =
   'https://www.koreabaseball.com/Record/TeamRank/TeamRank.aspx';
@@ -27,6 +28,7 @@ export class StandingsScraper {
 
   async scrape(): Promise<ScrapedStanding[]> {
     const response = await fetch(STANDINGS_SOURCE_URL, {
+      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     if (!response.ok) {
