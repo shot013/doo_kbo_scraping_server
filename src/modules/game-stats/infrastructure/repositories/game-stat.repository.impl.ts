@@ -79,6 +79,9 @@ interface RawTeamPitchingAggregateRow {
 const OUTS_EXPR =
   '(FLOOR(gs.innings_pitched) * 3 + ROUND((gs.innings_pitched - FLOOR(gs.innings_pitched)) * 10))';
 
+/** 시즌 집계 대상 경기(games g) 조건. 포스트시즌 박스스코어는 시즌 기록에 섞지 않는다. */
+const SEASON_GAME_CONDITION = "g.status = 'FINISHED' AND g.series = 'REGULAR'";
+
 const SORT_FIELD_MAP: Record<GameStatSortField, keyof GameStatOrmEntity> = {
   id: 'id',
   teamCode: 'teamCode',
@@ -256,7 +259,7 @@ export class GameStatRepositoryImpl implements GameStatRepository {
         SUM(gs.hits)::int AS hits
       FROM game_stats gs
       INNER JOIN games g ON g.id = gs.game_id
-      WHERE gs.stat_type = $1 AND g.season_year = $2 AND g.status = 'FINISHED'
+      WHERE gs.stat_type = $1 AND g.season_year = $2 AND ${SEASON_GAME_CONDITION}
       GROUP BY gs.team_code
     `;
     const rows = await this.ormRepository.query<RawTeamBattingAggregateRow[]>(
@@ -285,7 +288,7 @@ export class GameStatRepositoryImpl implements GameStatRepository {
         SUM(${OUTS_EXPR})::int AS "totalOuts"
       FROM game_stats gs
       INNER JOIN games g ON g.id = gs.game_id
-      WHERE gs.stat_type = $1 AND g.season_year = $2 AND g.status = 'FINISHED'
+      WHERE gs.stat_type = $1 AND g.season_year = $2 AND ${SEASON_GAME_CONDITION}
       GROUP BY gs.team_code
     `;
     const rows = await this.ormRepository.query<RawTeamPitchingAggregateRow[]>(
@@ -390,7 +393,7 @@ function buildAggregateQuery(options: {
 }): { sql: string; params: unknown[] } {
   const { statType, filter, selectExtra, havingExpr, orderExpr } = options;
   const params: unknown[] = [statType, filter.seasonYear];
-  let where = `gs.stat_type = $1 AND g.season_year = $2 AND g.status = 'FINISHED'`;
+  let where = `gs.stat_type = $1 AND g.season_year = $2 AND ${SEASON_GAME_CONDITION}`;
 
   if (filter.teamCode) {
     params.push(filter.teamCode);
@@ -447,7 +450,7 @@ function buildOpponentAggregateQuery(options: {
       ${selectExtra}
     FROM game_stats gs
     INNER JOIN games g ON g.id = gs.game_id
-    WHERE gs.stat_type = $1 AND gs.player_id = $2 AND g.season_year = $3 AND g.status = 'FINISHED'
+    WHERE gs.stat_type = $1 AND gs.player_id = $2 AND g.season_year = $3 AND ${SEASON_GAME_CONDITION}
     GROUP BY 1
     HAVING ${havingExpr}
     ORDER BY ${orderExpr}

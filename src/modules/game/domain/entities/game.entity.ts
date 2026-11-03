@@ -6,6 +6,15 @@ export enum GameStatus {
   POSTPONED = 'POSTPONED',
 }
 
+/** 시즌 단위 기록(순위표 집계, 선수 상대 성적, 매치업, 최근 폼)은 REGULAR만 대상으로 한다. */
+export enum GameSeries {
+  REGULAR = 'REGULAR',
+  WILDCARD = 'WILDCARD',
+  SEMI_PLAYOFF = 'SEMI_PLAYOFF',
+  PLAYOFF = 'PLAYOFF',
+  KOREAN_SERIES = 'KOREAN_SERIES',
+}
+
 export interface GameProps {
   id: string;
   seasonYear: number;
@@ -22,6 +31,9 @@ export interface GameProps {
   awayStarterPitcher: string | null;
   currentInning: string | null;
   status: GameStatus;
+  series: GameSeries;
+  /** 포스트시즌 시리즈 내 차전(예: KS 3차전 → 3). 정규시즌은 null. */
+  seriesGameNumber: number | null;
   sourceUrl: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -43,6 +55,8 @@ export class Game {
   readonly awayStarterPitcher: string | null;
   readonly currentInning: string | null;
   readonly status: GameStatus;
+  readonly series: GameSeries;
+  readonly seriesGameNumber: number | null;
   readonly sourceUrl: string | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
@@ -63,6 +77,8 @@ export class Game {
     this.awayStarterPitcher = props.awayStarterPitcher;
     this.currentInning = props.currentInning;
     this.status = props.status;
+    this.series = props.series;
+    this.seriesGameNumber = props.seriesGameNumber;
     this.sourceUrl = props.sourceUrl;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;

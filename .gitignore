@@ -60,3 +60,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Local-only ops notes (real infra IDs/IPs — never commit)
 /docs/ops/
+
+# Shared harness kit, cloned here and imported by CLAUDE.md (it is its own git repo)
+/doo_kbo_harness_kit/

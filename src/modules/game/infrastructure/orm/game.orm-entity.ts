@@ -6,7 +6,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { GameStatus } from '../../domain/entities/game.entity';
+import { GameSeries, GameStatus } from '../../domain/entities/game.entity';
 
 @Entity('games')
 @Index(['gameDate'])
@@ -76,6 +76,17 @@ export class GameOrmEntity {
     default: GameStatus.SCHEDULED,
   })
   status: GameStatus;
+
+  @Column({
+    name: 'series',
+    type: 'enum',
+    enum: GameSeries,
+    default: GameSeries.REGULAR,
+  })
+  series: GameSeries;
+
+  @Column({ name: 'series_game_number', type: 'smallint', nullable: true })
+  seriesGameNumber: number | null;
 
   @Column({ name: 'source_url', type: 'varchar', length: 512, nullable: true })
   sourceUrl: string | null;

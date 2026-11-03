@@ -67,6 +67,7 @@ export class PlateAppearanceRepositoryImpl implements PlateAppearanceRepository 
         COUNT(*) FILTER (WHERE pa.is_at_bat)::int AS "atBats",
         COUNT(*) FILTER (WHERE pa.result = 'HIT')::int AS hits
       FROM plate_appearances pa
+      INNER JOIN games g ON g.id = pa.game_id AND g.series = 'REGULAR'
       WHERE pa.batter_id = $1 AND pa.season_year = $2 AND pa.pitcher_id IS NOT NULL
       GROUP BY pa.pitcher_id, pa.pitcher_name, pa.pitcher_team_code
       HAVING COUNT(*) FILTER (WHERE pa.is_at_bat) > 0
@@ -103,6 +104,7 @@ export class PlateAppearanceRepositoryImpl implements PlateAppearanceRepository 
         COUNT(*) FILTER (WHERE pa.is_at_bat)::int AS "atBats",
         COUNT(*) FILTER (WHERE pa.result = 'STRIKEOUT')::int AS strikeouts
       FROM plate_appearances pa
+      INNER JOIN games g ON g.id = pa.game_id AND g.series = 'REGULAR'
       WHERE pa.pitcher_id = $1 AND pa.season_year = $2 AND pa.batter_id IS NOT NULL
       GROUP BY pa.batter_id, pa.batter_name, pa.batter_team_code
       HAVING COUNT(*) FILTER (WHERE pa.is_at_bat) > 0

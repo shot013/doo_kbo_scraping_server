@@ -13,6 +13,25 @@
 
 - `games`/`game-stats`/`standings` 목록 조회 API는 배열이 아니라 `{ data, total, page, limit, totalPages }` 형태의 `PaginatedResult`를 반환한다. 응답 크기가 무제한이라 컨슈머가 한 번에 전체를 받아야 했던 문제를 해결하기 위함.
 
+### 실시간 경기 데이터는 네이버 스포츠, 시즌 단위 데이터는 KBO (2026-08-16)
+
+- **결정**: 진행 중 스코어·선발투수(`game.scraper`의 보정), 박스스코어(`game-stats.scraper`), 문자중계(`play-by-play.scraper`)는 `api-gw.sports.naver.com`에서 받는다. 전체 일정, 순위, 로스터, 시즌 기록은 계속 koreabaseball.com에서 받는다.
+- **이유**: KBO 사이트의 실시간 데이터가 신뢰할 수 없었다. GameCenter 박스스코어 AJAX(`GetBoxScoreScroll`)는 자주 응답하지 않았고, `Schedule.aspx`는 경기가 끝날 때까지 스코어를 0-0으로 보여준다. 운영에서 네이버는 6회(2-1)를 보여주는데 KBO는 한 시간 넘게 매시간 재시도에도 데이터가 없던 사례가 있었다.
+- **적용**: 실시간 데이터가 틀리거나 늦다면 KBO 스크래퍼를 고치기 전에 네이버 쪽으로 해결되는지부터 본다. 네이버 gameId는 우리 gameId 뒤에 시즌 연도를 붙인 형식이라 별도 매핑 조회가 필요 없다.
+
+### 경기 일정 스크래핑: Playwright 대신 직접 fetch (2026-08-17)
+
+- **결정**: KBO `Schedule.aspx` 스크래핑을 Playwright 헤드리스 브라우저 대신, 그 페이지가 내부적으로 호출하는 `/ws/Schedule.asmx/GetScheduleList` AJAX 엔드포인트를 `fetch`로 직접 POST하는 방식으로 전환.
+- **이유**: Playwright로 네트워크 요청을 캡처해보니 세션 쿠키나 인증 없이도 plain `fetch`로 동일한 JSON을 받을 수 있었다. 브라우저 프로세스가 불필요한 무게였고, 1GB RAM EC2 인스턴스에서는 이 스크래퍼 때문에 스왑 파일까지 필요했었다.
+- **패턴**: 사이트가 내부적으로 XHR/AJAX로 데이터를 받는 구조라면 헤드리스 브라우저를 먼저 고르지 말고, 그 요청을 한 번 캡처해 인증 없이 직접 재현 가능한지부터 확인한다.
+- **부수 효과**: Playwright 사용처가 이 스크래퍼뿐이어서 npm 의존성과 Docker 런타임 베이스 이미지(`mcr.microsoft.com/playwright:*` → `node:20-slim`)도 함께 걷어냈다. 의존성을 없앨 때는 다른 사용처를 프로젝트 전체에서 grep하고, 인프라(Dockerfile, CI 이미지)도 정리 대상인지 점검한다.
+
+### Claude Code 하네스: 키트 공통 규칙 → CLAUDE.md → `.claude/rules/` (2026-11-03)
+
+- **결정**: `CLAUDE.md` 맨 위에서 `doo_kbo_harness_kit/KIT_RULES.md`를 import해 첫 단계 규칙으로 두고, `CLAUDE.md`를 프로젝트 최상위 규칙, `.claude/rules/*.md`를 그 하위 규칙으로 정리했다. 같은 규칙은 한 곳에만 두고, 기계적으로 판정 가능한 것(포맷, 브랜치명, 커밋 형식, 보호 브랜치 편집·push, 병합된 마이그레이션 수정)은 훅으로 옮겼다.
+- **이유**: 같은 규칙이 `CLAUDE.md`·rules·스킬·리뷰어에 최대 5번 중복돼 매 턴 중복 과금됐고, 이미 서로 모순되기 시작했다(예외를 던지는 계층). 프롬프트 규칙이던 "API 변경 시 README 갱신"은 지켜지지 않아 README가 실제 API와 어긋나 있었다.
+- **키트와의 차이**: `.claude/hooks/guard-git.sh`는 키트 템플릿에서 heredoc 커밋 차단 버그를 고치고, 브랜치명의 이슈 번호를 선택으로 바꾼 버전이다. 키트에 아직 반영되지 않았다.
+
 ## 진행 중 / 예정
 
 _(아직 없음 — 진행 중인 기능, 보류된 작업, 다음 단계 등을 기록)_

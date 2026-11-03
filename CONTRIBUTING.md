@@ -7,10 +7,13 @@
 
 - `main` — 항상 배포 가능한 상태. 직접 push 금지, PR로만 병합.
 - `develop` — 다음 배포를 준비하는 통합 브랜치. 기능 브랜치는 여기서 분기.
-- `feature/{issue번호}-{짧은-설명}` — 새 기능. 예: `feature/42-team-standings`
-- `fix/{issue번호}-{짧은-설명}` — 버그 수정
+- `feature/{짧은-설명}` — 새 기능. 이슈가 있으면 `feature/{issue번호}-{짧은-설명}`. 예: `feature/team-standings`, `feature/42-team-standings`
+- `fix/{짧은-설명}` — 버그 수정 (이슈 번호는 기능 브랜치와 같이 선택)
 - `chore/{짧은-설명}` — 빌드/설정/의존성 등 코드 동작에 영향 없는 변경
+- `docs/{짧은-설명}` — 문서만 바꾸는 변경
 - `release/{version}` — 배포 준비 (버전 고정, 최종 QA)
+
+브랜치명, 커밋 메시지 형식, `main` 직접 push 금지는 Claude Code의 `guard-git` 훅이 기계적으로 검사합니다.
 
 기능 브랜치는 완료 후 삭제합니다. `develop`이 오래 밀리지 않도록 주기적으로
 `main`에 병합하고 새로 분기하세요.
@@ -39,8 +42,9 @@ chore: bump dependency to latest
 - PR 하나 = 리뷰 가능한 단위 하나. 여러 기능을 한 PR에 묶지 않습니다.
 - PR 설명에는 변경 이유와 테스트 방법을 반드시 포함합니다 (템플릿 참고).
 - 최소 1명 이상의 승인 후 병합합니다.
-- 병합 전 `npm run lint`와 `npm run test`가 로컬에서 통과해야 합니다.
-  (CI에서도 동일하게 실행됩니다.)
+- 병합 전 `npm run format:check`, `npm run lint:check`, `npm run test`가 로컬에서 통과해야 합니다.
+  (CI에서도 동일한 순서로 실행됩니다.)
+- 엔드포인트를 추가·변경했다면 같은 PR에서 `README.md`의 `## API 목록`/`## API 호출 플로우`를 갱신합니다.
 - Squash merge를 기본으로 사용합니다.
 
 ## 코드 작성 규칙
@@ -48,4 +52,5 @@ chore: bump dependency to latest
 - 새 기능은 `src/modules/example/`의 폴더 구조를 그대로 복사해서 시작하세요.
   (레이어 분리 등 자세한 내용은 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [.claude/rules/architecture.md](.claude/rules/architecture.md) 참고)
 - 도메인/핵심 로직 레이어(`domain/`)는 Nest 프레임워크나 `application/`/`infrastructure/`를 import하지 않습니다.
-- `npm run lint`에서 경고가 나오지 않는 것을 기본 목표로 합니다.
+- `npm run lint:check`는 경고가 하나라도 있으면 실패합니다 (`--max-warnings 0`).
+- 이미 `develop`/`main`에 병합된 마이그레이션은 수정하지 않고 새 마이그레이션을 추가합니다.

@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GameStatus } from '../../../game/domain/entities/game.entity';
+import {
+  GameSeries,
+  GameStatus,
+} from '../../../game/domain/entities/game.entity';
 import { resolveKboTeam } from '../../../../common/kbo/kbo-team';
 
 export const SCHEDULE_SOURCE_URL =
@@ -11,6 +14,26 @@ export const NAVER_SCHEDULE_URL =
 
 /** 한 번에 한 달치 일정을 모두 받아오기 위한 페이지 크기 (한 달 최대 ~130경기). */
 const NAVER_SCHEDULE_PAGE_SIZE = 500;
+
+/**
+ * KBO 일정 페이지 시리즈 드롭다운(`ddlSeries`)의 값. 정규시즌 목록에는 포스트시즌
+ * (와일드카드·준PO·PO·KS)이 없어서 두 목록을 모두 요청한다.
+ */
+export const REGULAR_SERIES_IDS = '0,9,6';
+export const POSTSEASON_SERIES_IDS = '3,4,5,7';
+/** 같은 엔드포인트에 연달아 요청하므로 두 목록 사이에 텀을 둔다. */
+const SERIES_REQUEST_DELAY_MS = 500;
+
+type ScheduleScope = 'REGULAR' | 'POSTSEASON';
+
+/** 포스트시즌 행은 비고 칸에 시리즈와 차전이 들어간다 (예: "준PO 2차전"). */
+const POSTSEASON_LABEL_PATTERN = /(WC|준PO|PO|KS)\s*(\d+)차전/;
+const POSTSEASON_SERIES_BY_LABEL: Record<string, GameSeries> = {
+  WC: GameSeries.WILDCARD,
+  준PO: GameSeries.SEMI_PLAYOFF,
+  PO: GameSeries.PLAYOFF,
+  KS: GameSeries.KOREAN_SERIES,
+};
 
 interface NaverScheduleGame {
   gameId: string;
@@ -50,6 +73,8 @@ export interface ScrapedGame {
   homeStarterPitcher: string | null;
   awayStarterPitcher: string | null;
   status: GameStatus;
+  series: GameSeries;
+  seriesGameNumber: number | null;
   sourceUrl: string;
 }
 
@@ -66,13 +91,41 @@ export class GameScraper {
   /**
    * gameMonth를 넘기지 않으면 KBO 일정 페이지가 브라우저에서 로드될 때 요청하는
    * 기본값(현재 KST 기준 월)을 그대로 재현한다. 과거 달을 채워 넣고 싶을 때는
-   * gameMonth('01'~'12')를 직접 지정해서 호출한다.
+   * gameMonth('01'~'12')를 직접 지정해서 호출한다. 정규시즌과 포스트시즌 목록을
+   * 차례로 받아 합친다.
    */
   async scrape(seasonYear: number, gameMonth?: string): Promise<ScrapedGame[]> {
     const month = gameMonth ?? this.resolveCurrentKstMonth();
+    const regularRows = await this.fetchScheduleRows(
+      seasonYear,
+      month,
+      REGULAR_SERIES_IDS,
+    );
+    await delay(SERIES_REQUEST_DELAY_MS);
+    const postseasonRows = await this.fetchScheduleRows(
+      seasonYear,
+      month,
+      POSTSEASON_SERIES_IDS,
+    );
+
+    const games = [
+      ...this.parseRows(regularRows, seasonYear, 'REGULAR'),
+      ...this.parseRows(postseasonRows, seasonYear, 'POSTSEASON'),
+    ];
+    this.logger.log(`Scraped ${games.length} games for ${seasonYear}-${month}`);
+
+    await this.enrichFromNaver(games);
+    return games;
+  }
+
+  private async fetchScheduleRows(
+    seasonYear: number,
+    month: string,
+    srIdList: string,
+  ): Promise<KboScheduleRow[]> {
     const body = new URLSearchParams({
       leId: '1',
-      srIdList: '0,9,6',
+      srIdList,
       seasonId: String(seasonYear),
       gameMonth: month,
       teamId: '',
@@ -90,7 +143,9 @@ export class GameScraper {
       body: body.toString(),
     });
     if (!response.ok) {
-      throw new Error(`KBO schedule request failed: ${response.status}`);
+      throw new Error(
+        `KBO schedule request failed (srIdList=${srIdList}): ${response.status}`,
+      );
     }
     const data = (await response.json()) as KboScheduleResponse;
     if (!Array.isArray(data.rows)) {
@@ -98,11 +153,7 @@ export class GameScraper {
         'Unexpected KBO schedule response shape: rows is not an array',
       );
     }
-    const games = this.parseRows(data.rows, seasonYear);
-    this.logger.log(`Scraped ${games.length} games for ${seasonYear}-${month}`);
-
-    await this.enrichFromNaver(games);
-    return games;
+    return data.rows;
   }
 
   /**
@@ -170,7 +221,11 @@ export class GameScraper {
     }
   }
 
-  private parseRows(rows: KboScheduleRow[], seasonYear: number): ScrapedGame[] {
+  private parseRows(
+    rows: KboScheduleRow[],
+    seasonYear: number,
+    scope: ScheduleScope,
+  ): ScrapedGame[] {
     const games: ScrapedGame[] = [];
     const gameIndexByKey = new Map<string, number>();
     let currentDate: { month: string; day: string } | null = null;
@@ -199,6 +254,7 @@ export class GameScraper {
           timeCell,
           currentDate,
           seasonYear,
+          scope,
           gameIndexByKey,
         });
         if (game) games.push(game);
@@ -220,6 +276,7 @@ export class GameScraper {
     timeCell: string | undefined;
     currentDate: { month: string; day: string };
     seasonYear: number;
+    scope: ScheduleScope;
     gameIndexByKey: Map<string, number>;
   }): ScrapedGame | null {
     const {
@@ -230,6 +287,7 @@ export class GameScraper {
       timeCell,
       currentDate,
       seasonYear,
+      scope,
       gameIndexByKey,
     } = input;
 
@@ -261,7 +319,10 @@ export class GameScraper {
       gameId = `${key}${index}`;
     }
 
-    const note = (noteCell ?? '-').trim();
+    const { series, seriesGameNumber, note } = this.resolveSeries(
+      (noteCell ?? '-').trim(),
+      scope,
+    );
     const status = this.resolveStatus({
       hasScore: scores.length === 2,
       hasReviewLink: Boolean(gameIdMatch),
@@ -289,7 +350,36 @@ export class GameScraper {
       homeStarterPitcher: null,
       awayStarterPitcher: null,
       status,
+      series,
+      seriesGameNumber,
       sourceUrl: SCHEDULE_SOURCE_URL,
+    };
+  }
+
+  /**
+   * 포스트시즌 행의 비고 칸은 시리즈·차전("KS 1차전")이라 그대로 두면 연기로 판정된다.
+   * 그 부분을 떼어낸 나머지만 취소/연기 판정에 넘긴다. 시리즈를 알 수 없는 포스트시즌
+   * 행은 정규시즌으로 잘못 집계되지 않도록 예외를 던져 건너뛴다.
+   */
+  private resolveSeries(
+    rawNote: string,
+    scope: ScheduleScope,
+  ): { series: GameSeries; seriesGameNumber: number | null; note: string } {
+    if (scope === 'REGULAR') {
+      return {
+        series: GameSeries.REGULAR,
+        seriesGameNumber: null,
+        note: rawNote,
+      };
+    }
+    const label = POSTSEASON_LABEL_PATTERN.exec(rawNote);
+    if (!label) {
+      throw new Error(`Unrecognized postseason series note: ${rawNote}`);
+    }
+    return {
+      series: POSTSEASON_SERIES_BY_LABEL[label[1]],
+      seriesGameNumber: Number(label[2]),
+      note: rawNote.replace(label[0], '').trim() || '-',
     };
   }
 
@@ -304,4 +394,8 @@ export class GameScraper {
     }
     return GameStatus.SCHEDULED;
   }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

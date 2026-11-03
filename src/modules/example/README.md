@@ -1,7 +1,7 @@
 # example 모듈
 
 이 모듈은 실제 기능이 아니라 **새 모듈을 만들 때 복사할 참고 구현체**입니다
-(`add-feature` 스킬, `CLAUDE.md`의 "새 module 체크리스트" 참고).
+(절차는 `.claude/skills/add-feature/SKILL.md`, 계층 규칙은 `CLAUDE.md`의 공통 규칙과 `.claude/rules/architecture.md` 참고).
 
 `domain → infrastructure → application` 3계층이 전부 동작하는 최소 예시(이름/설명이 있는 `Example` 엔티티, 목록/단건 조회, 생성)를 담고 있습니다. `infrastructure/repositories/example.repository.impl.ts`는 실제 DB에 연결하지 않는 인메모리 저장소입니다 — 마이그레이션 없이 그대로 실행/복사할 수 있도록 하기 위함입니다. 실제 TypeORM 엔티티(`infrastructure/orm/`)와 마이그레이션을 쓰는 패턴은 `src/modules/game/`을 참고하세요. 페이징·정렬 같은 심화 패턴도 `src/modules/game/`에 있습니다.
 

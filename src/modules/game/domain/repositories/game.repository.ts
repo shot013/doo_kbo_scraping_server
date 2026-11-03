@@ -2,7 +2,7 @@ import {
   PaginatedResult,
   SortOrder,
 } from '../../../../common/pagination/pagination';
-import { Game, GameStatus } from '../entities/game.entity';
+import { Game, GameSeries, GameStatus } from '../entities/game.entity';
 
 export const GAME_REPOSITORY = Symbol('GAME_REPOSITORY');
 
@@ -13,6 +13,7 @@ export interface GameFilter {
   seasonYear?: number;
   gameDate?: string;
   status?: GameStatus;
+  series?: GameSeries;
   teamCode?: string;
   page?: number;
   limit?: number;
@@ -20,7 +21,7 @@ export interface GameFilter {
   sortOrder?: SortOrder;
 }
 
-/** 시즌 종료 경기의 홈/원정 점수를 팀 단위로 합산한 결과. 팀 득점/실점 계산에 쓰인다. */
+/** 정규시즌 종료 경기의 홈/원정 점수를 팀 단위로 합산한 결과. 팀 득점/실점 계산에 쓰인다. */
 export interface TeamRunsAggregate {
   teamCode: string;
   runsScored: number;
@@ -32,7 +33,7 @@ export interface GameRepository {
   findById(id: string): Promise<Game | null>;
   upsert(game: Game): Promise<Game>;
   upsertMany(games: Game[]): Promise<void>;
-  /** 특정 팀의 최근 종료 경기를 최신순으로 조회한다. */
+  /** 특정 팀의 최근 정규시즌 종료 경기를 최신순으로 조회한다. */
   findRecentFinished(teamCode: string, limit: number): Promise<Game[]>;
   aggregateTeamRuns(seasonYear: number): Promise<TeamRunsAggregate[]>;
 }
