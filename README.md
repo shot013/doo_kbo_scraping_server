@@ -55,7 +55,7 @@ npm run start:prod  # 빌드 산출물(dist) 실행 (사전에 npm run build 필
 
 ```bash
 npm run format:check   # 포맷 체크
-npm run lint           # 정적 분석
+npm run lint:check     # 정적 분석 (경고 0개, CI와 동일 — npm run lint는 자동 수정 포함)
 npm run test           # 전체 테스트
 ```
 

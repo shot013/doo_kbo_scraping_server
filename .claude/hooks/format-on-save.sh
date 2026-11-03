@@ -2,16 +2,21 @@
 # PostToolUse hook (Edit|Write): auto-format edited source files with prettier.
 # Parses hook stdin JSON with grep/sed only (no jq/python dependency) for portability.
 
+# prettier is a devDependency, so it is not on the global PATH — call the project's
+# own binary. `command -v prettier` always failed here and silently skipped formatting.
+prettier="${CLAUDE_PROJECT_DIR:-.}/node_modules/.bin/prettier"
+[ -e "$prettier" ] || exit 0
+
 # Hooks run in a non-interactive, non-login shell, so PATH additions from
 # ~/.bashrc / ~/.bash_profile (where toolchains are commonly added) are not
-# inherited. Source them here so prettier resolves the same as in a
-# normal terminal, without hardcoding any one machine's install path.
-if ! command -v prettier >/dev/null 2>&1; then
+# inherited. Source them here so node (needed by the prettier shim) resolves the
+# same as in a normal terminal, without hardcoding any one machine's install path.
+if ! command -v node >/dev/null 2>&1; then
   for rc in "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.zshrc" "$HOME/.profile"; do
     [ -f "$rc" ] && . "$rc" >/dev/null 2>&1
   done
 fi
-command -v prettier >/dev/null 2>&1 || exit 0
+command -v node >/dev/null 2>&1 || exit 0
 
 input=$(cat)
 
@@ -31,7 +36,7 @@ case "$norm" in
 esac
 
 case "$norm" in
-  *.ts) npx prettier --write "$f" >/dev/null 2>&1 ;;
+  *.ts) "$prettier" --write "$f" >/dev/null 2>&1 ;;
 esac
 
 exit 0
