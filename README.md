@@ -1,3 +1,176 @@
+# doo_kbo_scraping_server
+
+> KBO 공식 사이트와 네이버 스포츠에서 경기·순위·선수 기록을 주기적으로 스크래핑해 KBO 앱 [직관](https://github.com/shot013/doo_kbo_app)에 JSON API로 제공하는 Nest.js 서버
+
+## 화면
+
+이 서버의 API로 그리는 Flutter 앱 [직관(doo_kbo_app)](https://github.com/shot013/doo_kbo_app)의 실제 화면입니다 (2026-11-05, 2026 시즌 종료 시점 데이터). 각 화면 아래에 그 화면이 호출하는 API를 적었습니다.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><img src="docs/images/app-home.png" width="200" alt="HOME 화면" /></td>
+    <td align="center" width="25%"><img src="docs/images/app-standings.png" width="200" alt="순위 화면" /></td>
+    <td align="center" width="25%"><img src="docs/images/app-teams.png" width="200" alt="팀 화면" /></td>
+    <td align="center" width="25%"><img src="docs/images/app-player-detail.png" width="200" alt="선수 상세 화면" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>HOME</b><br />오늘의 경기 · 최근 경기 결과<br /><code>GET /games</code><br /><code>GET /game-results/recent</code></td>
+    <td align="center"><b>순위</b><br />정규시즌 순위표<br /><code>GET /standings</code></td>
+    <td align="center"><b>팀</b><br />순위 + 팀 타율·평균자책·득점·실점<br /><code>GET /teams</code></td>
+    <td align="center"><b>선수 상세</b><br />구단별 피안타율 · 상대 타자별 삼진율<br /><code>GET /players/:id</code></td>
+  </tr>
+</table>
+
+## 사용 기술
+
+| 영역 | 기술 |
+| --- | --- |
+| 런타임 · 프레임워크 | Node.js 20, TypeScript 5, Nest.js 11 (Express) |
+| DB · ORM | PostgreSQL 16, TypeORM 1 (스키마는 마이그레이션으로만 변경) |
+| 스크래핑 | `fetch`로 KBO 공식 사이트의 내부 API·페이지와 네이버 스포츠 API를 직접 호출, Cheerio로 HTML 파싱. 요청마다 15초 타임아웃, 요청 사이 딜레이 |
+| 스케줄링 | `@nestjs/schedule` — KST 기준 cron, 경기 시간대에는 5분 간격으로 경기 상태 갱신 |
+| 캐시 | `@nestjs/cache-manager` 인메모리 캐시 (순위·팀·기록 조회, `CACHE_TTL_MS` 기본 5분) |
+| 모니터링 | Sentry (`@sentry/nestjs`), 스크랩 소스별 성공/실패·소요시간을 `scrape-source-health` 테이블에 기록 |
+| 코드 품질 | ESLint 9 (`typescript-eslint` `recommendedTypeChecked`, 경고 0개), Prettier, Jest 30 |
+| CI | GitHub Actions — PR과 push마다 `format:check` → `lint:check` → `test` |
+| 배포 | Docker 멀티 스테이지 빌드 + docker compose (앱 · Postgres · 마이그레이션 러너), AWS EC2 |
+| AI 개발 환경 | Claude Code + 공용 하네스 [doo_kbo_harness_kit](https://github.com/shot013/doo_kbo_harness_kit) |
+
+## 아키텍처
+
+스케줄러가 외부 소스를 스크래핑해 Postgres에 저장하고, 앱은 저장된 데이터만 조회합니다. 앱 요청이 외부 사이트로 바로 나가지 않습니다.
+
+```mermaid
+flowchart LR
+  subgraph SRC["외부 데이터 소스"]
+    KBO["KBO 공식 사이트<br/>일정·결과 · 순위 · 로스터<br/>시즌 기록 · 경기 프리뷰"]
+    NAVER["네이버 스포츠 API<br/>박스스코어 · 문자중계<br/>실시간 스코어 · 선발투수"]
+  end
+
+  subgraph EC2["AWS EC2 — docker compose"]
+    subgraph NEST["Nest.js 서버 :3651"]
+      SCHED["ScrapeScheduler<br/>KST cron · 경기 시간대 5분 폴링"]
+      SCRAPE["scrape 모듈<br/>ScrapeService → Scraper<br/>15초 타임아웃 · 요청 간 딜레이"]
+      CTRL["Controller<br/>순위·팀·기록 응답은 인메모리 캐시"]
+      DOMAIN["도메인 모듈<br/>game · game-stats · standings · players<br/>plate-appearances · season-stats · game-preview"]
+      COMBO["조합 모듈<br/>teams · records · game-results"]
+      HEALTH["scrape-source-health<br/>소스별 성공/실패 · 소요시간"]
+    end
+    PG[("PostgreSQL 16")]
+  end
+
+  APP["직관 앱 (Flutter)"]
+  OPS["운영자<br/>POST /scrape/* 수동 실행 · 백필"]
+  SENTRY["Sentry"]
+
+  SCHED --> SCRAPE
+  OPS --> SCRAPE
+  SCRAPE -- "HTTP · Cheerio" --> KBO
+  SCRAPE -- "HTTP · JSON" --> NAVER
+  SCRAPE -- "upsertMany" --> DOMAIN
+  SCRAPE -- "log()" --> HEALTH
+  APP -- "GET /games · /standings · /teams · /players …" --> CTRL
+  CTRL --> DOMAIN
+  CTRL --> COMBO
+  COMBO -- "exports된 Service" --> DOMAIN
+  DOMAIN --> PG
+  HEALTH --> PG
+  NEST -.->|"예외"| SENTRY
+```
+
+각 모듈은 `domain` / `infrastructure` / `application` 세 계층으로 나뉩니다. `domain`은 Nest와 TypeORM을 모르는 순수 TypeScript이고, `infrastructure`가 `domain`의 repository 인터페이스를 구현합니다. 다른 모듈의 service만 조합하는 `teams`·`records`·`game-results`는 `application`만 둡니다.
+
+```mermaid
+flowchart LR
+  C["Controller<br/>application/"] --> S["Service<br/>application/<br/>null → NotFoundException"]
+  S --> R["Repository 인터페이스 + Symbol 토큰<br/>domain/repositories/"]
+  I["RepositoryImpl<br/>infrastructure/repositories/<br/>toDomain · toOrm"] -.->|"구현"| R
+  I --> O["ORM 엔티티<br/>infrastructure/orm/"]
+  O --> DB[("PostgreSQL")]
+```
+
+```
+src/
+  main.ts / instrument.ts   # 부트스트랩, 앱 로드 전 Sentry 초기화
+  app.module.ts             # 모듈 등록만
+  common/                   # database 설정, pagination, kbo(팀 코드 표)
+  database/                 # TypeORM CLI용 DataSource, migrations/
+  modules/
+    game/  game-stats/  standings/  players/  plate-appearances/
+    season-stats/  game-preview/  action-log/  scrape-source-health/
+                            # domain / infrastructure / application 3계층
+    teams/  records/  game-results/
+                            # application만 (다른 모듈 service 조합)
+    scrape/                 # 스크래퍼 + 스케줄러, 결과를 각 모듈 service로 저장
+    example/                # 새 모듈을 만들 때 복사하는 템플릿 (인메모리)
+```
+
+API별 호출 경로는 아래 [API 호출 플로우](#api-호출-플로우), 새 모듈 추가 절차는 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)에 있습니다.
+
+## Claude Code로 개발하는 방식
+
+이 저장소의 코드는 Claude Code가 규칙·스킬·훅·서브에이전트를 따라 작성합니다. 여러 저장소가 공유하는 규칙은 [doo_kbo_harness_kit](https://github.com/shot013/doo_kbo_harness_kit)(`KIT_RULES.md`)에 두고, 이 서버는 그 위에 `CLAUDE.md`와 `.claude/`로 서버 고유 규칙만 얹습니다.
+
+```mermaid
+flowchart TD
+  START(["세션 시작"]) --> KIT["① 키트 공통 규칙<br/>doo_kbo_harness_kit/KIT_RULES.md<br/>PR base · 작업 맥락 · 커밋 전 검증"]
+  KIT --> PROJ["② 서버 규칙<br/>CLAUDE.md · .claude/rules/*<br/>계층 import 방향 · DI · 스크래핑 예의"]
+  START -.->|"SessionStart 훅"| CHECK["check-kit.sh<br/>키트가 없으면 경고"]
+  PROJ --> ASK["개발 요청"]
+  ASK --> CTX["MEMORY.md · ERRORS.md<br/>필요한 섹션만 grep"]
+  CTX --> BRANCH["develop에서 작업 브랜치 생성<br/>feature/ · fix/ · chore/ · docs/"]
+  BRANCH --> KIND{"새 모듈·테이블이 필요한가?"}
+  KIND -- "예" --> ADD["/add-feature 스킬<br/>example 복사 → domain → infrastructure<br/>→ application → app.module 등록 → 마이그레이션"]
+  KIND -- "아니오" --> EDIT["코드 수정"]
+  ADD --> EDIT
+  EDIT -.->|"수정 전 훅"| GUARD_EDIT["block-generated-edit · guard-edit<br/>dist/ 수정 · develop/main에서 편집<br/>· 병합된 마이그레이션 수정 차단"]
+  EDIT -.->|"수정 후 훅"| FORMAT["format-on-save<br/>prettier 자동 적용"]
+  EDIT --> API{"엔드포인트·스케줄이 바뀌었나?"}
+  API -- "예" --> DOCS["/api-docs-sync 스킬<br/>README API 목록 · 호출 플로우 갱신"]
+  API -- "아니오" --> MANY
+  DOCS --> MANY{"모듈·스크래퍼·마이그레이션이<br/>걸친 변경인가?"}
+  MANY -- "예" --> REVIEW["nest-reviewer 서브에이전트<br/>계층 규칙 · 스크래퍼 타임아웃/딜레이<br/>· 크론 겹침 · 마이그레이션 down()"]
+  MANY -- "아니오" --> VERIFY
+  REVIEW --> VERIFY["/verify 스킬<br/>format:check → lint:check → test"]
+  VERIFY --> COMMIT["커밋 · push<br/>사용자가 요청했을 때만"]
+  COMMIT -.->|"git 명령 전 훅"| GUARD_GIT["guard-git<br/>브랜치명 · Conventional Commits<br/>· main 직접 push 차단"]
+  COMMIT --> CONFLICT["develop과 충돌 확인<br/>git fetch · git merge-tree"]
+  CONFLICT --> PR["PR 생성<br/>base = develop · PR 템플릿 체크리스트"]
+  PR --> CI["GitHub Actions CI<br/>format:check → lint:check → test"]
+```
+
+### 예시: 선수 상세 페이지의 "상대 타자별 삼진율" 기능
+
+위 [화면](#화면) 4번째 캡처의 "상대 타자별 삼진율"을 이 흐름으로 만들면 아래 순서가 됩니다. 결과물은 `plate-appearances` 모듈, `play-by-play` 스크래퍼, `GET /players/:id`의 `vsBatterStats` 필드입니다.
+
+| 단계 | 동작하는 것 | 이 기능에서 하는 일 |
+| --- | --- | --- |
+| 요청 | — | "선수 상세 페이지에 투수가 상대한 타자별 삼진율을 보여줄 데이터를 만들어줘" |
+| 맥락 확인 | `KIT_RULES.md` 작업 맥락 → `MEMORY.md` | "실시간 경기 데이터는 네이버 스포츠" 결정 섹션만 읽고, 타석 데이터 소스로 네이버 문자중계 API를 고름 |
+| 브랜치 | `guard-edit` 훅, `guard-git` 훅 | `develop`에서 바로 고치려 하면 차단 → `feature/batter-pitcher-matchup-stats` 생성, 브랜치명 규약 검사 |
+| 새 모듈 | `/add-feature` 스킬, `.claude/rules/architecture.md` | `example`을 복사해 `plate-appearances` 모듈 생성: 도메인 엔티티, `PLATE_APPEARANCE_REPOSITORY` 토큰, `*.orm-entity.ts`, `toDomain`/`toOrm` 구현체, `app.module.ts` 등록, 마이그레이션 생성 |
+| 스크래퍼 | `CLAUDE.md` 공통 규칙 (스크래핑 예의) | `play-by-play.scraper.ts`가 15초 타임아웃(`scrape-request.ts`)을 쓰고 이닝 요청 사이에 딜레이를 둠, 스케줄러에 등록 |
+| 모듈 조합 | `.claude/rules/architecture.md` (다른 모듈은 exports된 service로) | `players`가 `PlateAppearanceService`를 주입받아 `GET /players/:id`에 `vsBatterStats`를 붙임 — 다른 모듈의 repository 토큰은 쓰지 않음 |
+| 편집 중 | `format-on-save`, `guard-edit` 훅 | 저장할 때마다 prettier 적용, 이미 병합된 마이그레이션은 수정 차단 |
+| API 문서 | `/api-docs-sync` 스킬 | README `GET /players/:id` 설명에 `vsBatterStats`, `## API 목록`에 `/scrape/play-by-play`와 실행 시각 추가 |
+| 리뷰 | `nest-reviewer` 서브에이전트 | 새 모듈·스크래퍼·마이그레이션이 걸려 있어 위임: 계층 규칙, 스크래퍼 타임아웃·딜레이, 크론 겹침, 마이그레이션 `down()` 점검 |
+| 검증 | `/verify` 스킬 | `format:check` → `lint:check` → `test` |
+| 커밋 | `guard-git` 훅, `.claude/rules/git-workflow.md` | `feat(plate-appearances): ...` — scope는 모듈 디렉터리명 |
+| PR | `KIT_RULES.md` git, PR 템플릿 | `git merge-tree`로 `develop`과 충돌이 없는지 확인 → base `develop`으로 PR, "README API 목록 업데이트" 체크 |
+
+### 규칙을 어디에 두는가
+
+매 턴 컨텍스트에 들어가는 규칙은 최소로 두고, 기계적으로 판정할 수 있는 것은 훅으로, 특정 작업에서만 필요한 절차는 스킬로 내립니다.
+
+| 층 | 위치 | 언제 동작하나 | 이 저장소에서 하는 일 |
+| --- | --- | --- | --- |
+| 규칙 | 키트 `KIT_RULES.md` → `CLAUDE.md` → `.claude/rules/*` | 항상 (매 턴) | 계층 import 방향, DI·repository 배치, 예외 변환 위치, 스크래핑 예의, PR·충돌 확인 |
+| 훅 | `.claude/hooks/*` (`.claude/settings.json`에 등록) | 도구 호출 때 자동 | 키트 확인, 생성 파일·병합된 마이그레이션 보호, 자동 포맷, git 규약 강제 |
+| 스킬 | `.claude/skills/*` | 관련 작업일 때 | `/add-feature`, `/api-docs-sync`, `/verify` |
+| 서브에이전트 | `.claude/agents/nest-reviewer.md` | 여러 모듈·스크래퍼·마이그레이션 변경 후 | 린터가 못 잡는 아키텍처·스크래퍼 리뷰 |
+
+훅·스킬별 자세한 설명은 [docs/CLAUDE_CODE.md](docs/CLAUDE_CODE.md)에 있습니다.
+
 ## 서버 구동 방법
 
 ### 1. 의존성 설치
@@ -233,21 +406,3 @@ ScrapeController (application/scrape.controller.ts)
 - `POST /scrape/roster`: `RosterScraper`가 `Player/Search.aspx` 폼 postback으로 팀별 선수 목록(포지션/등번호/출신교)을 요청·파싱 → `PlayerService.upsert()`. `body.teamCode` 미지정 시 전체 팀 순회
 
 `/scrape/game-stats/backfill`을 제외한 나머지 스크래핑 API는 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답). `/scrape/game-stats/backfill`은 대상 시즌에 `FINISHED` 경기가 하나도 없을 때만 이렇게 실패하고, 개별 경기 실패는 삼켜서 계속 진행합니다.
-
-## Project structure
-
-```
-src/
-  main.ts               # 애플리케이션 진입점 (부트스트랩, 서버 시작)
-  app.module.ts          # 루트 모듈 (컨트롤러/프로바이더 조합)
-  app.controller.ts      # 라우팅 및 요청 처리
-  app.service.ts         # 비즈니스 로직
-  app.controller.spec.ts # 컨트롤러 유닛 테스트
-test/
-  app.e2e-spec.ts         # e2e 테스트
-```
-
-- **main.ts**: `NestFactory.create(AppModule)`로 앱 인스턴스를 생성하고 `PORT` 환경변수(없으면 3000)로 서버를 기동합니다.
-- **app.module.ts**: 애플리케이션의 루트 모듈입니다. 새 기능을 추가할 때는 별도 모듈(예: `ScrapeModule`)을 만들어 이곳 `imports`에 등록합니다.
-- **app.controller.ts**: HTTP 요청을 받아 서비스에 위임하는 계층입니다. 생성자 주입으로 `AppService`를 받습니다.
-- **app.service.ts**: 실제 로직이 들어가는 프로바이더(`@Injectable()`)입니다.
