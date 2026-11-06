@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { POSTSEASON_SERIES_IDS } from './game.scraper';
 import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const GAME_CENTER_SOURCE_URL =
@@ -12,8 +13,16 @@ const PITCHER_RECORD_URL =
 
 /** GAME_STATE_SC: 1=경기 전(프리뷰), 2=경기중, 3=경기종료. */
 const PREVIEW_GAME_STATE = '1';
-/** srId 0 = 정규시즌. 시범경기/올스타전/국제전은 KBO 사이트 자체에서도 프리뷰를 제공하지 않는다. */
+/** srId 0 = 정규시즌. */
 const REGULAR_SEASON_SR_ID = 0;
+/**
+ * 프리뷰를 스크랩할 경기의 SR_ID: 정규시즌 + 포스트시즌(4=WC, 3=준PO, 5=PO, 7=KS).
+ * 시범경기/올스타전/국제전은 KBO 사이트 자체에서도 프리뷰를 제공하지 않는다.
+ */
+const PREVIEW_TARGET_SR_IDS = new Set([
+  REGULAR_SEASON_SR_ID,
+  ...POSTSEASON_SERIES_IDS.split(',').map(Number),
+]);
 
 interface KboGameListGame {
   G_ID: string;
@@ -95,7 +104,7 @@ export class GamePreviewScraper {
     const targets = games.filter(
       (game) =>
         game.GAME_STATE_SC === PREVIEW_GAME_STATE &&
-        game.SR_ID === REGULAR_SEASON_SR_ID,
+        PREVIEW_TARGET_SR_IDS.has(game.SR_ID),
     );
 
     const previews: ScrapedGamePreview[] = [];
@@ -111,6 +120,11 @@ export class GamePreviewScraper {
     return previews;
   }
 
+  /**
+   * 팀 전력비교/선발투수 기록은 경기 자신의 SR_ID로 요청해 정규시즌과 포스트시즌 기록을
+   * 분리한다. 포스트시즌 경기는 그 시리즈(예: KS) 안의 기록만 돌아온다 — KBO는 srId를
+   * 하나만 받아서 포스트시즌 전체 합산 기록은 받을 수 없다.
+   */
   private async scrapeGame(game: KboGameListGame): Promise<ScrapedGamePreview> {
     const teamRecordRows = await this.fetchTable(TEAM_RECORD_URL, {
       leId: '1',
@@ -267,8 +281,11 @@ export class GamePreviewScraper {
   }
 }
 
-/** KBO는 표본이 없는 항목을 "-" 또는 빈 문자열로 내려준다. 둘 다 null로 정규화한다. */
+/**
+ * KBO는 표본이 없는 항목을 "-", 빈 문자열, `&nbsp;`(시리즈 첫 등판 투수의 시즌/상대 전적)로
+ * 내려준다. 모두 null로 정규화한다.
+ */
 function toTextOrNull(text: string | null | undefined): string | null {
-  const trimmed = text?.trim();
+  const trimmed = text?.replace(/&nbsp;/g, ' ').trim();
   return !trimmed || trimmed === '-' ? null : trimmed;
 }
