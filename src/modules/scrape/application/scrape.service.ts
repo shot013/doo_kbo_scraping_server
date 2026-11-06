@@ -57,6 +57,8 @@ export interface ScrapeSummary {
 
 /** 시즌 전체 백필은 수백 경기를 순회하므로 roster 스크랩(팀 10개, 500ms)보다 넉넉한 텀을 둔다. */
 const BACKFILL_DELAY_MS = 2000;
+/** 연속으로 이만큼 경기가 실패하면 네이버가 아직 응답하지 않는 것으로 보고 이번 회차를 멈춘다. */
+const MISSING_DATA_MAX_CONSECUTIVE_FAILURES = 2;
 
 @Injectable()
 export class ScrapeService {
@@ -696,6 +698,95 @@ export class ScrapeService {
       return { itemsScraped: savedCount, durationMs };
     } catch (error) {
       await this.logFailure(sourceName, NAVER_RELAY_URL, startedAt, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 시즌 FINISHED 경기 중 박스스코어나 타석이 비어 있는 경기만 다시 스크랩한다. 매시간 크론은
+   * 당일 경기만 보므로 네이버가 응답하지 않던 날 놓친 경기는 이 작업이 아니면 채워지지 않는다.
+   * 타석의 선수 이름은 박스스코어에서 채우므로, 박스스코어를 받지 못한 경기는 타석도 받지 않는다.
+   */
+  async scrapeMissingGameData(seasonYear: number): Promise<ScrapeSummary> {
+    const sourceName = 'naver-missing-game-data';
+    const startedAt = Date.now();
+
+    try {
+      const { data: finishedGames } = await this.gameService.findAll({
+        seasonYear,
+        status: GameStatus.FINISHED,
+        limit: 1000,
+      });
+      const gameIds = finishedGames.map((game) => game.id);
+      const withStats = new Set(
+        await this.gameStatService.findSavedGameIds(gameIds),
+      );
+      const withPlateAppearances = new Set(
+        await this.plateAppearanceService.findSavedGameIds(gameIds),
+      );
+      const targets = finishedGames.filter(
+        (game) => !withStats.has(game.id) || !withPlateAppearances.has(game.id),
+      );
+      if (targets.length === 0) {
+        return { itemsScraped: 0, durationMs: Date.now() - startedAt };
+      }
+
+      let savedCount = 0;
+      let failedGameCount = 0;
+      let consecutiveFailures = 0;
+      let hasRequested = false;
+      const pace = async (): Promise<void> => {
+        if (hasRequested) await delay(BACKFILL_DELAY_MS);
+        hasRequested = true;
+      };
+
+      for (const [index, game] of targets.entries()) {
+        try {
+          if (!withStats.has(game.id)) {
+            await pace();
+            savedCount += (await this.scrapeAndSaveGameStats(game)).saved;
+          }
+          if (!withPlateAppearances.has(game.id)) {
+            await pace();
+            savedCount += (await this.scrapeAndSavePlayByPlay(game)).saved;
+          }
+          consecutiveFailures = 0;
+        } catch (error) {
+          failedGameCount++;
+          consecutiveFailures++;
+          this.logger.warn(
+            `Failed to scrape missing data for ${game.id}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+          if (consecutiveFailures >= MISSING_DATA_MAX_CONSECUTIVE_FAILURES) {
+            throw new Error(
+              `Stopped after ${consecutiveFailures} consecutive failed games; ${failedGameCount + targets.length - index - 1}/${targets.length} games still missing data`,
+            );
+          }
+        }
+      }
+
+      const durationMs = Date.now() - startedAt;
+      await this.scrapeSourceHealthService.log({
+        sourceName,
+        targetUrl: NAVER_GAME_RECORD_URL,
+        status: ScrapeStatus.SUCCESS,
+        httpStatusCode: 200,
+        durationMs,
+        itemsScraped: savedCount,
+        errorMessage:
+          failedGameCount > 0
+            ? `${failedGameCount}/${targets.length} games failed (see server logs)`
+            : null,
+        scrapedAt: new Date(),
+      });
+      return { itemsScraped: savedCount, durationMs };
+    } catch (error) {
+      await this.logFailure(
+        sourceName,
+        NAVER_GAME_RECORD_URL,
+        startedAt,
+        error,
+      );
       throw error;
     }
   }
