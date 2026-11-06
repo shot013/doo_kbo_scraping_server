@@ -17,6 +17,11 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const DAILY_ROSTER_CRON = '0 18 * * *';
 /** 가장 이른 경기(14시)보다 앞서 프리뷰(경기 시작 전 데이터)를 미리 받아온다. */
 const DAILY_PREVIEW_CRON = '0 9 * * *';
+/**
+ * 놓친 지난 경기 데이터는 경기가 없는 새벽~오전에만 채워, 저녁 스크랩과 경기 시간대 5분 간격
+ * 스크랩이 보내는 네이버 요청과 겹치지 않게 한다.
+ */
+const MISSING_GAME_DATA_CRON = '30 2-12 * * *';
 const KST_CRON_OPTIONS = { timeZone: 'Asia/Seoul' };
 
 @Injectable()
@@ -24,6 +29,8 @@ export class ScrapeScheduler {
   private readonly logger = new Logger(ScrapeScheduler.name);
   /** 5분 간격 실행이 이전 회차와 겹치지 않도록 진행 중 여부를 기억한다. */
   private gamesScrapeRunning = false;
+  /** 밀린 경기가 많아 한 회차가 한 시간을 넘겨도 다음 회차가 같은 네이버에 겹쳐 요청하지 않게 한다. */
+  private missingGameDataScrapeRunning = false;
 
   constructor(
     private readonly scrapeService: ScrapeService,
@@ -191,6 +198,26 @@ export class ScrapeScheduler {
           `scheduled play-by-play scrape failed for ${game.id}: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
+    }
+  }
+
+  @Cron(MISSING_GAME_DATA_CRON, KST_CRON_OPTIONS)
+  async scrapeMissingGameData(): Promise<void> {
+    if (this.missingGameDataScrapeRunning) {
+      this.logger.warn(
+        'previous missing-game-data scrape is still running, skipping this run',
+      );
+      return;
+    }
+    this.missingGameDataScrapeRunning = true;
+    try {
+      await this.scrapeService.scrapeMissingGameData(new Date().getFullYear());
+    } catch (error) {
+      this.logger.error(
+        `scheduled missing-game-data scrape failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    } finally {
+      this.missingGameDataScrapeRunning = false;
     }
   }
 }

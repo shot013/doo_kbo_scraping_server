@@ -27,6 +27,8 @@ export interface PitcherVsBatterSplit {
 export interface PlateAppearanceRepository {
   upsert(plateAppearance: PlateAppearance): Promise<PlateAppearance>;
   upsertMany(plateAppearances: PlateAppearance[]): Promise<void>;
+  /** 주어진 경기 중 타석이 한 행이라도 저장된 경기 id만 돌려준다. */
+  findSavedGameIds(gameIds: string[]): Promise<string[]>;
   findBatterVsPitcherSplits(
     batterId: number,
     seasonYear: number,

@@ -141,6 +141,15 @@ export class GameStatRepositoryImpl implements GameStatRepository {
     return rows.map((row) => this.toDomain(row));
   }
 
+  async findSavedGameIds(gameIds: string[]): Promise<string[]> {
+    if (gameIds.length === 0) return [];
+    const rows = await this.ormRepository.query<{ gameId: string }[]>(
+      'SELECT DISTINCT game_id AS "gameId" FROM game_stats WHERE game_id = ANY($1)',
+      [gameIds],
+    );
+    return rows.map((row) => row.gameId);
+  }
+
   async findById(id: number): Promise<GameStat | null> {
     const row = await this.ormRepository.findOne({ where: { id } });
     return row ? this.toDomain(row) : null;

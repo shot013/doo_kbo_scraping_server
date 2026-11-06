@@ -80,4 +80,13 @@ export class ScrapeController {
       body?.seasonYear ?? new Date().getFullYear(),
     );
   }
+
+  @Post('missing-game-data')
+  scrapeMissingGameData(
+    @Body() body?: ScrapeRequestDto,
+  ): Promise<ScrapeSummary> {
+    return this.scrapeService.scrapeMissingGameData(
+      body?.seasonYear ?? new Date().getFullYear(),
+    );
+  }
 }

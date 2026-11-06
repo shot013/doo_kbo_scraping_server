@@ -328,6 +328,7 @@ npm run test           # 전체 테스트
 | POST | `/scrape/roster` | body: `teamCode`(미지정 시 전체 팀) | 팀 로스터(포지션/등번호/출신교) 스크래핑 실행 | O (매일 18:00 KST) |
 | POST | `/scrape/play-by-play` | body: `gameId`(필수) | 특정 경기의 타석 단위 문자중계(타자-투수 매치업/결과) 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `FINISHED` 상태만 자동 대상) |
 | POST | `/scrape/play-by-play/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 타석 데이터를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
+| POST | `/scrape/missing-game-data` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 `FINISHED` 경기 중 박스스코어나 타석 데이터가 비어 있는 경기만 스크랩 (네이버 장애로 놓친 경기 보충) | O (02시~12시 KST, 매시 30분) |
 
 - `/scrape/games` 스케줄러는 5분마다 깨어나 아래 경우에만 실제로 스크랩함 (`scrape.scheduler.ts`, `scrape-schedule.ts`). 이전 회차가 아직 끝나지 않았으면 그 회차는 건너뜀
   - 17시~다음날 1시 정각: 이번 달 (경기가 없는 날의 기본 주기)
@@ -404,6 +405,7 @@ ScrapeController (application/scrape.controller.ts)
 - `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
 - `POST /scrape/game-stats`: `body.gameId`의 경기를 `games`에서 조회(없으면 404)한 뒤 `GameStatsScraper`가 네이버 스포츠 박스스코어(`/schedule/games/{naverGameId}/record`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남. 네이버 gameId는 KBO gameId 뒤에 시즌 연도를 붙이고, 포스트시즌은 앞 연도 자리를 시리즈 SR_ID 4자리(WC `4444`, 준PO `3333`, PO `5555`, KS `7777`)로 바꾼 값이다(`/scrape/play-by-play`의 문자중계, `/scrape/games`의 실시간 스코어 보정도 같은 규칙)
 - `POST /scrape/game-stats/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 조회해 경기당 2초 텀을 두고 순회하며 `/scrape/game-stats`와 동일한 스크랩·저장 로직(`ScrapeService.scrapeAndSaveGameStats()`)을 재사용 — 이미 저장된 경기도 다시 스크랩해 `player_id`/`at_bats_against` 등 이후 추가된 필드를 보강한다. 경기 단위 실패는 warn 로그만 남기고 계속 진행(전체가 실패로 끝나지 않음)
+- `POST /scrape/missing-game-data`: `body.seasonYear`의 `FINISHED` 경기 중 `game_stats`나 `plate_appearances`가 한 행도 없는 경기만 골라, 요청마다 2초 텀을 두고 박스스코어 → 타석 순으로 `/scrape/game-stats`·`/scrape/play-by-play`와 같은 저장 로직을 실행한다. 매시간 크론은 당일 경기만 보므로 네이버가 응답하지 않던 날의 경기는 이 작업으로만 채워진다. 박스스코어를 받지 못한 경기는 타석도 건너뛰고(타석의 선수 이름을 박스스코어에서 채우므로), 연속 2경기가 실패하면 네이버가 아직 응답하지 않는 것으로 보고 멈춘다. 빠진 경기가 없으면 요청도 상태 기록도 하지 않는다
 - `POST /scrape/roster`: `RosterScraper`가 `Player/Search.aspx` 폼 postback으로 팀별 선수 목록(포지션/등번호/출신교)을 요청·파싱 → `PlayerService.upsert()`. `body.teamCode` 미지정 시 전체 팀 순회
 
-`/scrape/game-stats/backfill`을 제외한 나머지 스크래핑 API는 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답). `/scrape/game-stats/backfill`은 대상 시즌에 `FINISHED` 경기가 하나도 없을 때만 이렇게 실패하고, 개별 경기 실패는 삼켜서 계속 진행합니다.
+`/scrape/game-stats/backfill`을 제외한 나머지 스크래핑 API는 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답). `/scrape/game-stats/backfill`은 대상 시즌에 `FINISHED` 경기가 하나도 없을 때만 이렇게 실패하고, 개별 경기 실패는 삼켜서 계속 진행합니다. `/scrape/missing-game-data`는 개별 경기 실패를 삼키되, 연속 2경기가 실패해 멈추면 `FAILURE`로 기록하고 500으로 응답합니다.
