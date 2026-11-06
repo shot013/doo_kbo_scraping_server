@@ -4,6 +4,7 @@ import {
   GameStatus,
 } from '../../../game/domain/entities/game.entity';
 import { resolveKboTeam } from '../../../../common/kbo/kbo-team';
+import { fromNaverGameId } from './naver-game-id';
 import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const SCHEDULE_SOURCE_URL =
@@ -203,7 +204,7 @@ export class GameScraper {
         );
       }
       const naverById = new Map(
-        body.result.games.map((game) => [game.gameId.slice(0, -4), game]),
+        body.result.games.map((game) => [fromNaverGameId(game.gameId), game]),
       );
 
       for (const game of games) {

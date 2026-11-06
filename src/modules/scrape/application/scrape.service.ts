@@ -30,6 +30,7 @@ import {
   GameScraper,
   SCHEDULE_SOURCE_URL,
 } from '../infrastructure/scrapers/game.scraper';
+import { toNaverGameId } from '../infrastructure/scrapers/naver-game-id';
 import {
   NAVER_RELAY_URL,
   PlayByPlayScraper,
@@ -508,10 +509,12 @@ export class ScrapeService {
   async scrapeGameStats(gameId: string): Promise<ScrapeSummary> {
     const sourceName = 'naver-box-score';
     const startedAt = Date.now();
-    const targetUrl = `${NAVER_GAME_RECORD_URL}/${gameId}${gameId.slice(0, 4)}/record`;
+    let targetUrl = NAVER_GAME_RECORD_URL;
 
     try {
-      const { scraped, saved } = await this.scrapeAndSaveGameStats(gameId);
+      const game = await this.gameService.findById(gameId);
+      targetUrl = `${NAVER_GAME_RECORD_URL}/${toNaverGameId(game.id, game.series)}/record`;
+      const { scraped, saved } = await this.scrapeAndSaveGameStats(game);
       if (scraped === 0) {
         throw new Error('No game stats scraped from source');
       }
@@ -568,7 +571,7 @@ export class ScrapeService {
           await delay(BACKFILL_DELAY_MS);
         }
         try {
-          const { saved } = await this.scrapeAndSaveGameStats(game.id);
+          const { saved } = await this.scrapeAndSaveGameStats(game);
           savedCount += saved;
         } catch (error) {
           failedGameCount++;
@@ -607,10 +610,12 @@ export class ScrapeService {
   async scrapePlayByPlay(gameId: string): Promise<ScrapeSummary> {
     const sourceName = 'naver-play-by-play';
     const startedAt = Date.now();
-    const targetUrl = `${NAVER_RELAY_URL}/${gameId}${gameId.slice(0, 4)}/relay`;
+    let targetUrl = NAVER_RELAY_URL;
 
     try {
-      const { scraped, saved } = await this.scrapeAndSavePlayByPlay(gameId);
+      const game = await this.gameService.findById(gameId);
+      targetUrl = `${NAVER_RELAY_URL}/${toNaverGameId(game.id, game.series)}/relay`;
+      const { scraped, saved } = await this.scrapeAndSavePlayByPlay(game);
       if (scraped === 0) {
         throw new Error('No plate appearances scraped from source');
       }
@@ -664,7 +669,7 @@ export class ScrapeService {
           await delay(BACKFILL_DELAY_MS);
         }
         try {
-          const { saved } = await this.scrapeAndSavePlayByPlay(game.id);
+          const { saved } = await this.scrapeAndSavePlayByPlay(game);
           savedCount += saved;
         } catch (error) {
           failedGameCount++;
@@ -700,11 +705,12 @@ export class ScrapeService {
    * playerId로 매칭해 채운다 — `PlayByPlayScraper`의 클래스 doc 참고.
    */
   private async scrapeAndSavePlayByPlay(
-    gameId: string,
+    game: Game,
   ): Promise<{ scraped: number; saved: number }> {
-    const game = await this.gameService.findById(gameId);
+    const gameId = game.id;
     const scraped = await this.playByPlayScraper.scrape(
       gameId,
+      game.series,
       game.homeTeamCode,
       game.awayTeamCode,
     );
@@ -762,9 +768,10 @@ export class ScrapeService {
   }
 
   private async scrapeAndSaveGameStats(
-    gameId: string,
+    game: Game,
   ): Promise<{ scraped: number; saved: number }> {
-    const scraped = await this.gameStatsScraper.scrape(gameId);
+    const gameId = game.id;
+    const scraped = await this.gameStatsScraper.scrape(gameId, game.series);
     const now = new Date();
     const stats = scraped.map(
       (item) =>
