@@ -3,6 +3,8 @@ import {
   HitType,
   PlateAppearanceResult,
 } from '../../../plate-appearances/domain/entities/plate-appearance.entity';
+import { GameSeries } from '../../../game/domain/entities/game.entity';
+import { toNaverGameId } from './naver-game-id';
 import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const NAVER_RELAY_URL = 'https://api-gw.sports.naver.com/schedule/games';
@@ -72,13 +74,14 @@ export class PlayByPlayScraper {
 
   async scrape(
     gameId: string,
+    series: GameSeries,
     homeTeamCode: string,
     awayTeamCode: string,
   ): Promise<ScrapedPlateAppearance[]> {
     if (!GAME_ID_PATTERN.test(gameId)) {
       throw new Error(`Invalid gameId format: ${gameId}`);
     }
-    const naverGameId = `${gameId}${gameId.slice(0, 4)}`;
+    const naverGameId = toNaverGameId(gameId, series);
     const plateAppearances: ScrapedPlateAppearance[] = [];
 
     for (let inning = 1; inning <= MAX_INNINGS_TO_TRY; inning++) {

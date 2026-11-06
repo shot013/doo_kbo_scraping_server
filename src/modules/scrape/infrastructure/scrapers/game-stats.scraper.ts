@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PlayerStatType } from '../../../game-stats/domain/entities/game-stat.entity';
+import { GameSeries } from '../../../game/domain/entities/game.entity';
+import { toNaverGameId } from './naver-game-id';
 import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const NAVER_GAME_RECORD_URL =
@@ -74,19 +76,17 @@ export interface ScrapedGameStat {
  * KBO 공식 게임센터(koreabaseball.com)는 라이브 박스스코어 AJAX 응답이 느리거나
  * 아예 오지 않는 경우가 있어(Playwright로 최대 15초 대기해도 못 받는 사례 확인됨),
  * 더 안정적으로 응답하는 네이버 스포츠 API에서 같은 데이터를 가져온다.
- * 네이버 gameId는 KBO gameId 뒤에 연도(gameId 앞 4자리)를 붙인 형식이다
- * (예: "20260816OBHT0" -> "20260816OBHT02026").
+ * 네이버 gameId 변환 규칙은 `toNaverGameId` 참고.
  */
 @Injectable()
 export class GameStatsScraper {
   private readonly logger = new Logger(GameStatsScraper.name);
 
-  async scrape(gameId: string): Promise<ScrapedGameStat[]> {
+  async scrape(gameId: string, series: GameSeries): Promise<ScrapedGameStat[]> {
     if (!GAME_ID_PATTERN.test(gameId)) {
       throw new Error(`Invalid gameId format: ${gameId}`);
     }
-    const naverGameId = `${gameId}${gameId.slice(0, 4)}`;
-    const url = `${NAVER_GAME_RECORD_URL}/${naverGameId}/record`;
+    const url = `${NAVER_GAME_RECORD_URL}/${toNaverGameId(gameId, series)}/record`;
 
     const response = await fetch(url, {
       signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
