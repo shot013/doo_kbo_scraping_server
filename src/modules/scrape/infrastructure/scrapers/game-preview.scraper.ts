@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { POSTSEASON_SERIES_IDS } from './game.scraper';
 import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const GAME_CENTER_SOURCE_URL =
@@ -12,8 +13,22 @@ const PITCHER_RECORD_URL =
 
 /** GAME_STATE_SC: 1=경기 전(프리뷰), 2=경기중, 3=경기종료. */
 const PREVIEW_GAME_STATE = '1';
-/** srId 0 = 정규시즌. 시범경기/올스타전/국제전은 KBO 사이트 자체에서도 프리뷰를 제공하지 않는다. */
+/** srId 0 = 정규시즌. */
 const REGULAR_SEASON_SR_ID = 0;
+/**
+ * 프리뷰를 스크랩할 경기의 SR_ID: 정규시즌 + 포스트시즌(WC·준PO·PO·KS).
+ * 시범경기/올스타전/국제전은 KBO 사이트 자체에서도 프리뷰를 제공하지 않는다.
+ */
+const PREVIEW_TARGET_SR_IDS = new Set([
+  REGULAR_SEASON_SR_ID,
+  ...POSTSEASON_SERIES_IDS.split(',').map(Number),
+]);
+/**
+ * 팀 전력비교/선발투수 기록은 경기의 시리즈와 상관없이 정규시즌 기준으로 받는다.
+ * 포스트시즌 경기의 SR_ID로 요청하면 그 시리즈 안의 성적만 돌아와 시리즈 초반에는
+ * 투수 기록이 전부 비어 있고, 시즌 집계도 정규시즌만 쓰는 방침과 어긋난다.
+ */
+const PREVIEW_STATS_SR_ID = String(REGULAR_SEASON_SR_ID);
 
 interface KboGameListGame {
   G_ID: string;
@@ -95,7 +110,7 @@ export class GamePreviewScraper {
     const targets = games.filter(
       (game) =>
         game.GAME_STATE_SC === PREVIEW_GAME_STATE &&
-        game.SR_ID === REGULAR_SEASON_SR_ID,
+        PREVIEW_TARGET_SR_IDS.has(game.SR_ID),
     );
 
     const previews: ScrapedGamePreview[] = [];
@@ -114,7 +129,7 @@ export class GamePreviewScraper {
   private async scrapeGame(game: KboGameListGame): Promise<ScrapedGamePreview> {
     const teamRecordRows = await this.fetchTable(TEAM_RECORD_URL, {
       leId: '1',
-      srId: String(game.SR_ID),
+      srId: PREVIEW_STATS_SR_ID,
       seasonId: String(game.SEASON_ID),
       gameId: game.G_ID,
       groupSc: 'SEASON',
@@ -126,7 +141,7 @@ export class GamePreviewScraper {
     if (game.T_PIT_P_ID !== null && game.B_PIT_P_ID !== null) {
       const pitcherRows = await this.fetchTable(PITCHER_RECORD_URL, {
         leId: '1',
-        srId: String(game.SR_ID),
+        srId: PREVIEW_STATS_SR_ID,
         seasonId: String(game.SEASON_ID),
         awayTeamId: game.AWAY_ID,
         awayPitId: String(game.T_PIT_P_ID),
