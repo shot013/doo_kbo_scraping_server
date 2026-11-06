@@ -107,6 +107,8 @@ export interface GameStatRepository {
   aggregateTeamPitching(seasonYear: number): Promise<TeamPitchingAggregate[]>;
   /** 여러 경기의 박스스코어 전체(타자+투수)를 한 번에 조회한다. */
   findByGameIds(gameIds: string[]): Promise<GameStat[]>;
+  /** 주어진 경기 중 박스스코어가 한 행이라도 저장된 경기 id만 돌려준다. */
+  findSavedGameIds(gameIds: string[]): Promise<string[]>;
   findOpponentBattingSplits(
     playerId: number,
     seasonYear: number,
