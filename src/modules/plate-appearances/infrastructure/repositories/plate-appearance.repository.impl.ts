@@ -55,6 +55,15 @@ export class PlateAppearanceRepositoryImpl implements PlateAppearanceRepository 
     );
   }
 
+  async findSavedGameIds(gameIds: string[]): Promise<string[]> {
+    if (gameIds.length === 0) return [];
+    const rows = await this.ormRepository.query<{ gameId: string }[]>(
+      'SELECT DISTINCT game_id AS "gameId" FROM plate_appearances WHERE game_id = ANY($1)',
+      [gameIds],
+    );
+    return rows.map((row) => row.gameId);
+  }
+
   async findBatterVsPitcherSplits(
     batterId: number,
     seasonYear: number,

@@ -22,6 +22,10 @@ export class PlateAppearanceService {
     return this.plateAppearanceRepository.upsertMany(plateAppearances);
   }
 
+  findSavedGameIds(gameIds: string[]): Promise<string[]> {
+    return this.plateAppearanceRepository.findSavedGameIds(gameIds);
+  }
+
   findBatterVsPitcherSplits(
     batterId: number,
     seasonYear: number,
