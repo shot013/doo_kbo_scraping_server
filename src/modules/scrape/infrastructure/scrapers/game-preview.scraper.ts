@@ -16,19 +16,13 @@ const PREVIEW_GAME_STATE = '1';
 /** srId 0 = 정규시즌. */
 const REGULAR_SEASON_SR_ID = 0;
 /**
- * 프리뷰를 스크랩할 경기의 SR_ID: 정규시즌 + 포스트시즌(WC·준PO·PO·KS).
+ * 프리뷰를 스크랩할 경기의 SR_ID: 정규시즌 + 포스트시즌(4=WC, 3=준PO, 5=PO, 7=KS).
  * 시범경기/올스타전/국제전은 KBO 사이트 자체에서도 프리뷰를 제공하지 않는다.
  */
 const PREVIEW_TARGET_SR_IDS = new Set([
   REGULAR_SEASON_SR_ID,
   ...POSTSEASON_SERIES_IDS.split(',').map(Number),
 ]);
-/**
- * 팀 전력비교/선발투수 기록은 경기의 시리즈와 상관없이 정규시즌 기준으로 받는다.
- * 포스트시즌 경기의 SR_ID로 요청하면 그 시리즈 안의 성적만 돌아와 시리즈 초반에는
- * 투수 기록이 전부 비어 있고, 시즌 집계도 정규시즌만 쓰는 방침과 어긋난다.
- */
-const PREVIEW_STATS_SR_ID = String(REGULAR_SEASON_SR_ID);
 
 interface KboGameListGame {
   G_ID: string;
@@ -126,10 +120,15 @@ export class GamePreviewScraper {
     return previews;
   }
 
+  /**
+   * 팀 전력비교/선발투수 기록은 경기 자신의 SR_ID로 요청해 정규시즌과 포스트시즌 기록을
+   * 분리한다. 포스트시즌 경기는 그 시리즈(예: KS) 안의 기록만 돌아온다 — KBO는 srId를
+   * 하나만 받아서 포스트시즌 전체 합산 기록은 받을 수 없다.
+   */
   private async scrapeGame(game: KboGameListGame): Promise<ScrapedGamePreview> {
     const teamRecordRows = await this.fetchTable(TEAM_RECORD_URL, {
       leId: '1',
-      srId: PREVIEW_STATS_SR_ID,
+      srId: String(game.SR_ID),
       seasonId: String(game.SEASON_ID),
       gameId: game.G_ID,
       groupSc: 'SEASON',
@@ -141,7 +140,7 @@ export class GamePreviewScraper {
     if (game.T_PIT_P_ID !== null && game.B_PIT_P_ID !== null) {
       const pitcherRows = await this.fetchTable(PITCHER_RECORD_URL, {
         leId: '1',
-        srId: PREVIEW_STATS_SR_ID,
+        srId: String(game.SR_ID),
         seasonId: String(game.SEASON_ID),
         awayTeamId: game.AWAY_ID,
         awayPitId: String(game.T_PIT_P_ID),
@@ -282,8 +281,11 @@ export class GamePreviewScraper {
   }
 }
 
-/** KBO는 표본이 없는 항목을 "-" 또는 빈 문자열로 내려준다. 둘 다 null로 정규화한다. */
+/**
+ * KBO는 표본이 없는 항목을 "-", 빈 문자열, `&nbsp;`(시리즈 첫 등판 투수의 시즌/상대 전적)로
+ * 내려준다. 모두 null로 정규화한다.
+ */
 function toTextOrNull(text: string | null | undefined): string | null {
-  const trimmed = text?.trim();
+  const trimmed = text?.replace(/&nbsp;/g, ' ').trim();
   return !trimmed || trimmed === '-' ? null : trimmed;
 }

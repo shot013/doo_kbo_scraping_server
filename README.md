@@ -321,7 +321,7 @@ npm run test           # 전체 테스트
 | Method | Path | Query/Body | 설명 | 스케줄러 등록 |
 | --- | --- | --- | --- | --- |
 | POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도), `gameMonth`(`01`~`12`, 미지정 시 현재 KST 월) | 해당 월의 정규시즌·포스트시즌 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시 매 정시 — 현재 월. 추가로 경기 시간대에는 5분 간격 — 아래 참고) |
-| POST | `/scrape/game-previews` | body: `gameDate`(`YYYY-MM-DD`, 미지정 시 오늘) | 경기 시작 전(GAME_STATE_SC=1)인 정규시즌·포스트시즌 경기의 프리뷰(팀 전력비교/선발투수 매치업) 스크래핑 실행. 포스트시즌 경기도 기록은 정규시즌 기준 | O (매일 09:00 KST) |
+| POST | `/scrape/game-previews` | body: `gameDate`(`YYYY-MM-DD`, 미지정 시 오늘) | 경기 시작 전(GAME_STATE_SC=1)인 정규시즌·포스트시즌 경기의 프리뷰(팀 전력비교/선발투수 매치업) 스크래핑 실행. 포스트시즌 경기는 그 시리즈(WC/준PO/PO/KS) 안의 기록만 담음 | O (매일 09:00 KST) |
 | POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
 | POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
 | POST | `/scrape/game-stats/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 박스스코어를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
@@ -400,7 +400,7 @@ ScrapeController (application/scrape.controller.ts)
 ```
 
 - `POST /scrape/games`: `GameScraper`가 KBO 스케줄 페이지(`Schedule.aspx`)가 내부적으로 호출하는 `GetScheduleList` 엔드포인트를 정규시즌(`srIdList=0,9,6`)과 포스트시즌(`srIdList=3,4,5,7`) 목록으로 0.5초 간격을 두고 한 번씩 호출해 응답을 파싱 → `GameService.upsertMany()` (진행 중 경기는 네이버 스포츠 API로 실시간 스코어 보정). 포스트시즌 행은 비고 칸의 "WC/준PO/PO/KS N차전"에서 `series`/`seriesGameNumber`를 읽고, 시리즈를 알 수 없는 포스트시즌 행은 건너뜀
-- `POST /scrape/game-previews`: `GamePreviewScraper`가 `GetKboGameList`로 해당 날짜 경기 목록을 받아 경기 전(`GAME_STATE_SC=1`)인 정규시즌(`SR_ID=0`)·포스트시즌(`SR_ID=3,4,5,7`) 경기만 골라, 경기마다 GameCenter 프리뷰 탭이 쓰는 `GetTeamRecord`/`GetPitcherRecordAnalysis`를 호출 → `GamePreviewService.upsertMany()`. 두 엔드포인트는 항상 `srId=0`으로 요청해 포스트시즌 경기도 정규시즌 성적을 받는다(경기 자신의 `SR_ID`로 요청하면 그 시리즈 성적만 돌아옴)
+- `POST /scrape/game-previews`: `GamePreviewScraper`가 `GetKboGameList`로 해당 날짜 경기 목록을 받아 경기 전(`GAME_STATE_SC=1`)인 정규시즌(`SR_ID=0`)·포스트시즌(`SR_ID=3,4,5,7`) 경기만 골라, 경기마다 GameCenter 프리뷰 탭이 쓰는 `GetTeamRecord`/`GetPitcherRecordAnalysis`를 호출 → `GamePreviewService.upsertMany()`. 두 엔드포인트는 경기 자신의 `SR_ID`로 요청해 정규시즌 경기는 정규시즌 기록을, 포스트시즌 경기는 그 시리즈 안의 기록만 받는다(KBO가 `srId`를 하나만 받아 포스트시즌 전체 합산은 불가). 시리즈에 아직 등판하지 않은 투수의 기록 항목은 `null`
 - `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
 - `POST /scrape/game-stats`: `GameStatsScraper`가 `body.gameId`로 박스스코어(`GetBoxScoreScroll`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남
 - `POST /scrape/game-stats/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 조회해 경기당 2초 텀을 두고 순회하며 `/scrape/game-stats`와 동일한 스크랩·저장 로직(`ScrapeService.scrapeAndSaveGameStats()`)을 재사용 — 이미 저장된 경기도 다시 스크랩해 `player_id`/`at_bats_against` 등 이후 추가된 필드를 보강한다. 경기 단위 실패는 warn 로그만 남기고 계속 진행(전체가 실패로 끝나지 않음)
