@@ -24,6 +24,16 @@
 
 ---
 
+### [2026-11-06] 포스트시즌 경기의 박스스코어·타석 데이터가 전혀 저장되지 않음
+
+**증상**: 포스트시즌 경기의 `game_stats`/`plate_appearances`가 0건. `scrape_source_health`에는 `naver-box-score`/`naver-play-by-play`가 `The operation was aborted due to timeout`(11/03~04)으로 실패. 경기 중 실시간 스코어도 갱신되지 않음.
+
+**원인**: 네이버 gameId는 포스트시즌일 때 앞 4자리 연도 자리를 시리즈 SR_ID ×4(WC `4444`, 준PO `3333`, PO `5555`, KS `7777`)로 바꾼다(`20261104SSKT0` → `77771104SSKT02026`). 코드는 정규시즌 규칙(연도 뒤에 붙이기)만 써서 404가 났다. 11/03~04에는 네이버 장애로 timeout이 먼저 나서 404가 가려졌다.
+
+**해결**: `scrapers/naver-game-id.ts`의 `toNaverGameId(gameId, series)`/`fromNaverGameId()`로 변환을 모았다. 박스스코어·문자중계·실시간 스코어 보정이 모두 이 함수를 쓴다.
+
+**재발 방지**: 네이버 요청이 실패하면 `GET /schedule/games?fromDate=..&toDate=..&categoryId=kbo`로 실제 gameId부터 확인한다. 로컬 PC에서는 네이버가 timeout인데 EC2에서는 정상일 수 있으니 EC2에서도 확인한다.
+
 ### [2026-11-03] `format-on-save` 훅이 아무 파일도 포맷하지 않음
 
 **증상**: Claude Code로 `.ts` 파일을 수정해도 prettier가 적용되지 않고, 포맷 위반이 `npm run format:check`/lint 단계에서야 드러남. 훅 자체는 에러 없이 끝남.
