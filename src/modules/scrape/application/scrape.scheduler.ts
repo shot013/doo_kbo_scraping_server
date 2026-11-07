@@ -11,8 +11,11 @@ import {
 import { ScrapeService } from './scrape.service';
 
 const EVENING_HOURLY_CRON = `0 ${EVENING_HOURS.join(',')} * * *`;
-/** 경기 일정·결과 스크랩은 5분마다 깨어나되, 매시 정각 회차와 경기 시간대에만 실제로 요청한다. */
-const EVERY_5_MINUTES_CRON = '*/5 * * * *';
+/**
+ * 경기 일정·결과 스크랩은 매시 정각에 깨어나되, 저녁 회차와 경기 시간대에만 실제로 요청한다.
+ * 5분 간격이었으나 회차마다 네이버 요청이 나가 1시간 간격으로 줄였다.
+ */
+const HOURLY_CRON = '0 * * * *';
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DAILY_ROSTER_CRON = '0 18 * * *';
 /** 가장 이른 경기(14시)보다 앞서 프리뷰(경기 시작 전 데이터)를 미리 받아온다. */
@@ -22,7 +25,7 @@ const KST_CRON_OPTIONS = { timeZone: 'Asia/Seoul' };
 @Injectable()
 export class ScrapeScheduler {
   private readonly logger = new Logger(ScrapeScheduler.name);
-  /** 5분 간격 실행이 이전 회차와 겹치지 않도록 진행 중 여부를 기억한다. */
+  /** 한 회차가 길어져도 다음 회차와 겹치지 않도록 진행 중 여부를 기억한다. */
   private gamesScrapeRunning = false;
 
   constructor(
@@ -34,7 +37,7 @@ export class ScrapeScheduler {
    * 매시 정각(17시~다음날 1시)에는 이번 달을, 경기 시간대에는 그 경기가 속한 달을 스크랩한다.
    * 자정을 넘겨 끝나는 월말 경기는 다음 달 목록에 없으므로 경기가 속한 달을 따로 요청해야 한다.
    */
-  @Cron(EVERY_5_MINUTES_CRON, KST_CRON_OPTIONS)
+  @Cron(HOURLY_CRON, KST_CRON_OPTIONS)
   async scrapeGames(): Promise<void> {
     if (this.gamesScrapeRunning) {
       this.logger.warn(
