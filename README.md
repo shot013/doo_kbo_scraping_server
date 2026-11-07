@@ -28,7 +28,7 @@
 | 런타임 · 프레임워크 | Node.js 20, TypeScript 5, Nest.js 11 (Express) |
 | DB · ORM | PostgreSQL 16, TypeORM 1 (스키마는 마이그레이션으로만 변경) |
 | 스크래핑 | `fetch`로 KBO 공식 사이트의 내부 API·페이지와 네이버 스포츠 API를 직접 호출, Cheerio로 HTML 파싱. 요청마다 15초 타임아웃, 요청 사이 딜레이 |
-| 스케줄링 | `@nestjs/schedule` — KST 기준 cron, 경기 시간대에는 5분 간격으로 경기 상태 갱신 |
+| 스케줄링 | `@nestjs/schedule` — KST 기준 cron, 경기 시간대에는 매시 정각에 경기 상태 갱신 |
 | 캐시 | `@nestjs/cache-manager` 인메모리 캐시 (순위·팀·기록 조회, `CACHE_TTL_MS` 기본 5분) |
 | 모니터링 | Sentry (`@sentry/nestjs`), 스크랩 소스별 성공/실패·소요시간을 `scrape-source-health` 테이블에 기록 |
 | 코드 품질 | ESLint 9 (`typescript-eslint` `recommendedTypeChecked`, 경고 0개), Prettier, Jest 30 |
@@ -49,7 +49,7 @@ flowchart LR
 
   subgraph EC2["AWS EC2 — docker compose"]
     subgraph NEST["Nest.js 서버 :3651"]
-      SCHED["ScrapeScheduler<br/>KST cron · 경기 시간대 5분 폴링"]
+      SCHED["ScrapeScheduler<br/>KST cron · 경기 시간대 매시 폴링"]
       SCRAPE["scrape 모듈<br/>ScrapeService → Scraper<br/>15초 타임아웃 · 요청 간 딜레이"]
       CTRL["Controller<br/>순위·팀·기록 응답은 인메모리 캐시"]
       DOMAIN["도메인 모듈<br/>game · game-stats · standings · players<br/>plate-appearances · season-stats · game-preview"]
@@ -320,7 +320,7 @@ npm run test           # 전체 테스트
 
 | Method | Path | Query/Body | 설명 | 스케줄러 등록 |
 | --- | --- | --- | --- | --- |
-| POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도), `gameMonth`(`01`~`12`, 미지정 시 현재 KST 월) | 해당 월의 정규시즌·포스트시즌 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시 매 정시 — 현재 월. 추가로 경기 시간대에는 5분 간격 — 아래 참고) |
+| POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도), `gameMonth`(`01`~`12`, 미지정 시 현재 KST 월) | 해당 월의 정규시즌·포스트시즌 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시 매 정시 — 현재 월. 추가로 경기 시간대에는 그 외 시각에도 매 정시 — 아래 참고) |
 | POST | `/scrape/game-previews` | body: `gameDate`(`YYYY-MM-DD`, 미지정 시 오늘) | 경기 시작 전(GAME_STATE_SC=1)인 정규시즌·포스트시즌 경기의 프리뷰(팀 전력비교/선발투수 매치업) 스크래핑 실행. 포스트시즌 경기는 그 시리즈(WC/준PO/PO/KS) 안의 기록만 담음 | O (매일 09:00 KST) |
 | POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
 | POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
@@ -329,8 +329,8 @@ npm run test           # 전체 테스트
 | POST | `/scrape/play-by-play` | body: `gameId`(필수) | 특정 경기의 타석 단위 문자중계(타자-투수 매치업/결과) 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `FINISHED` 상태만 자동 대상) |
 | POST | `/scrape/play-by-play/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 타석 데이터를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
 
-- `/scrape/games` 스케줄러는 5분마다 깨어나 아래 경우에만 실제로 스크랩함 (`scrape.scheduler.ts`, `scrape-schedule.ts`). 이전 회차가 아직 끝나지 않았으면 그 회차는 건너뜀
-  - 17시~다음날 1시 정각: 이번 달 (경기가 없는 날의 기본 주기)
+- `/scrape/games` 스케줄러는 매시 정각에 깨어나 아래 경우에만 실제로 스크랩함 (`scrape.scheduler.ts`, `scrape-schedule.ts`). 이전 회차가 아직 끝나지 않았으면 그 회차는 건너뜀
+  - 17시~다음날 1시: 이번 달 (경기가 없는 날의 기본 주기)
   - 경기 시간대: 오늘·어제(KST) 경기 중 시작 10분 전부터 `FINISHED`가 될 때까지(취소·연기 제외, 시작 후 최대 6시간)인 경기가 있으면 그 경기가 속한 달. 자정을 넘겨 끝나는 월말 경기도 해당 월로 갱신됨
 - 모든 스크래핑 외부 요청에는 15초 타임아웃이 걸려 있음 (`scrape-request.ts`)
 

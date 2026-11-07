@@ -80,7 +80,7 @@ describe('ScrapeScheduler.scrapeGames', () => {
   it('경기 시간대도 매시 정각도 아니면 스크랩하지 않는다', async () => {
     games = [makeGame('2026-11-04T18:30', GameStatus.SCHEDULED)];
 
-    await runAt('2026-11-04T16:35');
+    await runAt('2026-11-04T16:00');
 
     expect(scrapeGames).not.toHaveBeenCalled();
   });
@@ -92,21 +92,21 @@ describe('ScrapeScheduler.scrapeGames', () => {
     expect(scrapeGames).toHaveBeenCalledWith(2026, '11');
   });
 
-  it('경기 시작 10분 전부터 5분 간격으로 스크랩한다 (14시 낮 경기 포함)', async () => {
+  it('저녁 회차가 아니어도 경기 시간대에는 매시 정각에 스크랩한다 (14시 낮 경기 포함)', async () => {
     games = [makeGame('2026-11-07T14:00', GameStatus.SCHEDULED)];
 
-    await runAt('2026-11-07T13:45');
-    await runAt('2026-11-07T13:50');
-    await runAt('2026-11-07T13:55');
+    await runAt('2026-11-07T13:00');
+    await runAt('2026-11-07T14:00');
+    await runAt('2026-11-07T15:00');
 
     expect(scrapeGames).toHaveBeenCalledTimes(2);
     expect(scrapeGames).toHaveBeenCalledWith(2026, '11');
   });
 
-  it('경기가 FINISHED가 되면 5분 간격 스크랩을 멈춘다', async () => {
-    games = [makeGame('2026-11-04T18:30', GameStatus.FINISHED)];
+  it('경기가 FINISHED가 되면 경기 시간대 스크랩을 멈춘다', async () => {
+    games = [makeGame('2026-11-07T14:00', GameStatus.FINISHED)];
 
-    await runAt('2026-11-04T21:35');
+    await runAt('2026-11-07T16:00');
 
     expect(scrapeGames).not.toHaveBeenCalled();
   });
@@ -129,14 +129,10 @@ describe('ScrapeScheduler.scrapeGames', () => {
       [2026, '10'],
     ]);
 
+    // 시작 후 6시간(00:30)이 지나면 FINISHED가 아니어도 더 폴링하지 않아, 01시에는 이번 달만 남는다.
     scrapeGames.mockClear();
-    await runAt('2026-11-01T00:10');
-    expect(scrapeGames.mock.calls).toEqual([[2026, '10']]);
-
-    // 시작 후 6시간(00:30)이 지나면 FINISHED가 아니어도 더 폴링하지 않는다.
-    scrapeGames.mockClear();
-    await runAt('2026-11-01T00:35');
-    expect(scrapeGames).not.toHaveBeenCalled();
+    await runAt('2026-11-01T01:00');
+    expect(scrapeGames.mock.calls).toEqual([[2026, '11']]);
   });
 
   it('이전 실행이 끝나지 않았으면 이번 회차는 건너뛴다', async () => {

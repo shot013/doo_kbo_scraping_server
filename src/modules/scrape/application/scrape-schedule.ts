@@ -3,7 +3,7 @@ import { Game, GameStatus } from '../../game/domain/entities/game.entity';
 /** 매시 정각 스크랩을 돌리는 KST 시각 (17시~다음날 1시). 경기가 없는 날의 기본 주기다. */
 export const EVENING_HOURS = [17, 18, 19, 20, 21, 22, 23, 0, 1];
 
-/** 경기 시작 이만큼 전부터 5분 간격 스크랩을 시작한다. */
+/** 경기 시작 이만큼 전부터 경기 시간대로 보고 스크랩한다. */
 const GAME_WINDOW_LEAD_MS = 10 * 60 * 1000;
 /**
  * KBO가 끝내 종료 처리를 하지 않는 경기(서스펜디드 등)를 무한히 폴링하지 않도록,
@@ -28,7 +28,7 @@ export function toKst(date: Date): {
   };
 }
 
-/** 5분 간격 크론의 실행 중 기존 매시 정각 스크랩에 해당하는 회차인지. */
+/** 매시 정각 크론의 실행 중 경기가 없어도 스크랩하는 저녁(17시~다음날 1시) 회차인지. */
 export function isEveningHourlySlot(now: Date): boolean {
   const { hour, minute } = toKst(now);
   return minute < 5 && EVENING_HOURS.includes(hour);
