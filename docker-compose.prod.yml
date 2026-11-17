@@ -17,6 +17,9 @@ services:
   app:
     build: .
     restart: unless-stopped
+    # 네이버 호출용 Chromium을 닫을 때마다 고아가 된 자식 프로세스가 PID 1(node)에
+    # 붙어 좀비로 남는다. node는 이를 회수하지 않으므로 init 프로세스를 PID 1로 둔다.
+    init: true
     env_file:
       - .env
     environment:
