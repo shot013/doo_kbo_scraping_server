@@ -13,6 +13,7 @@ import { ScrapeService } from './application/scrape.service';
 import { GamePreviewScraper } from './infrastructure/scrapers/game-preview.scraper';
 import { GameStatsScraper } from './infrastructure/scrapers/game-stats.scraper';
 import { GameScraper } from './infrastructure/scrapers/game.scraper';
+import { NaverBrowserClient } from './infrastructure/scrapers/naver-browser.client';
 import { PlayByPlayScraper } from './infrastructure/scrapers/play-by-play.scraper';
 import { RosterScraper } from './infrastructure/scrapers/roster.scraper';
 import { SeasonStatsScraper } from './infrastructure/scrapers/season-stats.scraper';
@@ -33,6 +34,7 @@ import { StandingsScraper } from './infrastructure/scrapers/standings.scraper';
   providers: [
     ScrapeService,
     ScrapeScheduler,
+    NaverBrowserClient,
     GameScraper,
     GamePreviewScraper,
     StandingsScraper,

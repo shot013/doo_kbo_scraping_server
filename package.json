@@ -37,6 +37,7 @@
     "cache-manager": "^7.2.9",
     "cheerio": "^1.2.0",
     "pg": "^8.22.0",
+    "puppeteer-core": "^24.43.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "typeorm": "^1.0.0"

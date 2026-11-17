@@ -11,6 +11,7 @@ import {
   REGULAR_SERIES_IDS,
   ScrapedGame,
 } from './game.scraper';
+import { NaverBrowserClient } from './naver-browser.client';
 
 interface KboScheduleFixture {
   rows: { row: { Text: string }[] }[];
@@ -26,8 +27,8 @@ function loadFixture(name: string): KboScheduleFixture {
 const EMPTY_SCHEDULE: KboScheduleFixture = { rows: [] };
 
 /**
- * KBO 일정 요청은 srIdList별 fixture를 돌려주고, 네이버 보정 요청은 실패시켜
- * KBO 응답만으로 파싱 결과를 검증한다 (보정 실패는 warn만 남기고 진행된다).
+ * KBO 일정 요청은 srIdList별 fixture를 돌려준다. 네이버 보정은 `NaverBrowserClient`를
+ * 실패시켜 KBO 응답만으로 파싱 결과를 검증한다 (보정 실패는 warn만 남기고 진행된다).
  */
 function mockFetch(bySeriesIds: Record<string, KboScheduleFixture>) {
   return jest.spyOn(global, 'fetch').mockImplementation((input, init) => {
@@ -68,7 +69,12 @@ describe('GameScraper', () => {
     jest.useFakeTimers();
     jest.spyOn(Logger.prototype, 'log').mockImplementation(() => undefined);
     jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
-    scraper = new GameScraper();
+    const naver = {
+      fetchJson: jest
+        .fn()
+        .mockRejectedValue(new Error('naver unavailable in test')),
+    } as unknown as NaverBrowserClient;
+    scraper = new GameScraper(naver);
   });
 
   afterEach(() => {
