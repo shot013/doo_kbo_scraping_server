@@ -44,7 +44,7 @@ docker compose version
 
 ### 스왑 설정 (중요)
 
-`t2.micro`/`t3.micro`는 RAM이 1GB뿐입니다. (과거엔 스크래핑 시 Playwright가 Chromium을 띄워 OOM 위험이 있었으나, 스크래퍼를 fetch 기반으로 전환하면서 더 이상 브라우저를 띄우지 않습니다.) 그래도 Postgres + Node를 함께 운영하는 만큼 여유 있게 최소 2GB 스왑을 만들어 둡니다.
+`t2.micro`/`t3.micro`는 RAM이 1GB뿐입니다. 네이버 스포츠 API를 호출할 때 앱 컨테이너가 헤드리스 Chromium을 띄우는데(요청이 있을 때만 띄우고 마지막 요청 30초 뒤 종료), 이때 수백 MB를 쓰므로 스왑이 없으면 OOM 위험이 있습니다. Postgres + Node + Chromium을 함께 운영하는 만큼 최소 2GB 스왑을 반드시 만들어 둡니다.
 
 ```bash
 sudo fallocate -l 2G /swapfile

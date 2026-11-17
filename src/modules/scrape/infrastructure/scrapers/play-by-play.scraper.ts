@@ -4,8 +4,8 @@ import {
   PlateAppearanceResult,
 } from '../../../plate-appearances/domain/entities/plate-appearance.entity';
 import { GameSeries } from '../../../game/domain/entities/game.entity';
+import { NaverBrowserClient } from './naver-browser.client';
 import { toNaverGameId } from './naver-game-id';
-import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const NAVER_RELAY_URL = 'https://api-gw.sports.naver.com/schedule/games';
 
@@ -72,6 +72,8 @@ export interface ScrapedPlateAppearance {
 export class PlayByPlayScraper {
   private readonly logger = new Logger(PlayByPlayScraper.name);
 
+  constructor(private readonly naver: NaverBrowserClient) {}
+
   async scrape(
     gameId: string,
     series: GameSeries,
@@ -115,14 +117,7 @@ export class PlayByPlayScraper {
     inning: number,
   ): Promise<NaverTextRelayItem[]> {
     const url = `${NAVER_RELAY_URL}/${naverGameId}/relay?inning=${inning}`;
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-    });
-    if (!response.ok) {
-      throw new Error(`Naver relay request failed: ${response.status}`);
-    }
-    const body = (await response.json()) as NaverRelayResponse;
+    const body = await this.naver.fetchJson<NaverRelayResponse>(url);
     return body.result.textRelayData?.textRelays ?? [];
   }
 

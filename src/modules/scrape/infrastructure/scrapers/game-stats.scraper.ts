@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PlayerStatType } from '../../../game-stats/domain/entities/game-stat.entity';
 import { GameSeries } from '../../../game/domain/entities/game.entity';
+import { NaverBrowserClient } from './naver-browser.client';
 import { toNaverGameId } from './naver-game-id';
-import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
 export const NAVER_GAME_RECORD_URL =
   'https://api-gw.sports.naver.com/schedule/games';
@@ -82,20 +82,15 @@ export interface ScrapedGameStat {
 export class GameStatsScraper {
   private readonly logger = new Logger(GameStatsScraper.name);
 
+  constructor(private readonly naver: NaverBrowserClient) {}
+
   async scrape(gameId: string, series: GameSeries): Promise<ScrapedGameStat[]> {
     if (!GAME_ID_PATTERN.test(gameId)) {
       throw new Error(`Invalid gameId format: ${gameId}`);
     }
     const url = `${NAVER_GAME_RECORD_URL}/${toNaverGameId(gameId, series)}/record`;
 
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-    });
-    if (!response.ok) {
-      throw new Error(`Naver box score request failed: ${response.status}`);
-    }
-    const body = (await response.json()) as NaverGameRecordResponse;
+    const body = await this.naver.fetchJson<NaverGameRecordResponse>(url);
     const record = body.result.recordData;
     if (!record) {
       throw new Error(

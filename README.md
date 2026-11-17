@@ -27,7 +27,7 @@
 | --- | --- |
 | 런타임 · 프레임워크 | Node.js 20, TypeScript 5, Nest.js 11 (Express) |
 | DB · ORM | PostgreSQL 16, TypeORM 1 (스키마는 마이그레이션으로만 변경) |
-| 스크래핑 | `fetch`로 KBO 공식 사이트의 내부 API·페이지와 네이버 스포츠 API를 직접 호출, Cheerio로 HTML 파싱. 요청마다 15초 타임아웃, 요청 사이 딜레이 |
+| 스크래핑 | KBO 공식 사이트의 내부 API·페이지는 `fetch`로 직접 호출하고 Cheerio로 HTML 파싱. 네이버 스포츠 API는 브라우저가 아닌 클라이언트에 응답하지 않아 헤드리스 Chromium(`puppeteer-core`) 안에서 호출. 요청마다 15초 타임아웃, 요청 사이 딜레이 |
 | 스케줄링 | `@nestjs/schedule` — KST 기준 cron, 경기 시간대에는 매시 정각에 경기 상태 갱신 |
 | 캐시 | `@nestjs/cache-manager` 인메모리 캐시 (순위·팀·기록 조회, `CACHE_TTL_MS` 기본 5분) |
 | 모니터링 | Sentry (`@sentry/nestjs`), 스크랩 소스별 성공/실패·소요시간을 `scrape-source-health` 테이블에 기록 |
@@ -66,7 +66,7 @@ flowchart LR
   SCHED --> SCRAPE
   OPS --> SCRAPE
   SCRAPE -- "HTTP · Cheerio" --> KBO
-  SCRAPE -- "HTTP · JSON" --> NAVER
+  SCRAPE -- "헤드리스 Chromium · JSON" --> NAVER
   SCRAPE -- "upsertMany" --> DOMAIN
   SCRAPE -- "log()" --> HEALTH
   APP -- "GET /games · /standings · /teams · /players …" --> CTRL
@@ -197,6 +197,7 @@ cp .env.example .env
 | `DB_DATABASE` | Postgres 데이터베이스명 | `doo_kbo` |
 | `DB_SYNCHRONIZE` | TypeORM synchronize 여부 (운영에서는 `false` 유지) | `false` |
 | `DB_LOGGING` | TypeORM 쿼리 로깅 여부 | `false` |
+| `CHROMIUM_PATH` | 네이버 스포츠 API 호출에 쓰는 Chromium/Chrome 실행 파일 경로. 로컬에서 네이버를 쓰는 스크래핑(`/scrape/games`의 보정, `/scrape/game-stats`, `/scrape/play-by-play`)을 돌릴 때만 필요 | 없음 (Docker 이미지는 `/usr/bin/chromium`) |
 
 ### 3. 로컬 Postgres 실행 (Docker)
 
@@ -393,7 +394,9 @@ Controller (application/*.controller.ts)
 ScrapeController (application/scrape.controller.ts)
   → ScrapeService (application/scrape.service.ts)
     → Scraper (infrastructure/scrapers/*.scraper.ts)
-        KBO/네이버 스포츠의 내부 API·페이지에 직접 fetch로 요청해 응답을 파싱
+        KBO의 내부 API·페이지는 직접 fetch로 요청해 응답을 파싱
+        네이버 스포츠 API는 NaverBrowserClient가 헤드리스 Chromium으로 네이버 문서를 연 뒤
+        그 페이지 안에서 fetch로 요청 (한 번에 하나씩, 마지막 요청 30초 뒤 브라우저 종료)
       → 파싱 결과를 Game/Standing/GameStat/Player 도메인 엔티티로 변환
         → 각 모듈의 Service.upsert()로 건별 저장 (개별 실패는 warn 로그 후 계속 진행)
     → ScrapeSourceHealthService.log()로 성공/실패·소요시간·저장 건수 기록

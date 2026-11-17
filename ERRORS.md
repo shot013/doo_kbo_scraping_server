@@ -24,6 +24,16 @@
 
 ---
 
+### [2026-11-17] 네이버 스포츠 API 요청이 전부 timeout (브라우저에서는 200)
+
+**증상**: `naver-box-score`/`naver-play-by-play`가 `The operation was aborted due to timeout`으로 실패하고, `/scrape/games`의 네이버 보정도 warn만 남기고 건너뛴다. 같은 주소가 브라우저에서는 200이다. curl로 보면 TLS 연결은 바로 끝나는데 응답이 오지 않는다(EC2에서 `Connection reset by peer`로 보인 날도 있었다).
+
+**원인**: 네이버가 브라우저가 아닌 클라이언트의 요청에 응답하지 않는다. `Referer`/`Origin`/`sec-ch-ua` 등 브라우저의 요청 헤더를 전부 붙여도, HTTP/2로 보내도 같았다. 헤드리스 Chromium도 User-Agent에 `HeadlessChrome`이 있으면 `ERR_CONNECTION_RESET`으로 끊긴다. 문자중계(`/relay`)는 브라우저에서도 주소를 직접 열면 응답이 없고, 네이버 페이지 안의 `fetch`로만 응답한다.
+
+**해결**: `scrapers/naver-browser.client.ts`의 `NaverBrowserClient`가 헤드리스 Chromium으로 `m.sports.naver.com/robots.txt`를 연 뒤 그 페이지 안에서 `fetch`로 호출한다. User-Agent의 `HeadlessChrome`은 `Chrome`으로 바꾼다. Docker 이미지에 Chromium을 넣고 `CHROMIUM_PATH`로 경로를 넘긴다.
+
+**재발 방지**: 다시 실패하면 (1) 브라우저에서 같은 주소가 200인지, (2) 앱 컨테이너에서 `chromium --version`이 실행되는지, (3) `.env`에 빈 `CHROMIUM_PATH=`가 있어 이미지 설정을 덮어쓰지 않는지 순서로 확인한다. curl이나 `fetch`로는 로컬과 EC2 모두 응답이 없으므로 확인 수단으로 쓰지 않는다.
+
 ### [2026-11-06] 포스트시즌 경기의 박스스코어·타석 데이터가 전혀 저장되지 않음
 
 **증상**: 포스트시즌 경기의 `game_stats`/`plate_appearances`가 0건. `scrape_source_health`에는 `naver-box-score`/`naver-play-by-play`가 `The operation was aborted due to timeout`(11/03~04)으로 실패. 경기 중 실시간 스코어도 갱신되지 않음.
@@ -32,7 +42,7 @@
 
 **해결**: `scrapers/naver-game-id.ts`의 `toNaverGameId(gameId, series)`/`fromNaverGameId()`로 변환을 모았다. 박스스코어·문자중계·실시간 스코어 보정이 모두 이 함수를 쓴다.
 
-**재발 방지**: 네이버 요청이 실패하면 `GET /schedule/games?fromDate=..&toDate=..&categoryId=kbo`로 실제 gameId부터 확인한다. 로컬 PC에서는 네이버가 timeout인데 EC2에서는 정상일 수 있으니 EC2에서도 확인한다.
+**재발 방지**: 네이버 요청이 실패하면 `GET /schedule/games?fromDate=..&toDate=..&categoryId=kbo`로 실제 gameId부터 확인한다. 이 주소는 브라우저에서 열어야 한다(curl/`fetch`로는 응답이 없다, 2026-11-17 항목 참고).
 
 ### [2026-11-03] `format-on-save` 훅이 아무 파일도 포맷하지 않음
 
