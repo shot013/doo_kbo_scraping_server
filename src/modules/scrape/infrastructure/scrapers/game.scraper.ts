@@ -4,6 +4,7 @@ import {
   GameStatus,
 } from '../../../game/domain/entities/game.entity';
 import { resolveKboTeam } from '../../../../common/kbo/kbo-team';
+import { NaverBrowserClient } from './naver-browser.client';
 import { fromNaverGameId } from './naver-game-id';
 import { SCRAPE_REQUEST_TIMEOUT_MS } from './scrape-request';
 
@@ -89,6 +90,8 @@ const GAME_ID_PATTERN = /gameId=([A-Za-z0-9]+)/;
 @Injectable()
 export class GameScraper {
   private readonly logger = new Logger(GameScraper.name);
+
+  constructor(private readonly naver: NaverBrowserClient) {}
 
   /**
    * gameMonth를 넘기지 않으면 KBO 일정 페이지가 브라우저에서 로드될 때 요청하는
@@ -190,14 +193,7 @@ export class GameScraper {
         `${NAVER_SCHEDULE_URL}?fields=basic,schedule,baseball` +
         `&fromDate=${fromDate}&toDate=${toDate}` +
         `&size=${NAVER_SCHEDULE_PAGE_SIZE}&categoryId=kbo`;
-      const response = await fetch(url, {
-        signal: AbortSignal.timeout(SCRAPE_REQUEST_TIMEOUT_MS),
-        headers: { 'User-Agent': 'Mozilla/5.0' },
-      });
-      if (!response.ok) {
-        throw new Error(`Naver schedule request failed: ${response.status}`);
-      }
-      const body = (await response.json()) as NaverScheduleResponse;
+      const body = await this.naver.fetchJson<NaverScheduleResponse>(url);
       if (body.result.gameTotalCount > body.result.games.length) {
         this.logger.warn(
           `Naver schedule returned ${body.result.games.length}/${body.result.gameTotalCount} games for ${fromDate}~${toDate}; some games were not enriched`,
