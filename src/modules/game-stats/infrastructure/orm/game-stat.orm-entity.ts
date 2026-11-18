@@ -12,6 +12,7 @@ import { PlayerStatType } from '../../domain/entities/game-stat.entity';
 @Index(['gameId'])
 @Index(['gameId', 'teamCode'])
 @Index(['gameId', 'teamCode', 'playerName', 'statType'], { unique: true })
+@Index('IDX_game_stats_player_id_stat_type', ['playerId', 'statType'])
 export class GameStatOrmEntity {
   @PrimaryGeneratedColumn()
   id: number;
