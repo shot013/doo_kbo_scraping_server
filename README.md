@@ -52,7 +52,7 @@ flowchart LR
       SCHED["ScrapeScheduler<br/>KST cron · 경기 시간대 매시 폴링"]
       SCRAPE["scrape 모듈<br/>ScrapeService → Scraper<br/>15초 타임아웃 · 요청 간 딜레이"]
       CTRL["Controller<br/>순위·팀·기록 응답은 인메모리 캐시"]
-      DOMAIN["도메인 모듈<br/>game · game-stats · standings · players<br/>plate-appearances · season-stats · game-preview"]
+      DOMAIN["도메인 모듈<br/>game · game-stats · standings · players<br/>plate-appearances · season-stats · game-preview<br/>game-events · game-line-scores"]
       COMBO["조합 모듈<br/>teams · records · game-results"]
       HEALTH["scrape-source-health<br/>소스별 성공/실패 · 소요시간"]
     end
@@ -98,6 +98,7 @@ src/
   modules/
     game/  game-stats/  standings/  players/  plate-appearances/
     season-stats/  game-preview/  action-log/  scrape-source-health/
+    game-events/  game-line-scores/
                             # domain / infrastructure / application 3계층
     teams/  records/  game-results/
                             # application만 (다른 모듈 service 조합)
@@ -266,6 +267,8 @@ npm run test           # 전체 테스트
 | GET | `/game-stats` | `gameId`, `teamCode`, `statType`(`BATTING`\|`PITCHING`), `page`, `limit`, `sortBy`(`id`\|`teamCode`\|`playerName`\|`homeRuns`\|`rbi`\|`battingAverage`\|`era`), `sortOrder` | 경기별 선수 기록 목록 조회 |
 | GET | `/game-stats/:id` | - | 선수 기록 단건 조회 |
 
+- 투수 행(`statType: PITCHING`)에는 `runsAllowed`(실점, 자책점은 `earnedRuns`), `pitchCount`(투구 수), `appearanceOrder`(팀 안 등판 순서, 선발 = 1)가 있다. 경기 요약의 투수 교체 표에 쓰며, 출처에 없거나 아직 수집 전이면 `null`
+
 ### Game Results (`src/modules/game-results`)
 
 | Method | Path | Query | 설명 |
@@ -324,11 +327,11 @@ npm run test           # 전체 테스트
 | POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도), `gameMonth`(`01`~`12`, 미지정 시 현재 KST 월) | 해당 월의 정규시즌·포스트시즌 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시 매 정시 — 현재 월. 추가로 경기 시간대에는 그 외 시각에도 매 정시 — 아래 참고) |
 | POST | `/scrape/game-previews` | body: `gameDate`(`YYYY-MM-DD`, 미지정 시 오늘) | 경기 시작 전(GAME_STATE_SC=1)인 정규시즌·포스트시즌 경기의 프리뷰(팀 전력비교/선발투수 매치업) 스크래핑 실행. 포스트시즌 경기는 그 시리즈(WC/준PO/PO/KS) 안의 기록만 담음 | O (매일 09:00 KST) |
 | POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
-| POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
+| POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 (점수표는 저장하지 않음) | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS` 상태만 자동 대상. 종료 경기의 박스스코어는 `/scrape/play-by-play` 회차가 함께 저장) |
 | POST | `/scrape/game-stats/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 박스스코어를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
 | POST | `/scrape/roster` | body: `teamCode`(미지정 시 전체 팀) | 팀 로스터(포지션/등번호/출신교) 스크래핑 실행 | O (매일 18:00 KST) |
-| POST | `/scrape/play-by-play` | body: `gameId`(필수) | 특정 경기의 타석 단위 문자중계(타자-투수 매치업/결과) 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `FINISHED` 상태만 자동 대상) |
-| POST | `/scrape/play-by-play/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 타석 데이터를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
+| POST | `/scrape/play-by-play` | body: `gameId`(필수) | 특정 경기의 박스스코어, 타석 단위 문자중계(타자-투수 매치업/결과), 경기 이벤트(득점·교체), 점수표를 차례로 스크래핑·저장. 응답의 `itemsScraped`는 저장한 타석 수 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `FINISHED` 상태만 자동 대상) |
+| POST | `/scrape/play-by-play/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기를 `/scrape/play-by-play`와 같은 흐름으로 재스크랩해 백필 (경기 요약 백필도 이것 하나로 됨) | X (일회성/수동 트리거) |
 
 - `/scrape/games` 스케줄러는 매시 정각에 깨어나 아래 경우에만 실제로 스크랩함 (`scrape.scheduler.ts`, `scrape-schedule.ts`). 이전 회차가 아직 끝나지 않았으면 그 회차는 건너뜀
   - 17시~다음날 1시: 이번 달 (경기가 없는 날의 기본 주기)
@@ -407,6 +410,11 @@ ScrapeController (application/scrape.controller.ts)
 - `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
 - `POST /scrape/game-stats`: `body.gameId`의 경기를 `games`에서 조회(없으면 404)한 뒤 `GameStatsScraper`가 네이버 스포츠 박스스코어(`/schedule/games/{naverGameId}/record`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남. 네이버 gameId는 KBO gameId 뒤에 시즌 연도를 붙이고, 포스트시즌은 앞 연도 자리를 시리즈 SR_ID 4자리(WC `4444`, 준PO `3333`, PO `5555`, KS `7777`)로 바꾼 값이다(`/scrape/play-by-play`의 문자중계, `/scrape/games`의 실시간 스코어 보정도 같은 규칙)
 - `POST /scrape/game-stats/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 조회해 경기당 2초 텀을 두고 순회하며 `/scrape/game-stats`와 동일한 스크랩·저장 로직(`ScrapeService.scrapeAndSaveGameStats()`)을 재사용 — 이미 저장된 경기도 다시 스크랩해 `player_id`/`at_bats_against` 등 이후 추가된 필드를 보강한다. 경기 단위 실패는 warn 로그만 남기고 계속 진행(전체가 실패로 끝나지 않음)
+- `POST /scrape/play-by-play`: `body.gameId`의 경기를 `games`에서 조회(없으면 404)한 뒤 한 경기를 아래 순서로 저장한다. 점수표가 있어야 경기 요약이 있다고 보므로(`GET /game-summaries/:gameId`) 점수표를 마지막에 둔다
+  1. `GameStatsScraper`가 박스스코어(`/record`)를 받아 `GameStatService.upsertMany()`. 같은 응답의 `scoreBoard`에서 점수표(이닝별 득점, R·H·E·B)도 파싱해 둔다. 투수 행의 `appearanceOrder`는 박스 배열 순서, `pitchCount`는 응답의 `bf`, 이닝은 `"1 ⅓"` 같은 분수 표기를 `"1.1"`로 바꾼다
+  2. 0.3초 뒤 `PlayByPlayScraper`가 문자중계(`/relay?inning=N`)를 1회부터 빈 응답이 나올 때까지 0.3초 간격으로 받는다. 타석 결과(득점 없음 `type 13`, 득점 `type 23`)는 `PlateAppearanceService.upsertMany()`로, 경기 이벤트는 `GameEventService.replaceByGameId()`로 경기 단위 교체 저장. 이벤트의 아웃·주자·점수는 그 이벤트를 반영한 뒤의 값이고, 득점 타석은 이어진 주자 이동까지 반영한다. 교체 문구의 선수 이름은 1의 박스스코어로 id를 맞춘다(박스스코어 요청이 실패하면 저장된 `game_stats`로 대신)
+  3. 경기가 `FINISHED`이고 1·2가 모두 저장됐을 때만 `GameLineScoreService.upsertMany()`로 점수표를 저장. 이벤트가 하나도 없으면 기존 이벤트를 지우지 않고 점수표도 건너뛴다
+- `POST /scrape/play-by-play/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 경기당 2초 텀을 두고 순회하며 `/scrape/play-by-play`와 같은 흐름(`ScrapeService.scrapeAndSavePlayByPlay()`)을 실행. 경기 단위 실패는 warn 로그만 남기고 계속 진행
 - `POST /scrape/roster`: `RosterScraper`가 `Player/Search.aspx` 폼 postback으로 팀별 선수 목록(포지션/등번호/출신교)을 요청·파싱 → `PlayerService.upsert()`. `body.teamCode` 미지정 시 전체 팀 순회
 
-`/scrape/game-stats/backfill`을 제외한 나머지 스크래핑 API는 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답). `/scrape/game-stats/backfill`은 대상 시즌에 `FINISHED` 경기가 하나도 없을 때만 이렇게 실패하고, 개별 경기 실패는 삼켜서 계속 진행합니다.
+두 백필(`/scrape/game-stats/backfill`, `/scrape/play-by-play/backfill`)을 제외한 나머지 스크래핑 API는 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답). 백필은 대상 시즌에 `FINISHED` 경기가 하나도 없을 때만 이렇게 실패하고, 개별 경기 실패는 삼켜서 계속 진행합니다.

@@ -34,6 +34,7 @@ src/
         repositories/
       application/
     game-stats/, standings/, scrape-source-health/  # game과 동일한 레이어 구조
+    game-events/, game-line-scores/  # 컨트롤러 없이 저장·조회 service만 exports (경기 요약의 원본: 문자중계 이벤트, 점수표)
     scrape/                   # DB 엔티티 없이 스크래퍼 3종을 오케스트레이션하는 모듈
 ```
 
