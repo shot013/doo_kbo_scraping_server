@@ -1,0 +1,6496 @@
+{
+  "1": [
+    {
+      "no": 9,
+      "inn": 1,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 52,
+          "text": "5번타자 김현수",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "2",
+            "base1": "4",
+            "base2": "1",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 53, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 54, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 55,
+          "text": "김현수 : 좌익수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "3",
+            "base1": "4",
+            "base2": "1",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 8,
+      "inn": 1,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 43,
+          "text": "4번타자 힐리어드",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "2",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 44, "text": "1구 스트라이크" },
+        {
+          "type": 7,
+          "seqno": 45,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "2",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 46, "text": "2구 헛스윙" },
+        { "type": 1, "seqno": 47, "text": "3구 볼" },
+        { "type": 1, "seqno": 48, "text": "4구 볼" },
+        { "type": 1, "seqno": 49, "text": "5구 볼" },
+        { "type": 1, "seqno": 50, "text": "6구 볼" },
+        {
+          "type": 13,
+          "seqno": 51,
+          "text": "힐리어드 : 볼넷",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "2",
+            "base1": "4",
+            "base2": "1",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 7,
+      "inn": 1,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 37,
+          "text": "3번타자 안현민",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "1",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 38, "text": "1구 스트라이크" },
+        {
+          "type": 7,
+          "seqno": 39,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "1",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 40, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 41, "text": "3구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 42,
+          "text": "안현민 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "2",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 6,
+      "inn": 1,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 29,
+          "text": "2번타자 김민혁",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 30, "text": "1구 번트파울" },
+        { "type": 1, "seqno": 31, "text": "2구 번트파울" },
+        { "type": 1, "seqno": 32, "text": "3구 파울" },
+        { "type": 1, "seqno": 33, "text": "4구 파울" },
+        { "type": 1, "seqno": 34, "text": "5구 볼" },
+        { "type": 1, "seqno": 35, "text": "6구 타격" },
+        {
+          "type": 13,
+          "seqno": 36,
+          "text": "김민혁 : 유격수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "1",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 5,
+      "inn": 1,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 19,
+          "text": "1번타자 최원준",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 20, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 21, "text": "2구 헛스윙" },
+        { "type": 1, "seqno": 22, "text": "3구 볼" },
+        { "type": 1, "seqno": 23, "text": "4구 볼" },
+        { "type": 1, "seqno": 24, "text": "5구 볼" },
+        { "type": 1, "seqno": 25, "text": "6구 파울" },
+        { "type": 1, "seqno": 26, "text": "7구 파울" },
+        { "type": 1, "seqno": 27, "text": "8구 타격" },
+        {
+          "type": 13,
+          "seqno": 28,
+          "text": "최원준 : 좌중간 2루타",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 4,
+      "inn": 1,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 18,
+          "text": "1회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 3,
+      "inn": 1,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 10,
+          "text": "3번타자 구자욱",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 11, "text": "1구 헛스윙" },
+        { "type": 1, "seqno": 12, "text": "2구 파울" },
+        { "type": 1, "seqno": 13, "text": "3구 볼" },
+        { "type": 1, "seqno": 14, "text": "4구 볼" },
+        { "type": 1, "seqno": 15, "text": "5구 파울" },
+        { "type": 1, "seqno": 16, "text": "6구 타격" },
+        {
+          "type": 13,
+          "seqno": 17,
+          "text": "구자욱 : 2루수 땅볼 아웃 (2루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "3",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 2,
+      "inn": 1,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 4,
+          "text": "2번타자 김성윤",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 5, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 6, "text": "2구 볼" },
+        { "type": 1, "seqno": 7, "text": "3구 헛스윙" },
+        { "type": 1, "seqno": 8, "text": "4구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 9,
+          "text": "김성윤 : 포수 스트라이크 낫 아웃 (포수->1루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 1,
+      "inn": 1,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 1,
+          "text": "1번타자 김지찬",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 2, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 3,
+          "text": "김지찬 : 2루수 땅볼 아웃 (2루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 0,
+      "inn": 1,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 0,
+          "text": "1회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    }
+  ],
+  "2": [
+    {
+      "no": 20,
+      "inn": 2,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 106,
+          "text": "9번타자 장준원",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "8",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64115",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 107, "text": "1구 볼" },
+        { "type": 1, "seqno": 108, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 109, "text": "3구 스트라이크" },
+        { "type": 1, "seqno": 110, "text": "4구 파울" },
+        { "type": 1, "seqno": 111, "text": "5구 파울" },
+        { "type": 1, "seqno": 112, "text": "6구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 113,
+          "text": "장준원 : 포수 스트라이크 낫 아웃 (포수->1루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "8",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64115",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 19,
+      "inn": 2,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 101,
+          "text": "8번타자 한승택",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 102, "text": "1구 볼" },
+        { "type": 1, "seqno": 103, "text": "2구 볼" },
+        { "type": 1, "seqno": 104, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 105,
+          "text": "한승택 : 투수 플라이 실책으로 출루 (투수 포구 실책)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "8",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 18,
+      "inn": 2,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 96,
+          "text": "7번타자 허경민",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "79240",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 97, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 98, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 99, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 100,
+          "text": "허경민 : 유격수 땅볼 아웃 (유격수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "79240",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 17,
+      "inn": 2,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 91,
+          "text": "6번타자 류현인",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "53036",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 92, "text": "1구 볼" },
+        { "type": 1, "seqno": 93, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 94, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 95,
+          "text": "류현인 : 투수 땅볼 아웃 (투수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "53036",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 16,
+      "inn": 2,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 90,
+          "text": "2회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64504",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 15,
+      "inn": 2,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 82,
+          "text": "8번타자 김영웅",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "52430",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 83, "text": "1구 볼" },
+        { "type": 1, "seqno": 84, "text": "2구 볼" },
+        {
+          "type": 7,
+          "seqno": 85,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "52430",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 86, "text": "3구 스트라이크" },
+        { "type": 1, "seqno": 87, "text": "4구 파울" },
+        { "type": 1, "seqno": 88, "text": "5구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 89,
+          "text": "김영웅 : 포수 스트라이크 낫 아웃 (포수 태그아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "52430",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 14,
+      "inn": 2,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 73,
+          "text": "7번타자 이재현",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 74,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 75, "text": "1구 볼" },
+        { "type": 1, "seqno": 76, "text": "2구 스트라이크" },
+        {
+          "type": 7,
+          "seqno": 77,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 78,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 79, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 80,
+          "text": "이재현 : 3루수 땅볼 아웃 (3루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 81,
+          "text": "1루주자 류지혁 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 13,
+      "inn": 2,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 68,
+          "text": "6번타자 류지혁",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "5",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 69, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 70,
+          "text": "류지혁 : 유격수 앞 땅볼로 출루",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 71,
+          "text": "3루주자 디아즈 : 태그아웃 (유격수->포수 태그아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 72,
+          "text": "2회초 6번타순 1구 후 18:57 ~ 18:59 (2분간) 삼성요청 비디오 판독: 디아즈 홈 태그 관련 아웃→아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 12,
+      "inn": 2,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 63,
+          "text": "5번타자 디아즈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 64, "text": "1구 볼" },
+        { "type": 1, "seqno": 65, "text": "2구 타격" },
+        {
+          "type": 23,
+          "seqno": 66,
+          "text": "디아즈 : 우익수 뒤 3루타",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "5",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 24,
+          "seqno": 67,
+          "text": "2루주자 최형우 : 홈인",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "5",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 11,
+      "inn": 2,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 57,
+          "text": "4번타자 최형우",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "72443",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 58, "text": "1구 볼" },
+        { "type": 1, "seqno": 59, "text": "2구 볼" },
+        { "type": 1, "seqno": 60, "text": "3구 스트라이크" },
+        { "type": 1, "seqno": 61, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 62,
+          "text": "최형우 : 우익수 오른쪽 2루타",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "72443",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 10,
+      "inn": 2,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 56,
+          "text": "2회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "0",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "3": [
+    {
+      "no": 29,
+      "inn": 3,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 152,
+          "text": "3번타자 안현민",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 153, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 154,
+          "text": "안현민 : 2루수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 155,
+          "text": "1루주자 김민혁 : 포스아웃 (2루수->1루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 28,
+      "inn": 3,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 144,
+          "text": "2번타자 김민혁",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 145,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 146, "text": "1구 파울" },
+        {
+          "type": 7,
+          "seqno": 147,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 148,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 149, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 150,
+          "text": "김민혁 : 포수 앞 땅볼로 출루",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 151,
+          "text": "1루주자 최원준 : 포스아웃 (포수->유격수 2루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 27,
+      "inn": 3,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 140,
+          "text": "1번타자 최원준",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 141, "text": "1구 볼" },
+        { "type": 1, "seqno": 142, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 143,
+          "text": "최원준 : 중견수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 26,
+      "inn": 3,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 139,
+          "text": "3회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 25,
+      "inn": 3,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 131,
+          "text": "3번타자 구자욱",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 132,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 133, "text": "1구 파울" },
+        { "type": 1, "seqno": 134, "text": "2구 볼" },
+        { "type": 1, "seqno": 135, "text": "3구 스트라이크" },
+        {
+          "type": 7,
+          "seqno": 136,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 137, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 138,
+          "text": "구자욱 : 1루수 땅볼 아웃 (1루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 24,
+      "inn": 3,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 126,
+          "text": "2번타자 김성윤",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 127, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 128, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 129, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 130,
+          "text": "김성윤 : 우익수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 23,
+      "inn": 3,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 120,
+          "text": "1번타자 김지찬",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 121, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 122, "text": "2구 볼" },
+        { "type": 1, "seqno": 123, "text": "3구 번트파울" },
+        { "type": 1, "seqno": 124, "text": "4구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 125,
+          "text": "김지찬 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 22,
+      "inn": 3,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 115,
+          "text": "9번타자 강민호",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "74540",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 116, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 117, "text": "2구 파울" },
+        { "type": 1, "seqno": 118, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 119,
+          "text": "강민호 : 투수 땅볼 아웃 (투수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "74540",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 21,
+      "inn": 3,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 114,
+          "text": "3회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69442",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "4": [
+    {
+      "no": 40,
+      "inn": 4,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 203,
+          "text": "8번타자 한승택",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "7",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 204, "text": "1구 파울" },
+        { "type": 1, "seqno": 205, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 206,
+          "text": "한승택 : 포수 파울플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "7",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 39,
+      "inn": 4,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 198,
+          "text": "7번타자 허경민",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "4",
+            "batter": "79240",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 199, "text": "1구 볼" },
+        { "type": 1, "seqno": 200, "text": "2구 타격" },
+        {
+          "type": 23,
+          "seqno": 201,
+          "text": "허경민 : 좌익수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "7",
+            "base2": "0",
+            "base3": "0",
+            "batter": "79240",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 24,
+          "seqno": 202,
+          "text": "3루주자 힐리어드 : 홈인",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "7",
+            "base2": "0",
+            "base3": "0",
+            "batter": "79240",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 38,
+      "inn": 4,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 193,
+          "text": "6번타자 류현인",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "4",
+            "batter": "53036",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 194, "text": "1구 볼" },
+        { "type": 1, "seqno": 195, "text": "2구 파울" },
+        { "type": 1, "seqno": 196, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 197,
+          "text": "류현인 : 2루수 땅볼 아웃 (2루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "4",
+            "batter": "53036",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 37,
+      "inn": 4,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 186,
+          "text": "5번타자 김현수",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 187, "text": "1구 파울" },
+        { "type": 1, "seqno": 188, "text": "2구 볼" },
+        { "type": 1, "seqno": 189, "text": "3구 볼" },
+        { "type": 1, "seqno": 190, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 191,
+          "text": "김현수 : 중견수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "4",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 192,
+          "text": "2루주자 힐리어드 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "4",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 36,
+      "inn": 4,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 183,
+          "text": "4번타자 힐리어드",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 184, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 185,
+          "text": "힐리어드 : 좌익수 왼쪽 2루타",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 35,
+      "inn": 4,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 182,
+          "text": "4회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 34,
+      "inn": 4,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 177,
+          "text": "7번타자 이재현",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "5",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 178, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 179, "text": "2구 볼" },
+        { "type": 1, "seqno": 180, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 181,
+          "text": "이재현 : 2루수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "0",
+            "base3": "5",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 33,
+      "inn": 4,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 168,
+          "text": "6번타자 류지혁",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "5",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 169, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 170, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 171, "text": "3구 볼" },
+        { "type": 1, "seqno": 172, "text": "4구 파울" },
+        { "type": 1, "seqno": 173, "text": "5구 파울" },
+        { "type": 1, "seqno": 174, "text": "6구 타격" },
+        {
+          "type": 13,
+          "seqno": 175,
+          "text": "류지혁 : 1루수 땅볼 아웃 (1루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "5",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 176,
+          "text": "2루주자 디아즈 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "5",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 32,
+      "inn": 4,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 163,
+          "text": "5번타자 디아즈",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 164, "text": "1구 볼" },
+        { "type": 1, "seqno": 165, "text": "2구 파울" },
+        { "type": 1, "seqno": 166, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 167,
+          "text": "디아즈 : 중견수 왼쪽 뒤 2루타",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "5",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 31,
+      "inn": 4,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 157,
+          "text": "4번타자 최형우",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "72443",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 158, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 159, "text": "2구 파울" },
+        { "type": 1, "seqno": 160, "text": "3구 볼" },
+        { "type": 1, "seqno": 161, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 162,
+          "text": "최형우 : 3루수 파울플라이 아웃",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "72443",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 30,
+      "inn": 4,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 156,
+          "text": "4회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "0",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "5": [
+    {
+      "no": 48,
+      "inn": 5,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 236,
+          "text": "2번타자 김민혁",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 237, "text": "1구 헛스윙" },
+        { "type": 1, "seqno": 238, "text": "2구 파울" },
+        { "type": 1, "seqno": 239, "text": "3구 파울" },
+        { "type": 1, "seqno": 240, "text": "4구 볼" },
+        { "type": 1, "seqno": 241, "text": "5구 볼" },
+        { "type": 1, "seqno": 242, "text": "6구 파울" },
+        { "type": 1, "seqno": 243, "text": "7구 타격" },
+        {
+          "type": 13,
+          "seqno": 244,
+          "text": "김민혁 : 좌익수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 47,
+      "inn": 5,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 229,
+          "text": "1번타자 최원준",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "9",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 230,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "9",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 231, "text": "1구 파울" },
+        { "type": 1, "seqno": 232, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 233,
+          "text": "최원준 : 1루수 병살타 아웃 (1루수->유격수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 234,
+          "text": "1루주자 장준원 : 포스아웃 (1루수->유격수 2루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 235,
+          "text": "5회말 1번타순 2구 후 19:56 ~ 19:57 (1분간) 삼성요청 비디오 판독: 최원준 타구 관련 세이프→아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 46,
+      "inn": 5,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 222,
+          "text": "9번타자 장준원",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64115",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 223, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 224, "text": "2구 파울" },
+        { "type": 1, "seqno": 225, "text": "3구 파울" },
+        { "type": 1, "seqno": 226, "text": "4구 볼" },
+        { "type": 1, "seqno": 227, "text": "5구 타격" },
+        {
+          "type": 13,
+          "seqno": 228,
+          "text": "장준원 : 중견수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "9",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64115",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 45,
+      "inn": 5,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 221,
+          "text": "5회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "51003",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 44,
+      "inn": 5,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 218,
+          "text": "1번타자 김지찬",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 219, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 220,
+          "text": "김지찬 : 투수 땅볼 아웃 (투수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 43,
+      "inn": 5,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 214,
+          "text": "9번타자 강민호",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "74540",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 215, "text": "1구 파울" },
+        { "type": 1, "seqno": 216, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 217,
+          "text": "강민호 : 유격수 땅볼 아웃 (유격수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "74540",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 42,
+      "inn": 5,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 208,
+          "text": "8번타자 김영웅",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52430",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 209, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 210, "text": "2구 파울" },
+        { "type": 1, "seqno": 211, "text": "3구 볼" },
+        { "type": 1, "seqno": 212, "text": "4구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 213,
+          "text": "김영웅 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52430",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 41,
+      "inn": 5,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 207,
+          "text": "5회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "6": [
+    {
+      "no": 60,
+      "inn": 6,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 310,
+          "text": "7번타자 허경민",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "5",
+            "base3": "4",
+            "batter": "79240",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 311, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 312, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 313,
+          "text": "허경민 : 1루수 땅볼 아웃 (1루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "5",
+            "base3": "4",
+            "batter": "79240",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 59,
+      "inn": 6,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 306,
+          "text": "6번타자 류현인",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "5",
+            "base3": "4",
+            "batter": "53036",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 307,
+          "text": "코칭스태프 마운드 방문",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "5",
+            "base3": "4",
+            "batter": "53036",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 308, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 309,
+          "text": "류현인 : 1루수 땅볼 아웃 (1루수->2루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "5",
+            "base3": "4",
+            "batter": "53036",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 58,
+      "inn": 6,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 299,
+          "text": "5번타자 김현수",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "4",
+            "base2": "0",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 300, "text": "1구 스트라이크" },
+        {
+          "type": 7,
+          "seqno": 301,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "4",
+            "base2": "0",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 302, "text": "2구 볼" },
+        { "type": 1, "seqno": 303, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 304,
+          "text": "김현수 : 우익수 오른쪽 2루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "5",
+            "base3": "4",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 305,
+          "text": "1루주자 힐리어드 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "5",
+            "base3": "4",
+            "batter": "76290",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 57,
+      "inn": 6,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 295,
+          "text": "4번타자 힐리어드",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 296, "text": "1구 볼" },
+        { "type": 1, "seqno": 297, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 298,
+          "text": "힐리어드 : 중견수 오른쪽 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "4",
+            "base2": "0",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 56,
+      "inn": 6,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 284,
+          "text": "3번타자 안현민",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 285,
+          "text": "대주자 박승규 : 좌익수(으)로 수비위치 변경",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 286, "text": "1구 헛스윙" },
+        { "type": 1, "seqno": 287, "text": "2구 파울" },
+        { "type": 1, "seqno": 288, "text": "3구 볼" },
+        { "type": 1, "seqno": 289, "text": "4구 볼" },
+        { "type": 1, "seqno": 290, "text": "5구 파울" },
+        { "type": 1, "seqno": 291, "text": "6구 볼" },
+        { "type": 1, "seqno": 292, "text": "7구 파울" },
+        { "type": 1, "seqno": 293, "text": "8구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 294,
+          "text": "안현민 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 55,
+      "inn": 6,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 283,
+          "text": "6회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 54,
+      "inn": 6,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 275,
+          "text": "6번타자 류지혁",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 276, "text": "1구 볼" },
+        { "type": 1, "seqno": 277, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 278, "text": "3구 볼" },
+        { "type": 1, "seqno": 279, "text": "4구 볼" },
+        { "type": 1, "seqno": 280, "text": "5구 타격" },
+        {
+          "type": 13,
+          "seqno": 281,
+          "text": "류지혁 : 1루수 병살타 아웃 (1루수->포수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "5",
+            "base2": "4",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 282,
+          "text": "3루주자 구자욱 : 포스아웃 (1루수->포수 홈 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "5",
+            "base2": "4",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 53,
+      "inn": 6,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 267,
+          "text": "5번타자 디아즈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 268,
+          "text": "1루주자 최형우 : 대주자 박승규 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 269,
+          "text": "코칭스태프 마운드 방문",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 270, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 271, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 272,
+          "text": "디아즈 : 우익수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 273,
+          "text": "1루주자 박승규 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 274,
+          "text": "2루주자 구자욱 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "54400",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 52,
+      "inn": 6,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 258,
+          "text": "4번타자 최형우",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "3",
+            "base2": "0",
+            "base3": "0",
+            "batter": "72443",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 259, "text": "1구 파울" },
+        { "type": 1, "seqno": 260, "text": "2구 헛스윙" },
+        { "type": 1, "seqno": 261, "text": "3구 파울" },
+        { "type": 1, "seqno": 262, "text": "4구 볼" },
+        { "type": 1, "seqno": 263, "text": "5구 파울" },
+        { "type": 1, "seqno": 264, "text": "6구 타격" },
+        {
+          "type": 13,
+          "seqno": 265,
+          "text": "최형우 : 좌익수 오른쪽 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "0",
+            "batter": "72443",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 266,
+          "text": "1루주자 구자욱 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "0",
+            "batter": "72443",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 51,
+      "inn": 6,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 251,
+          "text": "3번타자 구자욱",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 252, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 253, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 254, "text": "3구 파울" },
+        { "type": 1, "seqno": 255, "text": "4구 볼" },
+        { "type": 1, "seqno": 256, "text": "5구 타격" },
+        {
+          "type": 13,
+          "seqno": 257,
+          "text": "구자욱 : 좌중간 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "3",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 50,
+      "inn": 6,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 246,
+          "text": "2번타자 김성윤",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 247, "text": "1구 헛스윙" },
+        { "type": 1, "seqno": 248, "text": "2구 볼" },
+        { "type": 1, "seqno": 249, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 250,
+          "text": "김성윤 : 중견수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 49,
+      "inn": 6,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 245,
+          "text": "6회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "7": [
+    {
+      "no": 70,
+      "inn": 7,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 349,
+          "text": "2번타자 김민혁",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 350,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 351,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 352, "text": "1구 볼" },
+        { "type": 1, "seqno": 353, "text": "2구 볼" },
+        {
+          "type": 7,
+          "seqno": 354,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 355, "text": "3구 스트라이크" },
+        {
+          "type": 7,
+          "seqno": 356,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 357, "text": "4구 볼" },
+        { "type": 1, "seqno": 358, "text": "5구 파울" },
+        { "type": 1, "seqno": 359, "text": "6구 파울" },
+        { "type": 1, "seqno": 360, "text": "7구 파울" },
+        { "type": 1, "seqno": 361, "text": "8구 타격" },
+        {
+          "type": 13,
+          "seqno": 362,
+          "text": "김민혁 : 1루수 땅볼 아웃 (1루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64004",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 69,
+      "inn": 7,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 345,
+          "text": "1번타자 최원준",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 346, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 347, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 348,
+          "text": "최원준 : 우익수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 68,
+      "inn": 7,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 342,
+          "text": "9번타자 장준원",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64115",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 343, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 344,
+          "text": "장준원 : 유격수 땅볼 아웃 (유격수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64115",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 67,
+      "inn": 7,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 335,
+          "text": "8번타자 한승택",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 336,
+          "text": "대타 전병우 : 3루수(으)로 수비위치 변경",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "56459"
+          }
+        },
+        { "type": 1, "seqno": 337, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 338, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 339, "text": "3구 파울" },
+        { "type": 1, "seqno": 340, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 341,
+          "text": "한승택 : 3루수 땅볼 아웃 (3루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "56459"
+          }
+        }
+      ]
+    },
+    {
+      "no": 66,
+      "inn": 7,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 334,
+          "text": "7회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 65,
+      "inn": 7,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 326,
+          "text": "9번타자 강민호",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "74540",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 327, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 328, "text": "2구 볼" },
+        { "type": 1, "seqno": 329, "text": "3구 볼" },
+        { "type": 1, "seqno": 330, "text": "4구 스트라이크" },
+        { "type": 1, "seqno": 331, "text": "5구 파울" },
+        { "type": 1, "seqno": 332, "text": "6구 타격" },
+        {
+          "type": 13,
+          "seqno": 333,
+          "text": "강민호 : 유격수 땅볼 아웃 (유격수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "74540",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 64,
+      "inn": 7,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 323,
+          "text": "대타 전병우",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 324, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 325,
+          "text": "전병우 : 중견수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 63,
+      "inn": 7,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 322,
+          "text": "8번타자 김영웅",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52430",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 323,
+          "text": "8번타자 김영웅 : 대타 전병우 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 62,
+      "inn": 7,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 315,
+          "text": "7번타자 이재현",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        },
+        { "type": 1, "seqno": 316, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 317, "text": "2구 파울" },
+        { "type": 1, "seqno": 318, "text": "3구 파울" },
+        { "type": 1, "seqno": 319, "text": "4구 볼" },
+        { "type": 1, "seqno": 320, "text": "5구 타격" },
+        {
+          "type": 13,
+          "seqno": 321,
+          "text": "이재현 : 중견수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "64001"
+          }
+        }
+      ]
+    },
+    {
+      "no": 61,
+      "inn": 7,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 314,
+          "text": "7회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "8": [
+    {
+      "no": 80,
+      "inn": 8,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 419,
+          "text": "5번타자 김현수",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "50464"
+          }
+        },
+        { "type": 1, "seqno": 420, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 421, "text": "2구 볼" },
+        { "type": 1, "seqno": 422, "text": "3구 파울" },
+        { "type": 1, "seqno": 423, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 424,
+          "text": "김현수 : 1루수 땅볼 아웃 (1루수->투수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "50464"
+          }
+        }
+      ]
+    },
+    {
+      "no": 79,
+      "inn": 8,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 414,
+          "text": "4번타자 힐리어드",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "50464"
+          }
+        },
+        { "type": 1, "seqno": 415, "text": "1구 볼" },
+        { "type": 1, "seqno": 416, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 417, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 418,
+          "text": "힐리어드 : 유격수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "50464"
+          }
+        }
+      ]
+    },
+    {
+      "no": 78,
+      "inn": 8,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 407,
+          "text": "3번타자 안현민",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "56459"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 408,
+          "text": "투수 페덱 : 투수 이승민 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "50464"
+          }
+        },
+        { "type": 1, "seqno": 409, "text": "1구 볼" },
+        { "type": 1, "seqno": 410, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 411, "text": "3구 파울" },
+        { "type": 1, "seqno": 412, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 413,
+          "text": "안현민 : 우익수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "50464"
+          }
+        }
+      ]
+    },
+    {
+      "no": 77,
+      "inn": 8,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 406,
+          "text": "8회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 76,
+      "inn": 8,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 400,
+          "text": "5번타자 디아즈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "52060"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 401,
+          "text": "포수 마운드 방문",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 402, "text": "1구 볼" },
+        { "type": 1, "seqno": 403, "text": "2구 파울" },
+        { "type": 1, "seqno": 404, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 405,
+          "text": "디아즈 : 1루수 땅볼 아웃 (1루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "52060"
+          }
+        }
+      ]
+    },
+    {
+      "no": 75,
+      "inn": 8,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 396,
+          "text": "4번타자 박승규",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 397, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 398, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 399,
+          "text": "박승규 : 우익수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "52060"
+          }
+        }
+      ]
+    },
+    {
+      "no": 74,
+      "inn": 8,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 383,
+          "text": "3번타자 구자욱",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "69041"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 384,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "69041"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 385,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "69041"
+          }
+        },
+        { "type": 1, "seqno": 386, "text": "1구 볼" },
+        {
+          "type": 7,
+          "seqno": 387,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "69041"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 388,
+          "text": "투수 손동현 : 투수 박영현 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 389, "text": "2구 볼" },
+        {
+          "type": 7,
+          "seqno": 390,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 391, "text": "3구 볼" },
+        { "type": 1, "seqno": 392, "text": "4구 스트라이크" },
+        { "type": 1, "seqno": 393, "text": "5구 타격" },
+        {
+          "type": 13,
+          "seqno": 394,
+          "text": "구자욱 : 우익수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "52060"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 395,
+          "text": "1루주자 김성윤 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "52060"
+          }
+        }
+      ]
+    },
+    {
+      "no": 73,
+      "inn": 8,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 374,
+          "text": "2번타자 김성윤",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "69041"
+          }
+        },
+        { "type": 1, "seqno": 375, "text": "1구 볼" },
+        { "type": 1, "seqno": 376, "text": "2구 헛스윙" },
+        { "type": 1, "seqno": 377, "text": "3구 파울" },
+        { "type": 1, "seqno": 378, "text": "4구 볼" },
+        { "type": 1, "seqno": 379, "text": "5구 볼" },
+        { "type": 1, "seqno": 380, "text": "6구 볼" },
+        {
+          "type": 13,
+          "seqno": 381,
+          "text": "김성윤 : 볼넷",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "69041"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 382,
+          "text": "8회초 2번타순 6구 후 20:52 ~ 20:52 KT요청 비디오 판독: 김성윤 체크스윙 관련 노 스윙→노 스윙",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "69041"
+          }
+        }
+      ]
+    },
+    {
+      "no": 72,
+      "inn": 8,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 364,
+          "text": "1번타자 김지찬",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "64001"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 365,
+          "text": "투수 고영표 : 투수 손동현 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "69041"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 366,
+          "text": "좌익수 김민혁 : 좌익수 장진혁 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "69041"
+          }
+        },
+        { "type": 1, "seqno": 367, "text": "1구 볼" },
+        {
+          "type": 7,
+          "seqno": 368,
+          "text": "8회초 1번타순 1구 후 와인드업 투구 자세에서 자유족을 뺀 이후 투수판 이탈 경고: KT 손동현",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "69041"
+          }
+        },
+        { "type": 1, "seqno": 369, "text": "2구 볼" },
+        { "type": 1, "seqno": 370, "text": "3구 스트라이크" },
+        { "type": 1, "seqno": 371, "text": "4구 파울" },
+        { "type": 1, "seqno": 372, "text": "5구 타격" },
+        {
+          "type": 13,
+          "seqno": 373,
+          "text": "김지찬 : 2루수 땅볼 아웃 (2루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "69041"
+          }
+        }
+      ]
+    },
+    {
+      "no": 71,
+      "inn": 8,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 363,
+          "text": "8회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "9": [
+    {
+      "no": 93,
+      "inn": 9,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 483,
+          "text": "대타 권동진",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "51003",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 484,
+          "text": "코칭스태프 마운드 방문",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "51003",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 485, "text": "1구 볼" },
+        { "type": 1, "seqno": 486, "text": "2구 볼" },
+        { "type": 1, "seqno": 487, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 488,
+          "text": "권동진 : 좌익수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "51003",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 92,
+      "inn": 9,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 482,
+          "text": "9번타자 장준원",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "64115",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 483,
+          "text": "9번타자 장준원 : 대타 권동진 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "51003",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 91,
+      "inn": 9,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 471,
+          "text": "8번타자 한승택",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "50464"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 472,
+          "text": "투수 이승민 : 투수 원태인 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 473, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 474, "text": "2구 볼" },
+        { "type": 1, "seqno": 475, "text": "3구 헛스윙" },
+        { "type": 1, "seqno": 476, "text": "4구 파울" },
+        { "type": 1, "seqno": 477, "text": "5구 볼" },
+        { "type": 1, "seqno": 478, "text": "6구 볼" },
+        {
+          "type": 7,
+          "seqno": 479,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 480, "text": "7구 타격" },
+        {
+          "type": 13,
+          "seqno": 481,
+          "text": "한승택 : 중견수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 90,
+      "inn": 9,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 465,
+          "text": "7번타자 허경민",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "79240",
+            "pitcher": "50464"
+          }
+        },
+        { "type": 1, "seqno": 466, "text": "1구 볼" },
+        { "type": 1, "seqno": 467, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 468, "text": "3구 파울" },
+        { "type": 1, "seqno": 469, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 470,
+          "text": "허경민 : 좌중간 2루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "7",
+            "base3": "0",
+            "batter": "79240",
+            "pitcher": "50464"
+          }
+        }
+      ]
+    },
+    {
+      "no": 89,
+      "inn": 9,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 457,
+          "text": "대타 장성우",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "78548",
+            "pitcher": "50464"
+          }
+        },
+        { "type": 1, "seqno": 458, "text": "1구 볼" },
+        { "type": 1, "seqno": 459, "text": "2구 볼" },
+        { "type": 1, "seqno": 460, "text": "3구 볼" },
+        { "type": 1, "seqno": 461, "text": "4구 스트라이크" },
+        { "type": 1, "seqno": 462, "text": "5구 파울" },
+        { "type": 1, "seqno": 463, "text": "6구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 464,
+          "text": "장성우 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "78548",
+            "pitcher": "50464"
+          }
+        }
+      ]
+    },
+    {
+      "no": 88,
+      "inn": 9,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 455,
+          "text": "6번타자 류현인",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "53036",
+            "pitcher": "50464"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 456,
+          "text": "대타 김현준 : 포수 김도환 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "53036",
+            "pitcher": "50464"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 457,
+          "text": "6번타자 류현인 : 대타 장성우 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "78548",
+            "pitcher": "50464"
+          }
+        }
+      ]
+    },
+    {
+      "no": 87,
+      "inn": 9,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 454,
+          "text": "9회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64504",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 86,
+      "inn": 9,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 443,
+          "text": "대타 김현준",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "51417",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 444, "text": "1구 볼" },
+        {
+          "type": 7,
+          "seqno": 445,
+          "text": "코칭스태프 마운드 방문",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "51417",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 446, "text": "2구 볼" },
+        { "type": 1, "seqno": 447, "text": "3구 스트라이크" },
+        { "type": 1, "seqno": 448, "text": "4구 볼" },
+        { "type": 1, "seqno": 449, "text": "5구 스트라이크" },
+        {
+          "type": 7,
+          "seqno": 450,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "51417",
+            "pitcher": "52060"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 451,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "51417",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 452, "text": "6구 타격" },
+        {
+          "type": 13,
+          "seqno": 453,
+          "text": "김현준 : 중견수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "3",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "51417",
+            "pitcher": "52060"
+          }
+        }
+      ]
+    },
+    {
+      "no": 85,
+      "inn": 9,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 442,
+          "text": "9번타자 강민호",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "74540",
+            "pitcher": "52060"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 443,
+          "text": "9번타자 강민호 : 대타 김현준 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "51417",
+            "pitcher": "52060"
+          }
+        }
+      ]
+    },
+    {
+      "no": 84,
+      "inn": 9,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 435,
+          "text": "8번타자 전병우",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 436, "text": "1구 볼" },
+        { "type": 1, "seqno": 437, "text": "2구 헛스윙" },
+        { "type": 1, "seqno": 438, "text": "3구 파울" },
+        { "type": 1, "seqno": 439, "text": "4구 볼" },
+        { "type": 1, "seqno": 440, "text": "5구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 441,
+          "text": "전병우 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "52060"
+          }
+        }
+      ]
+    },
+    {
+      "no": 83,
+      "inn": 9,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 430,
+          "text": "7번타자 이재현",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "52060"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 431,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 432, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 433,
+          "text": "이재현 : 투수 희생번트 아웃 (투수->2루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "52060"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 434,
+          "text": "1루주자 류지혁 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "6",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "52060"
+          }
+        }
+      ]
+    },
+    {
+      "no": 82,
+      "inn": 9,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 426,
+          "text": "6번타자 류지혁",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "52060"
+          }
+        },
+        { "type": 1, "seqno": 427, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 428, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 429,
+          "text": "류지혁 : 중견수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "6",
+            "base2": "0",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "52060"
+          }
+        }
+      ]
+    },
+    {
+      "no": 81,
+      "inn": 9,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 425,
+          "text": "9회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "55425",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "10": [
+    {
+      "no": 109,
+      "inn": 10,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 574,
+          "text": "7번타자 허경민",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "79240",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 575, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 576, "text": "2구 볼" },
+        { "type": 1, "seqno": 577, "text": "3구 파울" },
+        { "type": 1, "seqno": 578, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 579,
+          "text": "허경민 : 2루수 앞 땅볼로 출루",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "7",
+            "base2": "4",
+            "base3": "3",
+            "batter": "79240",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 580,
+          "text": "1루주자 김현수 : 포스아웃 (2루수 2루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "3",
+            "base1": "7",
+            "base2": "4",
+            "base3": "3",
+            "batter": "79240",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 108,
+      "inn": 10,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 568,
+          "text": "6번타자 오윤석",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "64504",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 569,
+          "text": "1구 피치클락 타자위반 스트라이크",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "64504",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 570, "text": "2구 볼" },
+        { "type": 1, "seqno": 571, "text": "3구 파울" },
+        { "type": 1, "seqno": 572, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 573,
+          "text": "오윤석 : 1루수 라인드라이브 아웃",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "64504",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 107,
+      "inn": 10,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 559,
+          "text": "5번타자 김현수",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "2",
+            "batter": "76290",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 560, "text": "1구 볼" },
+        { "type": 1, "seqno": 561, "text": "2구 볼" },
+        { "type": 1, "seqno": 562, "text": "3구 볼" },
+        { "type": 1, "seqno": 563, "text": "4구 볼" },
+        {
+          "type": 23,
+          "seqno": 564,
+          "text": "김현수 : 볼넷",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "76290",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 565,
+          "text": "1루주자 힐리어드 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "76290",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 566,
+          "text": "2루주자 안현민 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "76290",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 24,
+          "seqno": 567,
+          "text": "3루주자 장진혁 : 홈인",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "4",
+            "base3": "3",
+            "batter": "76290",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 106,
+      "inn": 10,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 552,
+          "text": "4번타자 힐리어드",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 553,
+          "text": "포수 마운드 방문",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 554,
+          "text": "2루수 류지혁 : 2루수 김상준 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 555, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 556,
+          "text": "힐리어드 : 1루수 앞 땅볼로 출루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "2",
+            "batter": "56034",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 557,
+          "text": "1루주자 안현민 : 1루수 실책으로 2루까지 진루 (1루수 포구 실책)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "2",
+            "batter": "56034",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 558,
+          "text": "2루주자 장진혁 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "4",
+            "base2": "3",
+            "base3": "2",
+            "batter": "56034",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 105,
+      "inn": 10,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 544,
+          "text": "3번타자 안현민",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 545,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 546, "text": "1구 볼" },
+        {
+          "type": 7,
+          "seqno": 547,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 548, "text": "2구 헛스윙" },
+        { "type": 1, "seqno": 549, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 550,
+          "text": "안현민 : 투수 왼쪽 내야안타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 551,
+          "text": "1루주자 장진혁 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "3",
+            "base2": "2",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 104,
+      "inn": 10,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 538,
+          "text": "2번타자 장진혁",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66706",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 539, "text": "1구 볼" },
+        { "type": 1, "seqno": 540, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 541, "text": "3구 볼" },
+        { "type": 1, "seqno": 542, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 543,
+          "text": "장진혁 : 우익수 오른쪽 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "2",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66706",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 103,
+      "inn": 10,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 532,
+          "text": "1번타자 최원준",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 533,
+          "text": "대주자 박계범 : 지명타자(으)로 수비위치 변경",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "69446"
+          }
+        },
+        { "type": 1, "seqno": 534, "text": "1구 볼" },
+        { "type": 1, "seqno": 535, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 536, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 537,
+          "text": "최원준 : 우익수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 102,
+      "inn": 10,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 531,
+          "text": "10회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "69446"
+          }
+        }
+      ]
+    },
+    {
+      "no": 101,
+      "inn": 10,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 527,
+          "text": "7번타자 이재현",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "6",
+            "base2": "5",
+            "base3": "3",
+            "batter": "52415",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 528, "text": "1구 볼" },
+        { "type": 1, "seqno": 529, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 530,
+          "text": "이재현 : 유격수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "3",
+            "base1": "6",
+            "base2": "5",
+            "base3": "3",
+            "batter": "52415",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    },
+    {
+      "no": 100,
+      "inn": 10,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 515,
+          "text": "6번타자 류지혁",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "5",
+            "base2": "3",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "69047"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 516,
+          "text": "2루주자 구자욱 : 대주자 박계범 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "5",
+            "base2": "3",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "69047"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 517,
+          "text": "투수 전용주 : 투수 김정운 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "5",
+            "base2": "3",
+            "base3": "0",
+            "batter": "62234",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 518, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 519, "text": "2구 볼" },
+        { "type": 1, "seqno": 520, "text": "3구 파울" },
+        { "type": 1, "seqno": 521, "text": "4구 볼" },
+        { "type": 1, "seqno": 522, "text": "5구 볼" },
+        { "type": 1, "seqno": 523, "text": "6구 볼" },
+        {
+          "type": 13,
+          "seqno": 524,
+          "text": "류지혁 : 볼넷",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "6",
+            "base2": "5",
+            "base3": "3",
+            "batter": "62234",
+            "pitcher": "53029"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 525,
+          "text": "1루주자 디아즈 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "6",
+            "base2": "5",
+            "base3": "3",
+            "batter": "62234",
+            "pitcher": "53029"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 526,
+          "text": "2루주자 박계범 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "6",
+            "base2": "5",
+            "base3": "3",
+            "batter": "62234",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    },
+    {
+      "no": 99,
+      "inn": 10,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 508,
+          "text": "5번타자 디아즈",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "3",
+            "base2": "1",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "56011"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 509,
+          "text": "투수 스기모토 : 투수 전용주 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "3",
+            "base2": "1",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "69047"
+          }
+        },
+        { "type": 1, "seqno": 510, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 511, "text": "2구 타격" },
+        {
+          "type": 23,
+          "seqno": 512,
+          "text": "디아즈 : 우익수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "5",
+            "base2": "3",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "69047"
+          }
+        },
+        {
+          "type": 24,
+          "seqno": 513,
+          "text": "1루주자 구자욱 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "5",
+            "base2": "3",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "69047"
+          }
+        },
+        {
+          "type": 24,
+          "seqno": 514,
+          "text": "2루주자 김지찬 : 홈인",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "5",
+            "base2": "3",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "69047"
+          }
+        }
+      ]
+    },
+    {
+      "no": 98,
+      "inn": 10,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 503,
+          "text": "4번타자 박승규",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "3",
+            "base2": "1",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "56011"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 504,
+          "text": "포수 마운드 방문",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "3",
+            "base2": "1",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "56011"
+          }
+        },
+        { "type": 1, "seqno": 505, "text": "1구 볼" },
+        { "type": 1, "seqno": 506, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 507,
+          "text": "박승규 : 중견수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "2",
+            "base1": "3",
+            "base2": "1",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "56011"
+          }
+        }
+      ]
+    },
+    {
+      "no": 97,
+      "inn": 10,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 501,
+          "text": "3번타자 구자욱",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "56011"
+          }
+        },
+        {
+          "type": 13,
+          "seqno": 502,
+          "text": "구자욱 : 자동 고의4구",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "3",
+            "base2": "1",
+            "base3": "0",
+            "batter": "62404",
+            "pitcher": "56011"
+          }
+        }
+      ]
+    },
+    {
+      "no": 96,
+      "inn": 10,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 496,
+          "text": "2번타자 김성윤",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "56011"
+          }
+        },
+        { "type": 1, "seqno": 497, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 498, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 499,
+          "text": "김성윤 : 투수 희생번트 아웃 (투수->2루수 1루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "56011"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 500,
+          "text": "1루주자 김지찬 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "1",
+            "base1": "0",
+            "base2": "1",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "56011"
+          }
+        }
+      ]
+    },
+    {
+      "no": 95,
+      "inn": 10,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 490,
+          "text": "1번타자 김지찬",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "52060"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 491,
+          "text": "투수 박영현 : 투수 스기모토 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "56011"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 492,
+          "text": "대타 장성우 : 2루수 오윤석 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "56011"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 493,
+          "text": "대타 권동진 : 유격수(으)로 수비위치 변경",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "56011"
+          }
+        },
+        { "type": 1, "seqno": 494, "text": "1구 볼" },
+        {
+          "type": 13,
+          "seqno": 495,
+          "text": "김지찬 : 몸에 맞는 볼",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "56011"
+          }
+        }
+      ]
+    },
+    {
+      "no": 94,
+      "inn": 10,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 489,
+          "text": "10회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "1",
+            "awayScore": "1",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "11": [
+    {
+      "no": 119,
+      "inn": 11,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 626,
+          "text": "1번타자 최원준",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "62360"
+          }
+        },
+        { "type": 1, "seqno": 627, "text": "1구 볼" },
+        { "type": 1, "seqno": 628, "text": "2구 헛스윙" },
+        { "type": 1, "seqno": 629, "text": "3구 볼" },
+        { "type": 1, "seqno": 630, "text": "4구 스트라이크" },
+        { "type": 1, "seqno": 631, "text": "5구 타격" },
+        {
+          "type": 13,
+          "seqno": 632,
+          "text": "최원준 : 좌익수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "3",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66606",
+            "pitcher": "62360"
+          }
+        }
+      ]
+    },
+    {
+      "no": 118,
+      "inn": 11,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 620,
+          "text": "9번타자 권동진",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "51003",
+            "pitcher": "62360"
+          }
+        },
+        { "type": 1, "seqno": 621, "text": "1구 파울" },
+        { "type": 1, "seqno": 622, "text": "2구 볼" },
+        { "type": 1, "seqno": 623, "text": "3구 스트라이크" },
+        { "type": 1, "seqno": 624, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 625,
+          "text": "권동진 : 2루수 땅볼 아웃 (2루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "51003",
+            "pitcher": "62360"
+          }
+        }
+      ]
+    },
+    {
+      "no": 117,
+      "inn": 11,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 613,
+          "text": "8번타자 한승택",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "69446"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 614,
+          "text": "투수 원태인 : 투수 김태훈 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "62360"
+          }
+        },
+        { "type": 1, "seqno": 615, "text": "1구 볼" },
+        { "type": 1, "seqno": 616, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 617, "text": "3구 파울" },
+        { "type": 1, "seqno": 618, "text": "4구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 619,
+          "text": "한승택 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "62360"
+          }
+        }
+      ]
+    },
+    {
+      "no": 116,
+      "inn": 11,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 612,
+          "text": "11회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "63722",
+            "pitcher": "62360"
+          }
+        }
+      ]
+    },
+    {
+      "no": 115,
+      "inn": 11,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 600,
+          "text": "3번타자 박계범",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "2",
+            "base2": "0",
+            "base3": "1",
+            "batter": "64468",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 601, "text": "1구 스트라이크" },
+        {
+          "type": 7,
+          "seqno": 602,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "2",
+            "base2": "0",
+            "base3": "1",
+            "batter": "64468",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 603, "text": "2구 스트라이크" },
+        {
+          "type": 14,
+          "seqno": 604,
+          "text": "1루주자 김성윤 : 도루로 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "0",
+            "base2": "2",
+            "base3": "1",
+            "batter": "64468",
+            "pitcher": "53029"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 605,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "0",
+            "base2": "2",
+            "base3": "1",
+            "batter": "64468",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 606, "text": "3구 볼" },
+        {
+          "type": 7,
+          "seqno": 607,
+          "text": "11회초 3번타순 3구 후 22:17 ~ 22:17 KT요청 비디오 판독: 박계범 체크스윙 관련 노 스윙→노 스윙",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "0",
+            "base2": "2",
+            "base3": "1",
+            "batter": "64468",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 608, "text": "4구 볼" },
+        { "type": 1, "seqno": 609, "text": "5구 파울" },
+        { "type": 1, "seqno": 610, "text": "6구 스트라이크" },
+        {
+          "type": 13,
+          "seqno": 611,
+          "text": "박계범 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "3",
+            "base1": "0",
+            "base2": "2",
+            "base3": "1",
+            "batter": "64468",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    },
+    {
+      "no": 114,
+      "inn": 11,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 596,
+          "text": "2번타자 김성윤",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "67449",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 597, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 598,
+          "text": "김성윤 : 중견수 오른쪽 1루타",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "2",
+            "base2": "0",
+            "base3": "1",
+            "batter": "67449",
+            "pitcher": "53029"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 599,
+          "text": "1루주자 김지찬 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "2",
+            "base2": "0",
+            "base3": "1",
+            "batter": "67449",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    },
+    {
+      "no": 113,
+      "inn": 11,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 591,
+          "text": "1번타자 김지찬",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 592, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 593, "text": "2구 파울" },
+        { "type": 1, "seqno": 594, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 595,
+          "text": "김지찬 : 좌익수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "1",
+            "base2": "0",
+            "base3": "0",
+            "batter": "50458",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    },
+    {
+      "no": 112,
+      "inn": 11,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 587,
+          "text": "9번타자 김도환",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69442",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 588, "text": "1구 헛스윙" },
+        { "type": 1, "seqno": 589, "text": "2구 타격" },
+        {
+          "type": 13,
+          "seqno": 590,
+          "text": "김도환 : 중견수 플라이 아웃",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69442",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    },
+    {
+      "no": 111,
+      "inn": 11,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 582,
+          "text": "8번타자 전병우",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "53029"
+          }
+        },
+        { "type": 1, "seqno": 583, "text": "1구 볼" },
+        { "type": 1, "seqno": 584, "text": "2구 파울" },
+        { "type": 1, "seqno": 585, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 586,
+          "text": "전병우 : 유격수 땅볼 아웃 (유격수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    },
+    {
+      "no": 110,
+      "inn": 11,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 581,
+          "text": "11회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "53029"
+          }
+        }
+      ]
+    }
+  ],
+  "12": [
+    {
+      "no": 132,
+      "inn": 12,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 99,
+          "seqno": 701,
+          "text": "=====================================",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "3",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "55455"
+          }
+        },
+        {
+          "type": 99,
+          "seqno": 702,
+          "text": "승리투수: 김태훈",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "3",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "55455"
+          }
+        }
+      ]
+    },
+    {
+      "no": 131,
+      "inn": 12,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 691,
+          "text": "5번타자 김현수",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "2",
+            "base1": "4",
+            "base2": "0",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "55455"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 692,
+          "text": "포수 마운드 방문",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "2",
+            "base1": "4",
+            "base2": "0",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "55455"
+          }
+        },
+        { "type": 1, "seqno": 693, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 694, "text": "2구 볼" },
+        {
+          "type": 14,
+          "seqno": 695,
+          "text": "1루주자 힐리어드 : 폭투로 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "2",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "55455"
+          }
+        },
+        { "type": 1, "seqno": 696, "text": "3구 파울" },
+        { "type": 1, "seqno": 697, "text": "4구 볼" },
+        { "type": 1, "seqno": 698, "text": "5구 타격" },
+        {
+          "type": 13,
+          "seqno": 699,
+          "text": "김현수 : 2루수 땅볼 아웃 (2루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "3",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "55455"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 700,
+          "text": "데일리 MVP 삼성 페덱",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "3",
+            "base1": "0",
+            "base2": "4",
+            "base3": "0",
+            "batter": "76290",
+            "pitcher": "55455"
+          }
+        }
+      ]
+    },
+    {
+      "no": 130,
+      "inn": 12,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 684,
+          "text": "4번타자 힐리어드",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "55455"
+          }
+        },
+        { "type": 1, "seqno": 685, "text": "1구 볼" },
+        { "type": 1, "seqno": 686, "text": "2구 볼" },
+        { "type": 1, "seqno": 687, "text": "3구 볼" },
+        { "type": 1, "seqno": 688, "text": "4구 스트라이크" },
+        { "type": 1, "seqno": 689, "text": "5구 볼" },
+        {
+          "type": 13,
+          "seqno": 690,
+          "text": "힐리어드 : 볼넷",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "2",
+            "base1": "4",
+            "base2": "0",
+            "base3": "0",
+            "batter": "56034",
+            "pitcher": "55455"
+          }
+        }
+      ]
+    },
+    {
+      "no": 129,
+      "inn": 12,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 677,
+          "text": "3번타자 안현민",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "55455"
+          }
+        },
+        { "type": 1, "seqno": 678, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 679, "text": "2구 파울" },
+        { "type": 1, "seqno": 680, "text": "3구 볼" },
+        { "type": 1, "seqno": 681, "text": "4구 볼" },
+        { "type": 1, "seqno": 682, "text": "5구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 683,
+          "text": "안현민 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "2",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52001",
+            "pitcher": "55455"
+          }
+        }
+      ]
+    },
+    {
+      "no": 128,
+      "inn": 12,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 671,
+          "text": "대타 배정대",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64166",
+            "pitcher": "55455"
+          }
+        },
+        { "type": 1, "seqno": 672, "text": "1구 스트라이크" },
+        { "type": 1, "seqno": 673, "text": "2구 파울" },
+        { "type": 1, "seqno": 674, "text": "3구 볼" },
+        { "type": 1, "seqno": 675, "text": "4구 헛스윙" },
+        {
+          "type": 13,
+          "seqno": 676,
+          "text": "배정대 : 삼진 아웃",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "1",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64166",
+            "pitcher": "55455"
+          }
+        }
+      ]
+    },
+    {
+      "no": 127,
+      "inn": 12,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 669,
+          "text": "2번타자 장진혁",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66706",
+            "pitcher": "62360"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 670,
+          "text": "투수 김태훈 : 투수 배찬승 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "66706",
+            "pitcher": "55455"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 671,
+          "text": "2번타자 장진혁 : 대타 배정대 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64166",
+            "pitcher": "55455"
+          }
+        }
+      ]
+    },
+    {
+      "no": 126,
+      "inn": 12,
+      "homeOrAway": "1",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 668,
+          "text": "12회말 KT 공격",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "64166",
+            "pitcher": "55455"
+          }
+        }
+      ]
+    },
+    {
+      "no": 125,
+      "inn": 12,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 665,
+          "text": "8번타자 전병우",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "2",
+            "base1": "7",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "73117"
+          }
+        },
+        { "type": 1, "seqno": 666, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 667,
+          "text": "전병우 : 3루수 땅볼 아웃 (3루수->1루수 송구아웃)",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "3",
+            "base1": "7",
+            "base2": "0",
+            "base3": "0",
+            "batter": "65586",
+            "pitcher": "73117"
+          }
+        }
+      ]
+    },
+    {
+      "no": 124,
+      "inn": 12,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 653,
+          "text": "7번타자 이재현",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "6",
+            "base2": "5",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "50859"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 654,
+          "text": "투수 오원석 : 투수 우규민 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "6",
+            "base2": "5",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "73117"
+          }
+        },
+        { "type": 1, "seqno": 655, "text": "1구 볼" },
+        { "type": 1, "seqno": 656, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 657, "text": "3구 파울" },
+        { "type": 1, "seqno": 658, "text": "4구 파울" },
+        { "type": 1, "seqno": 659, "text": "5구 볼" },
+        { "type": 1, "seqno": 660, "text": "6구 타격" },
+        {
+          "type": 23,
+          "seqno": 661,
+          "text": "이재현 : 투수 앞 땅볼로 출루",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "7",
+            "base2": "5",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "73117"
+          }
+        },
+        {
+          "type": 24,
+          "seqno": 662,
+          "text": "1루주자 김상준 : 포스아웃 (투수->2루수 2루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "7",
+            "base2": "5",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "73117"
+          }
+        },
+        {
+          "type": 24,
+          "seqno": 663,
+          "text": "2루주자 디아즈 : 3루까지 진루",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "2",
+            "base1": "7",
+            "base2": "0",
+            "base3": "5",
+            "batter": "52415",
+            "pitcher": "73117"
+          }
+        },
+        {
+          "type": 24,
+          "seqno": 664,
+          "text": "3루주자 디아즈 : 실책으로 홈인 (2루수 송구 실책->1루수)",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "3",
+            "out": "2",
+            "base1": "7",
+            "base2": "0",
+            "base3": "0",
+            "batter": "52415",
+            "pitcher": "73117"
+          }
+        }
+      ]
+    },
+    {
+      "no": 123,
+      "inn": 12,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 645,
+          "text": "6번타자 김상준",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "0",
+            "base3": "0",
+            "batter": "55425",
+            "pitcher": "50859"
+          }
+        },
+        { "type": 1, "seqno": 646, "text": "1구 볼" },
+        { "type": 1, "seqno": 647, "text": "2구 스트라이크" },
+        { "type": 1, "seqno": 648, "text": "3구 번트파울" },
+        {
+          "type": 7,
+          "seqno": 649,
+          "text": "투수 투수판 이탈",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "0",
+            "base3": "0",
+            "batter": "55425",
+            "pitcher": "50859"
+          }
+        },
+        { "type": 1, "seqno": 650, "text": "4구 타격" },
+        {
+          "type": 13,
+          "seqno": 651,
+          "text": "김상준 : 우익수 앞 1루타",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "6",
+            "base2": "5",
+            "base3": "0",
+            "batter": "55425",
+            "pitcher": "50859"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 652,
+          "text": "1루주자 디아즈 : 2루까지 진루",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "6",
+            "base2": "5",
+            "base3": "0",
+            "batter": "55425",
+            "pitcher": "50859"
+          }
+        }
+      ]
+    },
+    {
+      "no": 122,
+      "inn": 12,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 640,
+          "text": "5번타자 디아즈",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "4",
+            "base2": "0",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "50859"
+          }
+        },
+        { "type": 1, "seqno": 641, "text": "1구 타격" },
+        {
+          "type": 13,
+          "seqno": 642,
+          "text": "디아즈 : 2루수 앞 땅볼로 출루",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "5",
+            "base2": "0",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "50859"
+          }
+        },
+        {
+          "type": 14,
+          "seqno": 643,
+          "text": "1루주자 박승규 : 포스아웃 (2루수->유격수 2루 터치아웃)",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "0",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "50859"
+          }
+        },
+        {
+          "type": 7,
+          "seqno": 644,
+          "text": "12회초 5번타순 1구 후 22:30 ~ 22:31 (1분간) 삼성요청 비디오 판독: 디아즈 타구 관련 아웃→세이프",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "1",
+            "base1": "5",
+            "base2": "0",
+            "base3": "0",
+            "batter": "54400",
+            "pitcher": "50859"
+          }
+        }
+      ]
+    },
+    {
+      "no": 121,
+      "inn": 12,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 8,
+          "seqno": 634,
+          "text": "4번타자 박승규",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "53029"
+          }
+        },
+        {
+          "type": 2,
+          "seqno": 635,
+          "text": "투수 김정운 : 투수 오원석 (으)로 교체",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "50859"
+          }
+        },
+        { "type": 1, "seqno": 636, "text": "1구 볼" },
+        { "type": 1, "seqno": 637, "text": "2구 파울" },
+        { "type": 1, "seqno": 638, "text": "3구 타격" },
+        {
+          "type": 13,
+          "seqno": 639,
+          "text": "박승규 : 좌익수 왼쪽 1루타",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "4",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "50859"
+          }
+        }
+      ]
+    },
+    {
+      "no": 120,
+      "inn": 12,
+      "homeOrAway": "0",
+      "textOptions": [
+        {
+          "type": 0,
+          "seqno": 633,
+          "text": "12회초 삼성 공격",
+          "currentGameState": {
+            "homeScore": "2",
+            "awayScore": "2",
+            "out": "0",
+            "base1": "0",
+            "base2": "0",
+            "base3": "0",
+            "batter": "69418",
+            "pitcher": "50859"
+          }
+        }
+      ]
+    }
+  ],
+  "13": []
+}

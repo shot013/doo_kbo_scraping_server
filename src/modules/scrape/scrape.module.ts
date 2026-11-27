@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { GameEventsModule } from '../game-events/game-events.module';
+import { GameLineScoresModule } from '../game-line-scores/game-line-scores.module';
 import { GamePreviewModule } from '../game-preview/game-preview.module';
 import { GameStatsModule } from '../game-stats/game-stats.module';
 import { GameModule } from '../game/game.module';
@@ -24,6 +26,8 @@ import { StandingsScraper } from './infrastructure/scrapers/standings.scraper';
     GameModule,
     GamePreviewModule,
     GameStatsModule,
+    GameEventsModule,
+    GameLineScoresModule,
     PlateAppearancesModule,
     PlayersModule,
     StandingsModule,

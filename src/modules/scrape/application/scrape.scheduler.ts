@@ -133,6 +133,10 @@ export class ScrapeScheduler {
     }
   }
 
+  /**
+   * 진행 중인 경기만 대상으로 한다. 종료된 경기의 박스스코어는 문자중계 회차(`scrapePlayByPlay`)가
+   * 이벤트·점수표와 함께 순서대로 저장한다 (점수표를 투수 기록보다 먼저 저장하지 않기 위해).
+   */
   @Cron(EVENING_HOURLY_CRON, KST_CRON_OPTIONS)
   async scrapeGameStats(): Promise<void> {
     const gameDate = new Date().toISOString().slice(0, 10);
@@ -148,9 +152,7 @@ export class ScrapeScheduler {
     }
 
     const targets = todaysGames.filter(
-      (game) =>
-        game.status === GameStatus.IN_PROGRESS ||
-        game.status === GameStatus.FINISHED,
+      (game) => game.status === GameStatus.IN_PROGRESS,
     );
 
     for (const game of targets) {
@@ -165,8 +167,9 @@ export class ScrapeScheduler {
   }
 
   /**
-   * 진행 중인 경기는 이닝 전체를 매시간 다시 받아야 해 비효율적이고, 타자-투수 상대전적은
-   * 완료된 경기만으로도 목적을 달성하므로 FINISHED 상태만 대상으로 한다.
+   * 진행 중인 경기는 이닝 전체를 매시간 다시 받아야 해 비효율적이고, 타자-투수 상대전적과
+   * 경기 요약은 완료된 경기만으로도 목적을 달성하므로 FINISHED 상태만 대상으로 한다.
+   * 경기마다 박스스코어 → 타석·이벤트 → 점수표 순으로 저장한다.
    */
   @Cron(EVENING_HOURLY_CRON, KST_CRON_OPTIONS)
   async scrapePlayByPlay(): Promise<void> {
