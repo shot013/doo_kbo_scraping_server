@@ -14,6 +14,7 @@ import { GameLineScoresModule } from './modules/game-line-scores/game-line-score
 import { GamePreviewModule } from './modules/game-preview/game-preview.module';
 import { GameResultsModule } from './modules/game-results/game-results.module';
 import { GameStatsModule } from './modules/game-stats/game-stats.module';
+import { GameSummariesModule } from './modules/game-summaries/game-summaries.module';
 import { PlateAppearancesModule } from './modules/plate-appearances/plate-appearances.module';
 import { PlayersModule } from './modules/players/players.module';
 import { RecordsModule } from './modules/records/records.module';
@@ -45,6 +46,7 @@ import { ScrapeModule } from './modules/scrape/scrape.module';
     GamePreviewModule,
     GameStatsModule,
     GameResultsModule,
+    GameSummariesModule,
     PlateAppearancesModule,
     PlayersModule,
     StandingsModule,
