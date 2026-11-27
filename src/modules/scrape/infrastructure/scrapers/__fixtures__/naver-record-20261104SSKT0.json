@@ -1,0 +1,569 @@
+{
+  "result": {
+    "recordData": {
+      "gameInfo": {
+        "aCode": "SS",
+        "hCode": "KT"
+      },
+      "battersBoxscore": {
+        "away": [
+          {
+            "name": "김지찬",
+            "playerCode": "50458",
+            "batOrder": 1,
+            "pos": "중",
+            "ab": 5,
+            "hit": 1,
+            "rbi": 0,
+            "run": 1,
+            "hra": "0.276"
+          },
+          {
+            "name": "김성윤",
+            "playerCode": "67449",
+            "batOrder": 2,
+            "pos": "우",
+            "ab": 4,
+            "hit": 2,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.400"
+          },
+          {
+            "name": "구자욱",
+            "playerCode": "62404",
+            "batOrder": 3,
+            "pos": "지",
+            "ab": 4,
+            "hit": 2,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.250"
+          },
+          {
+            "name": "박계범",
+            "playerCode": "64468",
+            "batOrder": 3,
+            "pos": "주지",
+            "ab": 1,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          },
+          {
+            "name": "최형우",
+            "playerCode": "72443",
+            "batOrder": 4,
+            "pos": "좌",
+            "ab": 3,
+            "hit": 2,
+            "rbi": 0,
+            "run": 1,
+            "hra": "0.389"
+          },
+          {
+            "name": "박승규",
+            "playerCode": "69418",
+            "batOrder": 4,
+            "pos": "주좌",
+            "ab": 3,
+            "hit": 1,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.292"
+          },
+          {
+            "name": "디아즈",
+            "playerCode": "54400",
+            "batOrder": 5,
+            "pos": "一",
+            "ab": 6,
+            "hit": 4,
+            "rbi": 2,
+            "run": 1,
+            "hra": "0.286"
+          },
+          {
+            "name": "류지혁",
+            "playerCode": "62234",
+            "batOrder": 6,
+            "pos": "二",
+            "ab": 4,
+            "hit": 1,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.261"
+          },
+          {
+            "name": "김상준",
+            "playerCode": "55425",
+            "batOrder": 6,
+            "pos": "二",
+            "ab": 1,
+            "hit": 1,
+            "rbi": 0,
+            "run": 0,
+            "hra": "1.000"
+          },
+          {
+            "name": "이재현",
+            "playerCode": "52415",
+            "batOrder": 7,
+            "pos": "유",
+            "ab": 5,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.167"
+          },
+          {
+            "name": "김영웅",
+            "playerCode": "52430",
+            "batOrder": 8,
+            "pos": "三",
+            "ab": 2,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.333"
+          },
+          {
+            "name": "전병우",
+            "playerCode": "65586",
+            "batOrder": 8,
+            "pos": "타三",
+            "ab": 4,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          },
+          {
+            "name": "강민호",
+            "playerCode": "74540",
+            "batOrder": 9,
+            "pos": "포",
+            "ab": 3,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.211"
+          },
+          {
+            "name": "김현준",
+            "playerCode": "51417",
+            "batOrder": 9,
+            "pos": "타",
+            "ab": 1,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          },
+          {
+            "name": "김도환",
+            "playerCode": "69442",
+            "batOrder": 9,
+            "pos": "포",
+            "ab": 1,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          }
+        ],
+        "home": [
+          {
+            "name": "최원준",
+            "playerCode": "66606",
+            "batOrder": 1,
+            "pos": "우",
+            "ab": 6,
+            "hit": 3,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.400"
+          },
+          {
+            "name": "김민혁",
+            "playerCode": "64004",
+            "batOrder": 2,
+            "pos": "좌",
+            "ab": 4,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.125"
+          },
+          {
+            "name": "장진혁",
+            "playerCode": "66706",
+            "batOrder": 2,
+            "pos": "좌",
+            "ab": 1,
+            "hit": 1,
+            "rbi": 0,
+            "run": 1,
+            "hra": "1.000"
+          },
+          {
+            "name": "배정대",
+            "playerCode": "64166",
+            "batOrder": 2,
+            "pos": "타",
+            "ab": 1,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          },
+          {
+            "name": "안현민",
+            "playerCode": "52001",
+            "batOrder": 3,
+            "pos": "지",
+            "ab": 6,
+            "hit": 1,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.222"
+          },
+          {
+            "name": "힐리어드",
+            "playerCode": "56034",
+            "batOrder": 4,
+            "pos": "중",
+            "ab": 4,
+            "hit": 2,
+            "rbi": 0,
+            "run": 1,
+            "hra": "0.625"
+          },
+          {
+            "name": "김현수",
+            "playerCode": "76290",
+            "batOrder": 5,
+            "pos": "一",
+            "ab": 5,
+            "hit": 1,
+            "rbi": 1,
+            "run": 0,
+            "hra": "0.333"
+          },
+          {
+            "name": "류현인",
+            "playerCode": "53036",
+            "batOrder": 6,
+            "pos": "二",
+            "ab": 3,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          },
+          {
+            "name": "장성우",
+            "playerCode": "78548",
+            "batOrder": 6,
+            "pos": "타",
+            "ab": 1,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          },
+          {
+            "name": "오윤석",
+            "playerCode": "64504",
+            "batOrder": 6,
+            "pos": "二",
+            "ab": 1,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          },
+          {
+            "name": "허경민",
+            "playerCode": "79240",
+            "batOrder": 7,
+            "pos": "三",
+            "ab": 5,
+            "hit": 2,
+            "rbi": 1,
+            "run": 0,
+            "hra": "0.222"
+          },
+          {
+            "name": "한승택",
+            "playerCode": "63722",
+            "batOrder": 8,
+            "pos": "포",
+            "ab": 5,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.111"
+          },
+          {
+            "name": "장준원",
+            "playerCode": "64115",
+            "batOrder": 9,
+            "pos": "유",
+            "ab": 3,
+            "hit": 1,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.250"
+          },
+          {
+            "name": "권동진",
+            "playerCode": "51003",
+            "batOrder": 9,
+            "pos": "타유",
+            "ab": 2,
+            "hit": 0,
+            "rbi": 0,
+            "run": 0,
+            "hra": "0.000"
+          }
+        ]
+      },
+      "pitchersBoxscore": {
+        "away": [
+          {
+            "name": "페덱",
+            "pcode": "56459",
+            "ab": 28,
+            "inn": "7",
+            "hit": 8,
+            "hr": 0,
+            "bb": 1,
+            "kk": 3,
+            "er": 1,
+            "r": 1,
+            "bf": 102,
+            "pa": 29,
+            "era": "1.29",
+            "wls": ""
+          },
+          {
+            "name": "이승민",
+            "pcode": "50464",
+            "ab": 5,
+            "inn": "1 ⅓",
+            "hit": 1,
+            "hr": 0,
+            "bb": 0,
+            "kk": 1,
+            "er": 0,
+            "r": 0,
+            "bf": 21,
+            "pa": 5,
+            "era": "0.00",
+            "wls": ""
+          },
+          {
+            "name": "원태인",
+            "pcode": "69446",
+            "ab": 8,
+            "inn": "1 ⅔",
+            "hit": 2,
+            "hr": 0,
+            "bb": 1,
+            "kk": 0,
+            "er": 0,
+            "r": 1,
+            "bf": 32,
+            "pa": 9,
+            "era": "0.00",
+            "wls": ""
+          },
+          {
+            "name": "김태훈",
+            "pcode": "62360",
+            "ab": 3,
+            "inn": "1",
+            "hit": 0,
+            "hr": 0,
+            "bb": 0,
+            "kk": 1,
+            "er": 0,
+            "r": 0,
+            "bf": 13,
+            "pa": 3,
+            "era": "0.00",
+            "wls": "승"
+          },
+          {
+            "name": "배찬승",
+            "pcode": "55455",
+            "ab": 3,
+            "inn": "1",
+            "hit": 0,
+            "hr": 0,
+            "bb": 1,
+            "kk": 2,
+            "er": 0,
+            "r": 0,
+            "bf": 19,
+            "pa": 4,
+            "era": "0.00",
+            "wls": "세"
+          }
+        ],
+        "home": [
+          {
+            "name": "고영표",
+            "pcode": "64001",
+            "ab": 27,
+            "inn": "7",
+            "hit": 7,
+            "hr": 0,
+            "bb": 0,
+            "kk": 4,
+            "er": 1,
+            "r": 1,
+            "bf": 96,
+            "pa": 27,
+            "era": "1.29",
+            "wls": ""
+          },
+          {
+            "name": "손동현",
+            "pcode": "69041",
+            "ab": 1,
+            "inn": "0 ⅓",
+            "hit": 0,
+            "hr": 0,
+            "bb": 1,
+            "kk": 0,
+            "er": 0,
+            "r": 0,
+            "bf": 12,
+            "pa": 2,
+            "era": "0.00",
+            "wls": ""
+          },
+          {
+            "name": "박영현",
+            "pcode": "52060",
+            "ab": 6,
+            "inn": "1 ⅔",
+            "hit": 2,
+            "hr": 0,
+            "bb": 0,
+            "kk": 1,
+            "er": 0,
+            "r": 0,
+            "bf": 23,
+            "pa": 7,
+            "era": "0.00",
+            "wls": ""
+          },
+          {
+            "name": "스기모토",
+            "pcode": "56011",
+            "ab": 1,
+            "inn": "0 ⅔",
+            "hit": 0,
+            "hr": 0,
+            "bb": 1,
+            "kk": 0,
+            "er": 1,
+            "r": 1,
+            "bf": 5,
+            "pa": 4,
+            "era": "13.50",
+            "wls": ""
+          },
+          {
+            "name": "전용주",
+            "pcode": "69047",
+            "ab": 1,
+            "inn": "0",
+            "hit": 1,
+            "hr": 0,
+            "bb": 0,
+            "kk": 0,
+            "er": 0,
+            "r": 0,
+            "bf": 2,
+            "pa": 1,
+            "era": "0.00",
+            "wls": ""
+          },
+          {
+            "name": "김정운",
+            "pcode": "53029",
+            "ab": 6,
+            "inn": "1 ⅓",
+            "hit": 2,
+            "hr": 0,
+            "bb": 1,
+            "kk": 1,
+            "er": 0,
+            "r": 0,
+            "bf": 23,
+            "pa": 7,
+            "era": "0.00",
+            "wls": ""
+          },
+          {
+            "name": "오원석",
+            "pcode": "50859",
+            "ab": 3,
+            "inn": "0 ⅓",
+            "hit": 2,
+            "hr": 0,
+            "bb": 0,
+            "kk": 0,
+            "er": 0,
+            "r": 1,
+            "bf": 8,
+            "pa": 3,
+            "era": "0.00",
+            "wls": "패"
+          },
+          {
+            "name": "우규민",
+            "pcode": "73117",
+            "ab": 2,
+            "inn": "0 ⅔",
+            "hit": 0,
+            "hr": 0,
+            "bb": 0,
+            "kk": 0,
+            "er": 0,
+            "r": 0,
+            "bf": 7,
+            "pa": 2,
+            "era": "0.00",
+            "wls": ""
+          }
+        ]
+      },
+      "scoreBoard": {
+        "rheb": {
+          "away": {
+            "r": 3,
+            "b": 4,
+            "e": 2,
+            "h": 14
+          },
+          "home": {
+            "r": 2,
+            "b": 3,
+            "e": 1,
+            "h": 11
+          }
+        },
+        "inn": {
+          "away": [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+          "home": [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0]
+        }
+      }
+    }
+  }
+}

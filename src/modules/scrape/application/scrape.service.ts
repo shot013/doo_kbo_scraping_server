@@ -2,6 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { resolveKboTeamByCode, KBO_TEAMS } from '../../../common/kbo/kbo-team';
 import { GameService } from '../../game/application/game.service';
 import { Game, GameStatus } from '../../game/domain/entities/game.entity';
+import { GameEventService } from '../../game-events/application/game-event.service';
+import { GameEvent } from '../../game-events/domain/entities/game-event.entity';
+import { GameLineScoreService } from '../../game-line-scores/application/game-line-score.service';
+import { GameLineScore } from '../../game-line-scores/domain/entities/game-line-score.entity';
 import { GamePreviewService } from '../../game-preview/application/game-preview.service';
 import { GamePreview } from '../../game-preview/domain/entities/game-preview.entity';
 import { GameStatService } from '../../game-stats/application/game-stat.service';
@@ -25,6 +29,8 @@ import {
 import {
   NAVER_GAME_RECORD_URL,
   GameStatsScraper,
+  ScrapedGameRecord,
+  ScrapedGameStat,
 } from '../infrastructure/scrapers/game-stats.scraper';
 import {
   GameScraper,
@@ -34,6 +40,7 @@ import { toNaverGameId } from '../infrastructure/scrapers/naver-game-id';
 import {
   NAVER_RELAY_URL,
   PlayByPlayScraper,
+  RosterEntry,
 } from '../infrastructure/scrapers/play-by-play.scraper';
 import {
   ROSTER_SOURCE_URL,
@@ -57,6 +64,8 @@ export interface ScrapeSummary {
 
 /** 시즌 전체 백필은 수백 경기를 순회하므로 roster 스크랩(팀 10개, 500ms)보다 넉넉한 텀을 둔다. */
 const BACKFILL_DELAY_MS = 2000;
+/** 같은 경기의 박스스코어와 문자중계를 잇달아 요청할 때의 텀 (문자중계 이닝 간 텀과 같다). */
+const SAME_GAME_REQUEST_DELAY_MS = 300;
 
 @Injectable()
 export class ScrapeService {
@@ -75,6 +84,8 @@ export class ScrapeService {
     private readonly standingService: StandingService,
     private readonly gameStatService: GameStatService,
     private readonly plateAppearanceService: PlateAppearanceService,
+    private readonly gameEventService: GameEventService,
+    private readonly gameLineScoreService: GameLineScoreService,
     private readonly playerService: PlayerService,
     private readonly seasonBattingStatService: SeasonBattingStatService,
     private readonly seasonPitchingStatService: SeasonPitchingStatService,
@@ -643,9 +654,10 @@ export class ScrapeService {
   }
 
   /**
-   * 시즌 전체 FINISHED 경기의 타석 데이터를 스크랩한다. `scrapeGameStatsBackfill`과 같은 이유로
-   * (경기당 이닝 수만큼 요청이 늘어나 시즌 전체는 상당히 오래 걸림) 스케줄러에는 등록하지 않고
-   * 수동 트리거 전용으로 둔다.
+   * 시즌 전체 FINISHED 경기의 타석 데이터를 스크랩한다. 경기마다 박스스코어·이벤트·점수표도
+   * 함께 저장하므로(`scrapeAndSavePlayByPlay`) 경기 요약 백필도 이것 하나로 된다.
+   * `scrapeGameStatsBackfill`과 같은 이유로 (경기당 이닝 수만큼 요청이 늘어나 시즌 전체는
+   * 상당히 오래 걸림) 스케줄러에는 등록하지 않고 수동 트리거 전용으로 둔다.
    */
   async scrapePlayByPlayBackfill(seasonYear: number): Promise<ScrapeSummary> {
     const sourceName = 'naver-play-by-play-backfill';
@@ -701,28 +713,50 @@ export class ScrapeService {
   }
 
   /**
-   * 타자/투수 이름은 relay 응답이 아니라 같은 경기의 `game_stats`(박스스코어)에서
-   * playerId로 매칭해 채운다 — `PlayByPlayScraper`의 클래스 doc 참고.
+   * 한 경기의 박스스코어 → 타석·이벤트 → 점수표 순으로 저장한다.
+   *
+   * 점수표가 있어야 경기 요약이 있다고 보므로(`GameLineScoreService` 참고) 점수표는
+   * 종료된 경기에서, 투수 기록과 이벤트를 모두 저장한 뒤에만 마지막으로 저장한다. 그래서
+   * 종료 경기의 박스스코어는 저녁 박스스코어 회차가 아니라 이 흐름에서 함께 받는다.
+   *
+   * 타자/투수 이름과 교체 선수 id는 relay 응답이 아니라 같은 경기의 박스스코어로 맞춘다
+   * (`PlayByPlayScraper`의 클래스 doc 참고). 박스스코어 요청이 실패하면 이미 저장된
+   * `game_stats`로 대신하고 점수표는 저장하지 않는다.
    */
   private async scrapeAndSavePlayByPlay(
     game: Game,
   ): Promise<{ scraped: number; saved: number }> {
     const gameId = game.id;
+    let record: ScrapedGameRecord | null = null;
+    let statsComplete = false;
+    try {
+      record = await this.gameStatsScraper.scrape(gameId, game.series);
+      const { scraped, saved } = await this.saveGameStats(game, record.stats);
+      statsComplete = scraped > 0 && scraped === saved;
+    } catch (error) {
+      this.logger.warn(
+        `Box score scrape failed for game ${gameId}, using stored game stats for names: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+    const roster: RosterEntry[] =
+      record?.stats ?? (await this.gameStatService.findByGameIds([gameId]));
+    await delay(SAME_GAME_REQUEST_DELAY_MS);
+
     const scraped = await this.playByPlayScraper.scrape(
       gameId,
       game.series,
       game.homeTeamCode,
       game.awayTeamCode,
+      roster,
     );
-    const gameStats = await this.gameStatService.findByGameIds([gameId]);
     const nameByPlayerId = new Map(
-      gameStats
+      roster
         .filter((stat) => stat.playerId !== null)
         .map((stat) => [stat.playerId as number, stat.playerName]),
     );
     const now = new Date();
 
-    const plateAppearances = scraped.map(
+    const plateAppearances = scraped.plateAppearances.map(
       (item) =>
         new PlateAppearance({
           id: 0,
@@ -764,14 +798,76 @@ export class ScrapeService {
       }
     }
 
-    return { scraped: scraped.length, saved: savedCount };
+    // 빈 응답으로 이미 저장된 이벤트를 지우지 않는다.
+    let eventsSaved = false;
+    if (scraped.events.length > 0) {
+      const events = scraped.events.map(
+        (item) =>
+          new GameEvent({
+            ...item,
+            id: 0,
+            seasonYear: game.seasonYear,
+            createdAt: now,
+          }),
+      );
+      try {
+        await this.gameEventService.replaceByGameId(gameId, events);
+        eventsSaved = true;
+      } catch (error) {
+        this.logger.warn(
+          `Failed to save ${events.length} game events for game ${gameId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    if (game.status !== GameStatus.FINISHED) {
+      return { scraped: plateAppearances.length, saved: savedCount };
+    }
+    if (!record || record.lineScores.length !== 2) {
+      this.logger.warn(
+        `Skipping line score for game ${gameId}: line score not found in box score`,
+      );
+    } else if (!statsComplete || !eventsSaved) {
+      this.logger.warn(
+        `Skipping line score for game ${gameId}: game stats or events were not fully saved`,
+      );
+    } else {
+      // 점수표 저장 실패는 다음 회차에 다시 시도하면 되므로 타석 저장 결과를 무효로 하지 않는다.
+      try {
+        await this.gameLineScoreService.upsertMany(
+          record.lineScores.map(
+            (item) =>
+              new GameLineScore({
+                ...item,
+                id: 0,
+                scrapedAt: now,
+                createdAt: now,
+                updatedAt: now,
+              }),
+          ),
+        );
+      } catch (error) {
+        this.logger.warn(
+          `Failed to save line score for game ${gameId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    return { scraped: plateAppearances.length, saved: savedCount };
   }
 
   private async scrapeAndSaveGameStats(
     game: Game,
   ): Promise<{ scraped: number; saved: number }> {
+    const { stats } = await this.gameStatsScraper.scrape(game.id, game.series);
+    return this.saveGameStats(game, stats);
+  }
+
+  private async saveGameStats(
+    game: Game,
+    scraped: ScrapedGameStat[],
+  ): Promise<{ scraped: number; saved: number }> {
     const gameId = game.id;
-    const scraped = await this.gameStatsScraper.scrape(gameId, game.series);
     const now = new Date();
     const stats = scraped.map(
       (item) =>
@@ -807,10 +903,9 @@ export class ScrapeService {
           save: item.save,
           hold: item.hold,
           era: item.era,
-          // 실점·투구 수·등판 순서는 박스스코어 스크래퍼가 채우기 전까지 비워 둔다 (KAN-7).
-          runsAllowed: null,
-          pitchCount: null,
-          appearanceOrder: null,
+          runsAllowed: item.runsAllowed,
+          pitchCount: item.pitchCount,
+          appearanceOrder: item.appearanceOrder,
           rawStats: null,
           createdAt: now,
           updatedAt: now,
