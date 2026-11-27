@@ -29,7 +29,7 @@
 | DB · ORM | PostgreSQL 16, TypeORM 1 (스키마는 마이그레이션으로만 변경) |
 | 스크래핑 | KBO 공식 사이트의 내부 API·페이지는 `fetch`로 직접 호출하고 Cheerio로 HTML 파싱. 네이버 스포츠 API는 브라우저가 아닌 클라이언트에 응답하지 않아 헤드리스 Chromium(`puppeteer-core`) 안에서 호출. 요청마다 15초 타임아웃, 요청 사이 딜레이 |
 | 스케줄링 | `@nestjs/schedule` — KST 기준 cron, 경기 시간대에는 매시 정각에 경기 상태 갱신 |
-| 캐시 | `@nestjs/cache-manager` 인메모리 캐시 (순위·팀·기록 조회, `CACHE_TTL_MS` 기본 5분) |
+| 캐시 | `@nestjs/cache-manager` 인메모리 캐시 (순위·팀·기록·경기 요약 조회, `CACHE_TTL_MS` 기본 5분) |
 | 모니터링 | Sentry (`@sentry/nestjs`), 스크랩 소스별 성공/실패·소요시간을 `scrape-source-health` 테이블에 기록 |
 | 코드 품질 | ESLint 9 (`typescript-eslint` `recommendedTypeChecked`, 경고 0개), Prettier, Jest 30 |
 | CI | GitHub Actions — PR과 push마다 `format:check` → `lint:check` → `test` |
@@ -52,8 +52,8 @@ flowchart LR
       SCHED["ScrapeScheduler<br/>KST cron · 경기 시간대 매시 폴링"]
       SCRAPE["scrape 모듈<br/>ScrapeService → Scraper<br/>15초 타임아웃 · 요청 간 딜레이"]
       CTRL["Controller<br/>순위·팀·기록 응답은 인메모리 캐시"]
-      DOMAIN["도메인 모듈<br/>game · game-stats · standings · players<br/>plate-appearances · season-stats · game-preview"]
-      COMBO["조합 모듈<br/>teams · records · game-results"]
+      DOMAIN["도메인 모듈<br/>game · game-stats · standings · players<br/>plate-appearances · season-stats · game-preview<br/>game-events · game-line-scores"]
+      COMBO["조합 모듈<br/>teams · records · game-results<br/>game-summaries"]
       HEALTH["scrape-source-health<br/>소스별 성공/실패 · 소요시간"]
     end
     PG[("PostgreSQL 16")]
@@ -78,7 +78,7 @@ flowchart LR
   NEST -.->|"예외"| SENTRY
 ```
 
-각 모듈은 `domain` / `infrastructure` / `application` 세 계층으로 나뉩니다. `domain`은 Nest와 TypeORM을 모르는 순수 TypeScript이고, `infrastructure`가 `domain`의 repository 인터페이스를 구현합니다. 다른 모듈의 service만 조합하는 `teams`·`records`·`game-results`는 `application`만 둡니다.
+각 모듈은 `domain` / `infrastructure` / `application` 세 계층으로 나뉩니다. `domain`은 Nest와 TypeORM을 모르는 순수 TypeScript이고, `infrastructure`가 `domain`의 repository 인터페이스를 구현합니다. 다른 모듈의 service만 조합하는 `teams`·`records`·`game-results`·`game-summaries`는 `application`만 둡니다.
 
 ```mermaid
 flowchart LR
@@ -98,8 +98,9 @@ src/
   modules/
     game/  game-stats/  standings/  players/  plate-appearances/
     season-stats/  game-preview/  action-log/  scrape-source-health/
+    game-events/  game-line-scores/
                             # domain / infrastructure / application 3계층
-    teams/  records/  game-results/
+    teams/  records/  game-results/  game-summaries/
                             # application만 (다른 모듈 service 조합)
     scrape/                 # 스크래퍼 + 스케줄러, 결과를 각 모듈 service로 저장
     example/                # 새 모듈을 만들 때 복사하는 템플릿 (인메모리)
@@ -266,6 +267,8 @@ npm run test           # 전체 테스트
 | GET | `/game-stats` | `gameId`, `teamCode`, `statType`(`BATTING`\|`PITCHING`), `page`, `limit`, `sortBy`(`id`\|`teamCode`\|`playerName`\|`homeRuns`\|`rbi`\|`battingAverage`\|`era`), `sortOrder` | 경기별 선수 기록 목록 조회 |
 | GET | `/game-stats/:id` | - | 선수 기록 단건 조회 |
 
+- 투수 행(`statType: PITCHING`)에는 `runsAllowed`(실점, 자책점은 `earnedRuns`), `pitchCount`(투구 수), `appearanceOrder`(팀 안 등판 순서, 선발 = 1)가 있다. 경기 요약의 투수 교체 표에 쓰며, 출처에 없거나 아직 수집 전이면 `null`
+
 ### Game Results (`src/modules/game-results`)
 
 | Method | Path | Query | 설명 |
@@ -275,6 +278,20 @@ npm run test           # 전체 테스트
 - 경기별로 베스트 활약 타자(`bestPerformer`: 타점 → 안타 → 득점 순으로 비교해 선정, 홈런 데이터 미보유로 비교 기준에서 제외)와 승/패/세이브/홀드 투수 기록(`pitchers`)을 함께 반환
 - 해당 날짜에 `game-stats`가 아직 스크래핑되지 않은 경기는 `bestPerformer: null`, `pitchers: []`
 - 포스트시즌 경기도 포함됨 (다른 시즌 단위 집계와 달리 정규시즌으로 거르지 않음)
+
+### Game Summaries (`src/modules/game-summaries`)
+
+| Method | Path | Query | 설명 |
+| --- | --- | --- | --- |
+| GET | `/game-summaries/:gameId` | - | 경기 요약(이닝별 점수, 득점 장면, 투수 교체, 대타) 조회. 요약이 없으면 404 |
+
+- 응답: `gameId`, `homeTeamCode`, `awayTeamCode`, `lineScore`, `scoringPlays`, `pitching`, `pinchHitters`. 팀 칩과 경기 스코어 카드는 기존 `/game-results/recent`를 그대로 쓴다
+- `lineScore`: `inningCount`(연장 포함 이닝 수)와 `away`/`home`별 `teamCode`, `innings`(길이 `inningCount`, 하지 않은 이닝은 `null`이고 앱은 표기하지 않음. 예: 이미 이긴 홈 팀의 9회말), `runs`, `hits`, `errors`, `walks`
+- `scoringPlays[]`: 점수가 바뀐 장면마다 `inning`, `half`(`TOP`\|`BOTTOM`), `teamCode`(득점 팀), `description`(예: `정내야 3점 홈런`, `대타 표중견 1타점 2루타`, 타석 외 득점은 문자중계 원문), 그 뒤 점수 `homeScore`/`awayScore`, `isReversal`(리드 팀이 바뀜), `isTying`(동점이 됨)
+- `pitching.away[]`/`pitching.home[]`: 등판 순서대로 `playerId`, `playerName`, `role`(`STARTER`\|`RELIEVER`), `entry`(선발은 `null`, 구원은 `inning`, `half`, `outs`, `runners`(주자가 있는 루 번호 배열, 빈 배열 = 주자 없음), `atInningStart`), `outs`(잡은 아웃 수, 5.1이닝 = `16`), `pitchCount`, `runs`(실점), `decision`(`WIN`\|`LOSS`\|`SAVE`\|`HOLD`\|`null`). 등판 상황의 `outs`/`runners`는 출처에 없으면 `null`
+- `pinchHitters.summary.away`/`home`: `teamCode`, `count`(대타 수), `atBats`, `hits`, `rbi`. `pinchHitters.appearances[]`: `inning`, `half`, `teamCode`, `playerId`/`playerName`(대타), `replacedPlayerId`/`replacedPlayerName`, `pitcherId`/`pitcherName`(상대 투수), `resultText`(예: `2루타`, `삼진`, `유격수 땅볼`), `isHit`, `rbi`(그 타석 전후 점수 차, 점수를 모르면 `null`). 타석 전에 다시 교체되거나 이닝이 끝난 대타는 결과 필드가 `null`/`false`/`0`
+- 점수표(`game_line_scores`)가 저장된 경기만 요약이 있다고 본다. 경기가 없거나 점수표가 아직 없으면 404 (앱은 "아직 이 경기의 요약 정보가 없습니다."를 보임). 문자중계가 아직 없으면 `scoringPlays`, `pinchHitters.appearances`는 빈 배열이고 투수 `entry`는 `null`
+- 저장된 원본(점수표, 문자중계 이벤트, 박스스코어)으로 요청 때 계산하며, 응답은 인메모리 캐시(`CACHE_TTL_MS`, 기본 5분)에 둔다. 404는 캐시하지 않는다
 
 ### Standings (`src/modules/standings`)
 
@@ -324,11 +341,11 @@ npm run test           # 전체 테스트
 | POST | `/scrape/games` | body: `seasonYear`(미지정 시 현재 연도), `gameMonth`(`01`~`12`, 미지정 시 현재 KST 월) | 해당 월의 정규시즌·포스트시즌 경기 일정/결과 스크래핑 실행 | O (17시~다음날 1시 매 정시 — 현재 월. 추가로 경기 시간대에는 그 외 시각에도 매 정시 — 아래 참고) |
 | POST | `/scrape/game-previews` | body: `gameDate`(`YYYY-MM-DD`, 미지정 시 오늘) | 경기 시작 전(GAME_STATE_SC=1)인 정규시즌·포스트시즌 경기의 프리뷰(팀 전력비교/선발투수 매치업) 스크래핑 실행. 포스트시즌 경기는 그 시리즈(WC/준PO/PO/KS) 안의 기록만 담음 | O (매일 09:00 KST) |
 | POST | `/scrape/standings` | body: `seasonYear`(미지정 시 현재 연도) | 순위표 스크래핑 실행 | O (17시~다음날 1시, 매 정시) |
-| POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS`/`FINISHED` 상태만 자동 대상) |
+| POST | `/scrape/game-stats` | body: `gameId`(필수) | 특정 경기의 선수 기록 스크래핑 실행 (점수표는 저장하지 않음) | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `IN_PROGRESS` 상태만 자동 대상. 종료 경기의 박스스코어는 `/scrape/play-by-play` 회차가 함께 저장) |
 | POST | `/scrape/game-stats/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 박스스코어를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
 | POST | `/scrape/roster` | body: `teamCode`(미지정 시 전체 팀) | 팀 로스터(포지션/등번호/출신교) 스크래핑 실행 | O (매일 18:00 KST) |
-| POST | `/scrape/play-by-play` | body: `gameId`(필수) | 특정 경기의 타석 단위 문자중계(타자-투수 매치업/결과) 스크래핑 실행 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `FINISHED` 상태만 자동 대상) |
-| POST | `/scrape/play-by-play/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기의 타석 데이터를 재스크랩(upsert)해 백필 | X (일회성/수동 트리거) |
+| POST | `/scrape/play-by-play` | body: `gameId`(필수) | 특정 경기의 박스스코어, 타석 단위 문자중계(타자-투수 매치업/결과), 경기 이벤트(득점·교체), 점수표를 차례로 스크래핑·저장. 응답의 `itemsScraped`는 저장한 타석 수 | O (17시~다음날 1시, 매 정시 — 당일 경기 중 `FINISHED` 상태만 자동 대상) |
+| POST | `/scrape/play-by-play/backfill` | body: `seasonYear`(미지정 시 현재 연도) | 시즌 전체 `FINISHED` 경기를 `/scrape/play-by-play`와 같은 흐름으로 재스크랩해 백필 (경기 요약 백필도 이것 하나로 됨) | X (일회성/수동 트리거) |
 
 - `/scrape/games` 스케줄러는 매시 정각에 깨어나 아래 경우에만 실제로 스크랩함 (`scrape.scheduler.ts`, `scrape-schedule.ts`). 이전 회차가 아직 끝나지 않았으면 그 회차는 건너뜀
   - 17시~다음날 1시: 이번 달 (경기가 없는 날의 기본 주기)
@@ -379,14 +396,15 @@ Controller (application/*.controller.ts)
 
 - `POST /action-logs`는 스크랩 파이프라인이 아니라 앱 클라이언트가 직접 호출하는 쓰기 API입니다. 클라이언트가 일정 주기로 모아 보낸 로그 배열(`body.logs`)을 `ActionLogController.logMany` → `ActionLogService.logMany` → `ACTION_LOG_REPOSITORY` 구현체가 한 번에 insert (스크래핑 API처럼 실패 시 별도 상태 기록 없이 예외가 그대로 전파됨)
 
-### 조합 API — Teams / Players / Records / Game Results
+### 조합 API — Teams / Players / Records / Game Results / Game Summaries
 
-`Teams`/`Records`/`Game Results`는 자체 domain/infrastructure 레이어 없이 다른 모듈의 Service를 조합해 응답을 만듭니다. `Players`만 자체 `PLAYER_REPOSITORY`를 가진 일반적인 조회 모듈입니다.
+`Teams`/`Records`/`Game Results`/`Game Summaries`는 자체 domain/infrastructure 레이어 없이 다른 모듈의 Service를 조합해 응답을 만듭니다. `Players`만 자체 `PLAYER_REPOSITORY`를 가진 일반적인 조회 모듈입니다.
 
 - `GET /teams`, `GET /teams/:code`: `TeamsService`가 `StandingService`(순위/승패) + `GameService.getRecentForm()`(최근 5경기 폼) + `PlayerService`(로스터, 상세 조회 시)를 조합
 - `GET /players`, `GET /players/:id`: `PlayerService` → `PLAYER_REPOSITORY` 구현체가 조회, 시즌 대표 기록은 `SeasonBattingStatService`/`SeasonPitchingStatService`(팀코드+이름 매칭)로 붙임. `GET /players/:id`의 `vsTeamStats`는 `GameStatService.findOpponentBattingSplits()`/`findOpponentPitchingSplits()`가 `game_stats.player_id`로 필터링해 `games` 테이블과 조인, 상대팀(`CASE WHEN gs.team_code = g.home_team_code THEN away ELSE home`)별로 GROUP BY 집계
 - `GET /records/batters`, `GET /records/pitchers`: `RecordsService`가 `SeasonBattingStatService`/`SeasonPitchingStatService`로 시즌 집계 리더보드를 만들고, `PlayerService.findAllPlayers()`(팀코드+이름 매칭)로 각 항목에 `playerId`를 붙임
 - `GET /game-results/recent`: `GameResultService`가 `GameService`(해당 날짜 종료 경기 목록) + `GameStatService.findByGameIds()`(경기별 박스스코어)를 조합해 베스트 활약 타자·투수 기록을 계산
+- `GET /game-summaries/:gameId`: `GameSummaryService`가 `GameService.findById()`(홈·원정 팀, 없으면 404) → `GameLineScoreService.findByGameId()`(점수표, 없으면 404) → `GameEventService.findByGameId()`(문자중계 이벤트) + `GameStatService.findByGameIds()`(박스스코어 투수 기록, 선수 이름)를 읽고, `application/builders/`의 순수 함수로 득점 장면·투수 등판 상황·대타 결과를 계산
 
 ### 스크래핑 API — `POST /scrape/*`
 
@@ -407,6 +425,11 @@ ScrapeController (application/scrape.controller.ts)
 - `POST /scrape/standings`: `StandingsScraper`가 KBO 팀순위 페이지를 파싱 → `StandingService.upsert()`
 - `POST /scrape/game-stats`: `body.gameId`의 경기를 `games`에서 조회(없으면 404)한 뒤 `GameStatsScraper`가 네이버 스포츠 박스스코어(`/schedule/games/{naverGameId}/record`) 응답을 타자/투수로 나눠 파싱 → `GameStatService.upsert()`. 대상 경기가 아직 시작 전이면 응답 자체가 없어 실패로 끝남. 네이버 gameId는 KBO gameId 뒤에 시즌 연도를 붙이고, 포스트시즌은 앞 연도 자리를 시리즈 SR_ID 4자리(WC `4444`, 준PO `3333`, PO `5555`, KS `7777`)로 바꾼 값이다(`/scrape/play-by-play`의 문자중계, `/scrape/games`의 실시간 스코어 보정도 같은 규칙)
 - `POST /scrape/game-stats/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 조회해 경기당 2초 텀을 두고 순회하며 `/scrape/game-stats`와 동일한 스크랩·저장 로직(`ScrapeService.scrapeAndSaveGameStats()`)을 재사용 — 이미 저장된 경기도 다시 스크랩해 `player_id`/`at_bats_against` 등 이후 추가된 필드를 보강한다. 경기 단위 실패는 warn 로그만 남기고 계속 진행(전체가 실패로 끝나지 않음)
+- `POST /scrape/play-by-play`: `body.gameId`의 경기를 `games`에서 조회(없으면 404)한 뒤 한 경기를 아래 순서로 저장한다. 점수표가 있어야 경기 요약이 있다고 보므로(`GET /game-summaries/:gameId`) 점수표를 마지막에 둔다
+  1. `GameStatsScraper`가 박스스코어(`/record`)를 받아 `GameStatService.upsertMany()`. 같은 응답의 `scoreBoard`에서 점수표(이닝별 득점, R·H·E·B)도 파싱해 둔다. 투수 행의 `appearanceOrder`는 박스 배열 순서, `pitchCount`는 응답의 `bf`, 이닝은 `"1 ⅓"` 같은 분수 표기를 `"1.1"`로 바꾼다
+  2. 0.3초 뒤 `PlayByPlayScraper`가 문자중계(`/relay?inning=N`)를 1회부터 빈 응답이 나올 때까지 0.3초 간격으로 받는다. 타석 결과(득점 없음 `type 13`, 득점 `type 23`)는 `PlateAppearanceService.upsertMany()`로, 경기 이벤트는 `GameEventService.replaceByGameId()`로 경기 단위 교체 저장. 이벤트의 아웃·주자·점수는 그 이벤트를 반영한 뒤의 값이고, 득점 타석은 이어진 주자 이동까지 반영한다. 교체 문구의 선수 이름은 1의 박스스코어로 id를 맞춘다(박스스코어 요청이 실패하면 저장된 `game_stats`로 대신)
+  3. 경기가 `FINISHED`이고 1·2가 모두 저장됐을 때만 `GameLineScoreService.upsertMany()`로 점수표를 저장. 이벤트가 하나도 없으면 기존 이벤트를 지우지 않고 점수표도 건너뛴다
+- `POST /scrape/play-by-play/backfill`: `body.seasonYear`의 `FINISHED` 경기 전체를 경기당 2초 텀을 두고 순회하며 `/scrape/play-by-play`와 같은 흐름(`ScrapeService.scrapeAndSavePlayByPlay()`)을 실행. 경기 단위 실패는 warn 로그만 남기고 계속 진행
 - `POST /scrape/roster`: `RosterScraper`가 `Player/Search.aspx` 폼 postback으로 팀별 선수 목록(포지션/등번호/출신교)을 요청·파싱 → `PlayerService.upsert()`. `body.teamCode` 미지정 시 전체 팀 순회
 
-`/scrape/game-stats/backfill`을 제외한 나머지 스크래핑 API는 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답). `/scrape/game-stats/backfill`은 대상 시즌에 `FINISHED` 경기가 하나도 없을 때만 이렇게 실패하고, 개별 경기 실패는 삼켜서 계속 진행합니다.
+두 백필(`/scrape/game-stats/backfill`, `/scrape/play-by-play/backfill`)을 제외한 나머지 스크래핑 API는 실패하면(빈 결과 포함) `scrape-source-health`에 `FAILURE`로 기록되고 예외가 컨트롤러까지 그대로 전파됩니다(500 응답). 백필은 대상 시즌에 `FINISHED` 경기가 하나도 없을 때만 이렇게 실패하고, 개별 경기 실패는 삼켜서 계속 진행합니다.

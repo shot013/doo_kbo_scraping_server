@@ -159,3 +159,49 @@ describe('ScrapeScheduler.scrapeGames', () => {
     );
   });
 });
+
+describe('ScrapeScheduler 박스스코어·문자중계 회차', () => {
+  const games = [
+    makeGame('2026-10-28T14:00', GameStatus.FINISHED),
+    makeGame('2026-10-28T18:30', GameStatus.IN_PROGRESS),
+    makeGame('2026-10-28T18:31', GameStatus.SCHEDULED),
+  ];
+  let scrapeGameStats: jest.Mock<Promise<unknown>, [string]>;
+  let scrapePlayByPlay: jest.Mock<Promise<unknown>, [string]>;
+  let scheduler: ScrapeScheduler;
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(kst('2026-10-28T20:00'));
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    scrapeGameStats = jest
+      .fn<Promise<unknown>, [string]>()
+      .mockResolvedValue({});
+    scrapePlayByPlay = jest
+      .fn<Promise<unknown>, [string]>()
+      .mockResolvedValue({});
+    scheduler = new ScrapeScheduler(
+      { scrapeGameStats, scrapePlayByPlay } as unknown as ScrapeService,
+      {
+        findAll: () => Promise.resolve({ data: games }),
+      } as unknown as GameService,
+    );
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('박스스코어 회차는 진행 중인 경기만 받는다 (종료 경기는 문자중계 회차가 함께 저장)', async () => {
+    await scheduler.scrapeGameStats();
+
+    expect(scrapeGameStats.mock.calls).toEqual([['game-2026-10-28T18:30']]);
+  });
+
+  it('문자중계 회차는 종료된 경기만 받는다', async () => {
+    await scheduler.scrapePlayByPlay();
+
+    expect(scrapePlayByPlay.mock.calls).toEqual([['game-2026-10-28T14:00']]);
+  });
+});

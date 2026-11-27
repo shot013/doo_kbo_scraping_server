@@ -125,6 +125,15 @@ export class GameStatOrmEntity {
   })
   era: string | null;
 
+  @Column({ name: 'runs_allowed', type: 'smallint', nullable: true })
+  runsAllowed: number | null;
+
+  @Column({ name: 'pitch_count', type: 'smallint', nullable: true })
+  pitchCount: number | null;
+
+  @Column({ name: 'appearance_order', type: 'smallint', nullable: true })
+  appearanceOrder: number | null;
+
   @Column({ name: 'raw_stats', type: 'jsonb', nullable: true })
   rawStats: Record<string, unknown> | null;
 
