@@ -35,6 +35,7 @@ src/
       application/
     game-stats/, standings/, scrape-source-health/  # game과 동일한 레이어 구조
     game-events/, game-line-scores/  # 컨트롤러 없이 저장·조회 service만 exports (경기 요약의 원본: 문자중계 이벤트, 점수표)
+    game-summaries/           # application/만 둠: 위 두 모듈 + game, game-stats service를 조합해 경기 요약을 요청 때 계산 (builders/ 순수 함수)
     scrape/                   # DB 엔티티 없이 스크래퍼 3종을 오케스트레이션하는 모듈
 ```
 
