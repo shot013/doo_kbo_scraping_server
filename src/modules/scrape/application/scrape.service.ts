@@ -807,6 +807,10 @@ export class ScrapeService {
           save: item.save,
           hold: item.hold,
           era: item.era,
+          // 실점·투구 수·등판 순서는 박스스코어 스크래퍼가 채우기 전까지 비워 둔다 (KAN-7).
+          runsAllowed: null,
+          pitchCount: null,
+          appearanceOrder: null,
           rawStats: null,
           createdAt: now,
           updatedAt: now,

@@ -37,6 +37,11 @@ export interface GameStatProps {
   save: boolean;
   hold: boolean;
   era: string | null;
+  /** 실점 (자책점이 아닌 전체 실점). 출처에 없으면 null. */
+  runsAllowed: number | null;
+  pitchCount: number | null;
+  /** 팀 안에서의 등판 순서 (선발 = 1). 출처에 없으면 null. */
+  appearanceOrder: number | null;
   rawStats: Record<string, unknown> | null;
   createdAt: Date;
   updatedAt: Date;
@@ -74,6 +79,9 @@ export class GameStat {
   readonly save: boolean;
   readonly hold: boolean;
   readonly era: string | null;
+  readonly runsAllowed: number | null;
+  readonly pitchCount: number | null;
+  readonly appearanceOrder: number | null;
   readonly rawStats: Record<string, unknown> | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
