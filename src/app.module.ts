@@ -9,6 +9,7 @@ import { DatabaseModule } from './common/database/database.module';
 import { ActionLogModule } from './modules/action-log/action-log.module';
 import { ExampleModule } from './modules/example/example.module';
 import { GameModule } from './modules/game/game.module';
+import { GameEventsModule } from './modules/game-events/game-events.module';
 import { GamePreviewModule } from './modules/game-preview/game-preview.module';
 import { GameResultsModule } from './modules/game-results/game-results.module';
 import { GameStatsModule } from './modules/game-stats/game-stats.module';
@@ -38,6 +39,7 @@ import { ScrapeModule } from './modules/scrape/scrape.module';
     ActionLogModule,
     ExampleModule,
     GameModule,
+    GameEventsModule,
     GamePreviewModule,
     GameStatsModule,
     GameResultsModule,
