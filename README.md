@@ -52,7 +52,7 @@ flowchart LR
       SCHED["ScrapeScheduler<br/>KST cron · 경기 시간대 매시 폴링"]
       SCRAPE["scrape 모듈<br/>ScrapeService → Scraper<br/>15초 타임아웃 · 요청 간 딜레이"]
       CTRL["Controller<br/>순위·팀·기록 응답은 인메모리 캐시"]
-      DOMAIN["도메인 모듈<br/>game · game-stats · standings · players<br/>plate-appearances · season-stats · game-preview"]
+      DOMAIN["도메인 모듈<br/>game · game-stats · standings · players<br/>plate-appearances · season-stats · game-preview<br/>game-events · game-line-scores"]
       COMBO["조합 모듈<br/>teams · records · game-results"]
       HEALTH["scrape-source-health<br/>소스별 성공/실패 · 소요시간"]
     end
@@ -98,6 +98,7 @@ src/
   modules/
     game/  game-stats/  standings/  players/  plate-appearances/
     season-stats/  game-preview/  action-log/  scrape-source-health/
+    game-events/  game-line-scores/
                             # domain / infrastructure / application 3계층
     teams/  records/  game-results/
                             # application만 (다른 모듈 service 조합)
@@ -265,6 +266,8 @@ npm run test           # 전체 테스트
 | --- | --- | --- | --- |
 | GET | `/game-stats` | `gameId`, `teamCode`, `statType`(`BATTING`\|`PITCHING`), `page`, `limit`, `sortBy`(`id`\|`teamCode`\|`playerName`\|`homeRuns`\|`rbi`\|`battingAverage`\|`era`), `sortOrder` | 경기별 선수 기록 목록 조회 |
 | GET | `/game-stats/:id` | - | 선수 기록 단건 조회 |
+
+- 투수 행(`statType: PITCHING`)에는 `runsAllowed`(실점, 자책점은 `earnedRuns`), `pitchCount`(투구 수), `appearanceOrder`(팀 안 등판 순서, 선발 = 1)가 있다. 경기 요약의 투수 교체 표에 쓰며, 출처에 없거나 아직 수집 전이면 `null`
 
 ### Game Results (`src/modules/game-results`)
 
