@@ -238,6 +238,8 @@ npm run test           # 전체 테스트
 
 프로덕션용 `Dockerfile`/`docker-compose.prod.yml`이 준비되어 있습니다. AWS EC2 프리티어 기준 배포 절차는 [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) 참고.
 
+`main`에 병합되면 GitHub Actions(`.github/workflows/deploy.yaml`)가 CI를 통과한 뒤 `scripts/deploy.sh`로 EC2에 자동 배포합니다(DB 백업 → 빌드 → 마이그레이션 → 재기동 → 헬스체크). 필요한 시크릿은 [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md#8-자동-배포-github-actions) 참고.
+
 ## API 목록
 
 응답 형식은 컨트롤러 참고 (별도 global prefix 없음). 목록 API는 페이지네이션 공통 응답 `{ data, total, page, limit, totalPages }`을 사용하며, `page`/`limit` 기본값은 각각 `1`/`20` (`limit` 최대 `100`), `sortOrder` 기본값은 `ASC`.

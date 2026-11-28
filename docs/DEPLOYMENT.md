@@ -100,13 +100,18 @@ curl http://localhost:3651/games
 ## 6. 운영
 
 - **로그**: `docker compose -f docker-compose.prod.yml logs -f app`
-- **업데이트 배포**:
+- **업데이트 배포**: `main`에 병합되면 GitHub Actions가 자동으로 배포합니다(아래 "8. 자동 배포"). 수동으로 할 때는 같은 스크립트를 로컬에서 SSH로 흘려보냅니다:
+  ```bash
+  ssh -i <pem경로> ubuntu@<EIP> 'bash -s' < scripts/deploy.sh
+  ```
+  스크립트가 하는 일은 서버에서 직접 실행하는 아래 명령과 같습니다(백업과 헬스체크 포함):
   ```bash
   git pull
-  docker compose -f docker-compose.prod.yml build app
-  docker compose -f docker-compose.prod.yml run --rm migrate   # 마이그레이션 있을 때만
+  docker compose -f docker-compose.prod.yml build app migrate
+  docker compose -f docker-compose.prod.yml run --rm migrate
   docker compose -f docker-compose.prod.yml up -d app
   ```
+  `migrate`도 반드시 함께 빌드합니다. `app`만 빌드하면 `migrate` 이미지가 이전 배포의 것으로 남아 새 마이그레이션을 찾지 못하고 "No migrations are pending"으로 끝납니다. 대기 중인 마이그레이션이 없으면 `run --rm migrate`는 아무것도 하지 않으므로 매번 실행해도 됩니다.
 - **DB 데이터**: `postgres_data` named volume에 저장되므로 `docker compose down`으로 컨테이너를 내려도 유지됩니다. 볼륨까지 지우려면 `docker compose down -v` (주의).
 - **`.env` 값만 바꿀 때** (예: `SENTRY_DSN` 교체): 코드 변경이 없으므로 재빌드 없이 `.env`만 수정 후 `docker compose -f docker-compose.prod.yml up -d app`로 `app`만 재기동하면 됩니다. 로컬에서 SSH 한 줄로 원격 `.env`를 갱신할 수도 있습니다:
   ```bash
@@ -137,3 +142,52 @@ aws ec2 delete-key-pair --key-name <KEY_NAME>
 ```
 
 `describe-addresses`/`describe-instances`로 각 ID를 다시 확인할 수 있습니다. DB 데이터는 인스턴스와 함께 사라지므로(EBS 볼륨은 인스턴스 종료 시 기본적으로 같이 삭제됨), 필요한 데이터가 있다면 종료 전에 백업하세요.
+
+## 8. 자동 배포 (GitHub Actions)
+
+`.github/workflows/deploy.yaml`이 `main`에 push(= `develop` → `main` PR 병합)될 때마다 CI(포맷·린트·테스트)를 다시 돌리고, 통과하면 SSH로 `scripts/deploy.sh`를 서버에서 실행합니다. Actions 탭의 **Deploy → Run workflow**로 `main`을 수동 배포할 수도 있습니다.
+
+`scripts/deploy.sh`의 순서:
+
+1. 사전 점검: 서버 저장소에 커밋 안 된 변경이 있거나 백필 요청(`/scrape/*/backfill`)이 실행 중이면 중단합니다. 백필은 수 시간 걸리는 단일 HTTP 요청이라 app을 재기동하면 끊기기 때문입니다. 그래도 배포하려면 수동 실행에서 `force`를 켭니다.
+2. `git fetch` + `main` fast-forward (배포 대상 커밋이 포함됐는지 확인)
+3. DB 백업: `~/backups/db_<시각>_<이전 커밋>.sql.gz`, 최근 5개만 보관
+4. `build app migrate` → `run --rm migrate` → `up -d app`
+5. 헬스체크: `GET /games?limit=1`이 200이 될 때까지 최대 90초. 실패하면 app 로그를 남기고 워크플로를 실패시킵니다
+6. dangling 이미지 정리
+
+자동 롤백은 하지 않습니다. 실패하면 Actions 로그를 보고, 필요하면 서버에서 이전 커밋으로 `git checkout <커밋>` 후 `build app` → `up -d app`, 마이그레이션까지 되돌려야 하면 `docker compose -f docker-compose.prod.yml run --rm migrate npm run migration:revert`, 데이터 복구가 필요하면 백업을 `gunzip -c <백업> | docker compose -f docker-compose.prod.yml exec -T postgres psql -U <DB_USERNAME> <DB_DATABASE>`로 되돌립니다.
+
+### 필요한 GitHub 시크릿
+
+저장소 **Settings → Secrets and variables → Actions**에 등록합니다.
+
+| 시크릿 | 필수 | 값 |
+| --- | --- | --- |
+| `EC2_HOST` | O | 서버 주소 (Elastic IP) |
+| `EC2_SSH_KEY` | O | 접속용 `.pem` 파일 내용 전체 (`-----BEGIN ...`부터 `-----END ...`까지) |
+| `EC2_USER` | | SSH 사용자. 없으면 `ubuntu` |
+| `EC2_KNOWN_HOSTS` | | `ssh-keyscan <EC2_HOST>` 출력. 없으면 배포 때마다 keyscan으로 받습니다(중간자 공격에 취약하므로 등록 권장) |
+
+보안 그룹이 22번 포트를 특정 IP로만 열어 두었다면 GitHub Actions 러너(매번 IP가 바뀜)가 접속할 수 없습니다. 아래 시크릿을 추가하면 배포하는 동안만 러너 IP를 보안 그룹에 추가했다가 끝나면 지웁니다. 22번을 전체에 열어 두는 것보다 안전합니다.
+
+| 시크릿 | 값 |
+| --- | --- |
+| `EC2_SECURITY_GROUP_ID` | 인스턴스 보안 그룹 ID (`sg-...`) |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | 배포 전용 IAM 사용자의 액세스 키 |
+| `AWS_REGION` | 없으면 `ap-northeast-2` |
+
+배포 전용 IAM 사용자에는 그 보안 그룹의 인바운드 규칙 추가·삭제 권한만 줍니다:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["ec2:AuthorizeSecurityGroupIngress", "ec2:RevokeSecurityGroupIngress"],
+      "Resource": "arn:aws:ec2:ap-northeast-2:<계정ID>:security-group/<sg-ID>"
+    }
+  ]
+}
+```
