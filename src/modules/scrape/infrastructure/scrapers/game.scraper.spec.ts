@@ -242,6 +242,79 @@ describe('GameScraper', () => {
     ]);
   });
 
+  describe('시리즈가 일찍 끝나 열리지 않은 포스트시즌 경기', () => {
+    const PLAYED_IDS = [
+      '20261101HTSS0',
+      '20261103SSKT0',
+      '20261104SSKT0',
+      '20261106KTSS0',
+      '20261107KTSS0',
+      '20261108KTSS0',
+    ];
+
+    /** 네이버 일정은 열리지 않은 경기를 내려주지 않는다 (실측: KS 6·7차전 없음). */
+    function useNaverSchedule(gameIds: string[], totalCount = gameIds.length) {
+      const naver = {
+        fetchJson: jest.fn().mockResolvedValue({
+          result: {
+            games: gameIds.map((id) => ({
+              gameId: `${id}2026`,
+              homeTeamScore: null,
+              awayTeamScore: null,
+              homeStarterName: '',
+              awayStarterName: '',
+            })),
+            gameTotalCount: totalCount,
+          },
+        }),
+      } as unknown as NaverBrowserClient;
+      scraper = new GameScraper(naver);
+    }
+
+    function statusById(games: ScrapedGame[]): Record<string, GameStatus> {
+      return Object.fromEntries(games.map((game) => [game.id, game.status]));
+    }
+
+    beforeEach(() => {
+      mockFetch({
+        [POSTSEASON_SERIES_IDS]: loadFixture(
+          'kbo-schedule-2026-11-postseason.json',
+        ),
+      });
+    });
+
+    it('날짜가 지났는데 예정 상태이고 네이버에 없으면 취소로 본다', async () => {
+      jest.setSystemTime(new Date('2026-11-28T12:00:00+09:00'));
+      useNaverSchedule(PLAYED_IDS);
+
+      const statuses = statusById(await scrape('11'));
+
+      expect(statuses['20261110SSKT0']).toBe(GameStatus.CANCELLED);
+      expect(statuses['20261111SSKT0']).toBe(GameStatus.CANCELLED);
+      // 네이버에 있는 경기는 KBO 기준 상태를 그대로 둔다.
+      expect(statuses['20261108KTSS0']).toBe(GameStatus.SCHEDULED);
+    });
+
+    it('아직 날짜가 오지 않은 경기는 그대로 예정이다', async () => {
+      jest.setSystemTime(new Date('2026-11-10T09:00:00+09:00'));
+      useNaverSchedule(PLAYED_IDS);
+
+      const statuses = statusById(await scrape('11'));
+
+      expect(statuses['20261110SSKT0']).toBe(GameStatus.SCHEDULED);
+      expect(statuses['20261111SSKT0']).toBe(GameStatus.SCHEDULED);
+    });
+
+    it('네이버 응답이 잘려 일부만 왔으면 취소로 판단하지 않는다', async () => {
+      jest.setSystemTime(new Date('2026-11-28T12:00:00+09:00'));
+      useNaverSchedule(PLAYED_IDS, PLAYED_IDS.length + 10);
+
+      const statuses = statusById(await scrape('11'));
+
+      expect(statuses['20261110SSKT0']).toBe(GameStatus.SCHEDULED);
+    });
+  });
+
   it('정규시즌 경기는 REGULAR로 저장하고, 비고가 있으면 연기로 판정한다', async () => {
     const regular = loadFixture('kbo-schedule-2026-10-regular.json');
     const cells = regular.rows[0].row;

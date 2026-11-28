@@ -166,6 +166,12 @@ export class GameScraper {
    * KBO 일정 페이지가 브라우저에서 로드될 때 자동으로 요청하는 값(현재 KST 기준 월)을
    * 그대로 재현한다. 서버 프로세스의 로컬 타임존과 무관하게 KST 기준으로 계산한다.
    */
+  private resolveTodayKst(): string {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(
+      new Date(),
+    );
+  }
+
   private resolveCurrentKstMonth(): string {
     return new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Seoul',
@@ -203,9 +209,16 @@ export class GameScraper {
         body.result.games.map((game) => [fromNaverGameId(game.gameId), game]),
       );
 
+      const complete = body.result.gameTotalCount <= body.result.games.length;
+      const today = this.resolveTodayKst();
       for (const game of games) {
         const naverGame = naverById.get(game.id);
-        if (!naverGame) continue;
+        if (!naverGame) {
+          if (complete && isUnplayedPostseasonGame(game, today)) {
+            game.status = GameStatus.CANCELLED;
+          }
+          continue;
+        }
         // 선발 예고 전인 경기는 선발투수가 빈 문자열로 내려온다.
         game.homeStarterPitcher = naverGame.homeStarterName?.trim() || null;
         game.awayStarterPitcher = naverGame.awayStarterName?.trim() || null;
@@ -394,6 +407,23 @@ export class GameScraper {
     }
     return GameStatus.SCHEDULED;
   }
+}
+
+/**
+ * 시리즈가 일찍 끝나 열리지 않은 포스트시즌 경기(예: 5차전에서 끝난 한국시리즈의 6·7차전).
+ * KBO 일정에는 점수 없는 예정 경기로 남지만 네이버 일정에서는 빠진다. 그래서 날짜가 지났는데도
+ * 예정 상태이고 네이버에 없는 포스트시즌 경기를 취소로 본다. 정규시즌 미편성 경기는 비고 칸으로
+ * 연기 판정을 하므로 여기서 건드리지 않는다.
+ */
+export function isUnplayedPostseasonGame(
+  game: Pick<ScrapedGame, 'series' | 'status' | 'gameDate'>,
+  todayKst: string,
+): boolean {
+  return (
+    game.series !== GameSeries.REGULAR &&
+    game.status === GameStatus.SCHEDULED &&
+    game.gameDate < todayKst
+  );
 }
 
 function delay(ms: number): Promise<void> {
