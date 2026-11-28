@@ -244,6 +244,8 @@ npm run test           # 전체 테스트
 
 응답 형식은 컨트롤러 참고 (별도 global prefix 없음). 목록 API는 페이지네이션 공통 응답 `{ data, total, page, limit, totalPages }`을 사용하며, `page`/`limit` 기본값은 각각 `1`/`20` (`limit` 최대 `100`), `sortOrder` 기본값은 `ASC`.
 
+enum 쿼리(`/games`의 `status`·`series`, `/game-stats`의 `statType`, `/scrape-source-health`의 `status`)에 목록 밖의 값을 보내면 허용 값을 알려 주는 400을 반환합니다(대소문자 구분).
+
 ### Games (`src/modules/game`)
 
 | Method | Path | Query/Body | 설명 |

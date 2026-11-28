@@ -1,5 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ScrapeSourceHealth } from '../domain/entities/scrape-source-health.entity';
+import { parseEnumQuery } from '../../../common/http/enum-query';
+import {
+  ScrapeSourceHealth,
+  ScrapeStatus,
+} from '../domain/entities/scrape-source-health.entity';
 import { ScrapeSourceHealthQueryDto } from './dto/scrape-source-health-query.dto';
 import { ScrapeSourceHealthService } from './scrape-source-health.service';
 
@@ -13,7 +17,7 @@ export class ScrapeSourceHealthController {
   ): Promise<ScrapeSourceHealth[]> {
     return this.service.findAll({
       sourceName: query.sourceName,
-      status: query.status,
+      status: parseEnumQuery('status', query.status, ScrapeStatus),
       limit: query.limit ? Number(query.limit) : undefined,
     });
   }

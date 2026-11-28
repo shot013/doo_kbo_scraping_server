@@ -1,7 +1,6 @@
-import { ScrapeStatus } from '../../domain/entities/scrape-source-health.entity';
-
 export class ScrapeSourceHealthQueryDto {
   sourceName?: string;
-  status?: ScrapeStatus;
+  /** `ScrapeStatus` 값. 컨트롤러에서 검증한다. */
+  status?: string;
   limit?: string;
 }
