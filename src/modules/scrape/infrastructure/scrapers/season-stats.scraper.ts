@@ -79,7 +79,9 @@ export class SeasonStatsScraper {
     }
 
     this.logger.log(`Scraped ${stats.length} season batting stat rows`);
-    return stats;
+    return dedupeByStatKey(stats, (kept, dropped) =>
+      this.logDuplicate('batting', kept, dropped),
+    );
   }
 
   private parseBattingRows(
@@ -191,7 +193,19 @@ export class SeasonStatsScraper {
     }
 
     this.logger.log(`Scraped ${stats.length} season pitching stat rows`);
-    return stats;
+    return dedupeByStatKey(stats, (kept, dropped) =>
+      this.logDuplicate('pitching', kept, dropped),
+    );
+  }
+
+  private logDuplicate(
+    kind: string,
+    kept: DedupableSeasonStat,
+    dropped: DedupableSeasonStat,
+  ): void {
+    this.logger.warn(
+      `Duplicate season ${kind} row for ${kept.teamCode} ${kept.playerName}: kept rank=${kept.rank} games=${kept.games}, dropped rank=${dropped.rank} games=${dropped.games}`,
+    );
   }
 
   private parsePitchingRows(
@@ -350,6 +364,44 @@ function delay(ms: number): Promise<void> {
 
 export function toStatKey(teamCode: string, playerName: string): string {
   return `${teamCode}|${playerName}`;
+}
+
+interface DedupableSeasonStat {
+  teamCode: string;
+  playerName: string;
+  rank: number;
+  games: number;
+}
+
+/**
+ * 시즌 기록은 (시즌, 팀, 선수명)으로 저장하므로 같은 키가 한 배치에 두 번 들어가면 일괄 upsert가
+ * `ON CONFLICT DO UPDATE command cannot affect row a second time`으로 실패한다. KBO 표에는
+ * 같은 팀·같은 이름이 두 번 나오는 경우가 있어(동명이인 등) 키마다 경기 수가 많은 행 하나만
+ * 남기고, 버린 행은 `onDuplicate`로 알린다. 순서는 처음 나온 위치를 유지한다.
+ */
+export function dedupeByStatKey<T extends DedupableSeasonStat>(
+  stats: readonly T[],
+  onDuplicate: (kept: T, dropped: T) => void = () => undefined,
+): T[] {
+  const indexByKey = new Map<string, number>();
+  const result: T[] = [];
+  for (const stat of stats) {
+    const key = toStatKey(stat.teamCode, stat.playerName);
+    const index = indexByKey.get(key);
+    if (index === undefined) {
+      indexByKey.set(key, result.length);
+      result.push(stat);
+      continue;
+    }
+    const existing = result[index];
+    if (stat.games > existing.games) {
+      result[index] = stat;
+      onDuplicate(stat, existing);
+    } else {
+      onDuplicate(existing, stat);
+    }
+  }
+  return result;
 }
 
 /**

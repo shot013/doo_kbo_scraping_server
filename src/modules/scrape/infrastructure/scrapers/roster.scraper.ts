@@ -150,7 +150,7 @@ export class RosterScraper {
       const position = POSITION_TEXT_MAP[positionText];
       if (!name || !idMatch || !position) {
         this.logger.warn(
-          `Skipping malformed roster row (team=${teamCode}, name="${name}"): missing id or position`,
+          `Skipping malformed roster row (team=${teamCode}, name="${name}"): missing id or position (href="${href}", position="${positionText}")`,
         );
         return;
       }
