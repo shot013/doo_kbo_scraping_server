@@ -6,8 +6,6 @@ name: Server Status
 
 on:
   workflow_dispatch:
-  push:
-    branches: [chore/server-status]
 
 concurrency:
   group: server-status

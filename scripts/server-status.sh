@@ -14,6 +14,9 @@ git log -1 --format='%h %ci %s'
 section '컨테이너'
 "${COMPOSE[@]}" ps
 
+section '앱 헬스체크'
+echo "GET /games?limit=1 -> $(curl -s -o /dev/null -m 10 -w '%{http_code}' 'http://localhost:3651/games?limit=1')"
+
 section '백필 요청'
 pgrep -af '^curl .*backfill' || echo '(실행 중인 백필 없음)'
 for f in ~/backfill_*.json; do
