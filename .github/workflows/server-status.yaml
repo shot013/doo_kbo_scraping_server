@@ -73,6 +73,14 @@ jobs:
           fi
           chmod 600 ~/.ssh/known_hosts
 
+      - name: Debug known hosts (public info only)
+        if: github.ref == 'refs/heads/chore/ops-run'
+        run: |
+          echo "lines: $(wc -l <~/.ssh/known_hosts), bytes: $(wc -c <~/.ssh/known_hosts)"
+          awk '{h=$1; if (h ~ /^\|1\|/) h="hashed"; else if (h == ENVIRON["EC2_HOST"]) h="matches EC2_HOST"; else h="other(" length($1) " chars)"; print "line " NR ": fields=" NF ", host=" h ", type=" $2}' ~/.ssh/known_hosts
+          echo "-- secret fingerprints"; ssh-keygen -lf ~/.ssh/known_hosts || true
+          echo "-- server fingerprints (ssh-keyscan)"; ssh-keyscan -T 10 "$EC2_HOST" 2>/dev/null | ssh-keygen -lf - || true
+
       - name: Server status
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
