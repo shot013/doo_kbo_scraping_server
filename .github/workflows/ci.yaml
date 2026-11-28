@@ -5,6 +5,8 @@ on:
     branches: [main, develop]
   push:
     branches: [main, develop]
+  # deploy.yaml이 배포 전에 같은 검사를 돌리려고 호출한다.
+  workflow_call:
 
 jobs:
   lint-and-test:
