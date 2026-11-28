@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
+import { parseEnumQuery } from '../../../common/http/enum-query';
 import { PaginatedResult } from '../../../common/pagination/pagination';
 import { GamePreview } from '../../game-preview/domain/entities/game-preview.entity';
 import { Game, GameSeries, GameStatus } from '../domain/entities/game.entity';
@@ -69,8 +70,8 @@ export class GameController {
     const result = await this.gameService.findAllWithPreview({
       seasonYear: query.seasonYear ? Number(query.seasonYear) : undefined,
       gameDate: query.gameDate,
-      status: query.status,
-      series: query.series,
+      status: parseEnumQuery('status', query.status, GameStatus),
+      series: parseEnumQuery('series', query.series, GameSeries),
       teamCode: query.teamCode,
       page: query.page ? Number(query.page) : undefined,
       limit: query.limit ? Number(query.limit) : undefined,

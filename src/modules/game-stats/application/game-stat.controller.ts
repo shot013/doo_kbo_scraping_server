@@ -1,6 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { parseEnumQuery } from '../../../common/http/enum-query';
 import { PaginatedResult } from '../../../common/pagination/pagination';
-import { GameStat } from '../domain/entities/game-stat.entity';
+import { GameStat, PlayerStatType } from '../domain/entities/game-stat.entity';
 import { GameStatSortField } from '../domain/repositories/game-stat.repository';
 import { GameStatQueryDto } from './dto/game-stat-query.dto';
 import { GameStatService } from './game-stat.service';
@@ -16,7 +17,7 @@ export class GameStatController {
     return this.gameStatService.findAll({
       gameId: query.gameId,
       teamCode: query.teamCode,
-      statType: query.statType,
+      statType: parseEnumQuery('statType', query.statType, PlayerStatType),
       page: query.page ? Number(query.page) : undefined,
       limit: query.limit ? Number(query.limit) : undefined,
       sortBy: query.sortBy as GameStatSortField | undefined,
