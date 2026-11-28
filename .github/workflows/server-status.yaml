@@ -6,6 +6,8 @@ name: Server Status
 
 on:
   workflow_dispatch:
+  push:
+    branches: [chore/ops-run]
 
 concurrency:
   group: server-status
@@ -75,6 +77,12 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
             "${EC2_USER}@${EC2_HOST}" 'bash -s' <scripts/server-status.sh
+
+      - name: One-off diagnostics
+        if: always() && github.ref == 'refs/heads/chore/ops-run'
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
+            "${EC2_USER}@${EC2_HOST}" 'bash -s' <scripts/ops-oneoff.sh
 
       - name: Revoke SSH from this runner
         if: always() && env.RUNNER_IP != ''
