@@ -1,0 +1,88 @@
+name: Server Status
+
+# 운영 서버 상태를 읽기 전용으로 조회한다 (scripts/server-status.sh). 서버에 아무것도 바꾸지 않는다.
+# PC 없이 휴대폰에서도 Actions 탭 → Server Status → Run workflow로 실행하고 로그로 결과를 본다.
+# 시크릿은 deploy.yaml과 같다 (docs/DEPLOYMENT.md "8. 자동 배포").
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: server-status
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USER: ${{ secrets.EC2_USER || 'ubuntu' }}
+      EC2_KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+      EC2_SECURITY_GROUP_ID: ${{ secrets.EC2_SECURITY_GROUP_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION || 'ap-northeast-2' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check secrets
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          for name in EC2_HOST EC2_SSH_KEY EC2_KNOWN_HOSTS EC2_SECURITY_GROUP_ID AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+            if [ -n "${!name}" ]; then echo "${name}: set"; else echo "${name}: (empty)"; fi
+          done
+          [ -n "$EC2_HOST" ] && [ -n "$EC2_SSH_KEY" ] || { echo "::error::EC2_HOST/EC2_SSH_KEY 시크릿이 없습니다"; exit 1; }
+
+      - name: Allow SSH from this runner
+        if: env.EC2_SECURITY_GROUP_ID != ''
+        run: |
+          ip=$(curl -fsS https://checkip.amazonaws.com | tr -d '[:space:]')
+          if out=$(aws ec2 authorize-security-group-ingress \
+            --group-id "$EC2_SECURITY_GROUP_ID" \
+            --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=${ip}/32,Description=github-actions-status}]" 2>&1); then
+            echo "RUNNER_IP=${ip}" >>"$GITHUB_ENV"
+          elif grep -q 'InvalidPermission.Duplicate' <<<"$out"; then
+            echo "${ip}/32는 이미 허용돼 있어 그대로 둡니다"
+          else
+            echo "$out" >&2
+            exit 1
+          fi
+
+      - name: Set up SSH key
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" >~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          if [ -n "$EC2_KNOWN_HOSTS" ]; then
+            # Windows에서 복사한 값의 CRLF를 지운다 (남아 있으면 키를 못 읽어 Host key verification failed).
+            printf '%s\n' "$EC2_KNOWN_HOSTS" | tr -d '\r' >~/.ssh/known_hosts
+          else
+            for _ in 1 2 3 4 5; do
+              ssh-keyscan -T 10 "$EC2_HOST" >~/.ssh/known_hosts 2>/dev/null && [ -s ~/.ssh/known_hosts ] && break
+              sleep 5
+            done
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Server status
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
+            "${EC2_USER}@${EC2_HOST}" 'bash -s' <scripts/server-status.sh
+
+      - name: Revoke SSH from this runner
+        if: always() && env.RUNNER_IP != ''
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id "$EC2_SECURITY_GROUP_ID" \
+            --protocol tcp --port 22 --cidr "${RUNNER_IP}/32"
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

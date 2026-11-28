@@ -158,6 +158,10 @@ aws ec2 delete-key-pair --key-name <KEY_NAME>
 
 자동 롤백은 하지 않습니다. 실패하면 Actions 로그를 보고, 필요하면 서버에서 이전 커밋으로 `git checkout <커밋>` 후 `build app` → `up -d app`, 마이그레이션까지 되돌려야 하면 `docker compose -f docker-compose.prod.yml run --rm migrate npm run migration:revert`, 데이터 복구가 필요하면 백업을 `gunzip -c <백업> | docker compose -f docker-compose.prod.yml exec -T postgres psql -U <DB_USERNAME> <DB_DATABASE>`로 되돌립니다.
 
+### 서버 상태 확인 (GitHub Actions)
+
+Actions 탭의 **Server Status → Run workflow**로 PC 없이 서버 상태를 읽기 전용으로 조회할 수 있습니다(`scripts/server-status.sh`). 배포 커밋, 컨테이너 상태, `/games` 헬스체크, 실행 중인 백필과 그 응답(`~/backfill_*.json`), 경기 요약이 저장된 경기 수, 최근 3시간 경고·에러 로그, 메모리·디스크를 보여 줍니다. 시크릿은 자동 배포와 같습니다.
+
 ### 필요한 GitHub 시크릿
 
 저장소 **Settings → Secrets and variables → Actions**에 등록합니다.
