@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # One-off read-only diagnostics (not for merge).
+main() {
 cd ~/doo_kbo_scraping_server || exit 1
 C=(docker compose -f docker-compose.prod.yml)
 
+if false; then
 echo '##### backend: game summary samples'
 for g in 20261108KTSS0 20261104SSKT0 20261029SSHT0; do
   echo "== $g"
@@ -10,6 +12,7 @@ for g in 20261108KTSS0 20261104SSKT0 20261029SSHT0; do
 done
 "${C[@]}" exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT game_id, team_code, is_home, innings, runs FROM game_line_scores WHERE game_id IN ('"'"'20261108KTSS0'"'"','"'"'20261104SSKT0'"'"','"'"'20261029SSHT0'"'"') ORDER BY game_id, is_home;"'
 
+fi
 echo '##### scraping: dist scrapers'
 "${C[@]}" exec -T app ls dist/modules/scrape/infrastructure/scrapers/
 
@@ -39,3 +42,5 @@ new RosterScraper().scrape('LG').then((p) => console.log('rows', p.length))
   .catch((e) => { console.error('ERR', e && e.stack || e); process.exit(1); });
 JS
 echo '##### done'
+}
+main </dev/null
