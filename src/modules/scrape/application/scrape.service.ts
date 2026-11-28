@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { resolveKboTeamByCode, KBO_TEAMS } from '../../../common/kbo/kbo-team';
 import { GameService } from '../../game/application/game.service';
-import { Game, GameStatus } from '../../game/domain/entities/game.entity';
+import {
+  Game,
+  GameSeries,
+  GameStatus,
+} from '../../game/domain/entities/game.entity';
 import { GameEventService } from '../../game-events/application/game-event.service';
 import { GameEvent } from '../../game-events/domain/entities/game-event.entity';
 import { GameLineScoreService } from '../../game-line-scores/application/game-line-score.service';
@@ -56,6 +60,7 @@ import {
   STANDINGS_SOURCE_URL,
   StandingsScraper,
 } from '../infrastructure/scrapers/standings.scraper';
+import { toKst } from './scrape-schedule';
 
 export interface ScrapeSummary {
   itemsScraped: number;
@@ -151,6 +156,8 @@ export class ScrapeService {
         }
       }
 
+      await this.cancelDroppedPostseasonGames(seasonYear, games, now);
+
       const durationMs = Date.now() - startedAt;
       const failedCount = scraped.length - savedCount;
       await this.scrapeSourceHealthService.log({
@@ -170,6 +177,54 @@ export class ScrapeService {
     } catch (error) {
       await this.logFailure(sourceName, SCHEDULE_SOURCE_URL, startedAt, error);
       throw error;
+    }
+  }
+
+  /**
+   * 시리즈가 일찍 끝나면 KBO 일정은 열리지 않은 남은 경기(예: 5차전에서 끝난 한국시리즈의
+   * 6·7차전)를 목록에서 뺀다. upsert만으로는 이미 저장된 그 경기가 예정 상태로 남으므로,
+   * 이번에 받은 달의 포스트시즌 경기 중 날짜가 지났는데 예정 상태이고 목록에 없는 경기를 취소로
+   * 바꾼다. 포스트시즌 경기를 하나도 받지 못한 달은 목록이 비정상일 수 있어 건드리지 않는다.
+   * 실패해도 일정 저장 결과에는 영향을 주지 않는다.
+   */
+  private async cancelDroppedPostseasonGames(
+    seasonYear: number,
+    scrapedGames: Game[],
+    now: Date,
+  ): Promise<void> {
+    const postseason = scrapedGames.filter(
+      (game) => game.series !== GameSeries.REGULAR,
+    );
+    const months = new Set(postseason.map((game) => game.gameDate.slice(0, 7)));
+    if (months.size === 0) return;
+    const scrapedIds = new Set(scrapedGames.map((game) => game.id));
+    const todayKst = toKst(now).date;
+
+    try {
+      const { data: scheduled } = await this.gameService.findAll({
+        seasonYear,
+        status: GameStatus.SCHEDULED,
+        limit: 1000,
+      });
+      const dropped = scheduled.filter(
+        (game) =>
+          game.series !== GameSeries.REGULAR &&
+          months.has(game.gameDate.slice(0, 7)) &&
+          game.gameDate < todayKst &&
+          !scrapedIds.has(game.id),
+      );
+      for (const game of dropped) {
+        await this.gameService.upsert(
+          new Game({ ...game, status: GameStatus.CANCELLED, updatedAt: now }),
+        );
+        this.logger.log(
+          `Marked unplayed postseason game ${game.id} (${game.gameDate}) as CANCELLED`,
+        );
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Failed to cancel unplayed postseason games: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 

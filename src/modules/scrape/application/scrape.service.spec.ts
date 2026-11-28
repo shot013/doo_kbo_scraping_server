@@ -192,12 +192,27 @@ describe('ScrapeService.scrapePlayByPlay', () => {
         calls.push(name);
         return Promise.resolve(value);
       };
-    scrapeRecord = jest.fn(track('scrapeRecord', record));
-    scrapePlayByPlay = jest.fn(track('scrapePlayByPlay', playByPlay));
-    upsertStats = jest.fn(track('upsertStats', undefined));
-    findStoredStats = jest.fn(track('findStoredStats', [] as GameStat[]));
-    replaceEvents = jest.fn(track('replaceEvents', undefined));
-    upsertLineScores = jest.fn(track('upsertLineScores', undefined));
+    scrapeRecord = jest
+      .fn<Promise<ScrapedGameRecord>, [string, GameSeries]>()
+      .mockImplementation(track('scrapeRecord', record));
+    scrapePlayByPlay = jest
+      .fn<
+        Promise<ScrapedPlayByPlay>,
+        [string, GameSeries, string, string, readonly RosterEntry[]]
+      >()
+      .mockImplementation(track('scrapePlayByPlay', playByPlay));
+    upsertStats = jest
+      .fn<Promise<void>, [GameStat[]]>()
+      .mockImplementation(track('upsertStats', undefined));
+    findStoredStats = jest
+      .fn<Promise<GameStat[]>, [string[]]>()
+      .mockImplementation(track('findStoredStats', [] as GameStat[]));
+    replaceEvents = jest
+      .fn<Promise<void>, [string, GameEvent[]]>()
+      .mockImplementation(track('replaceEvents', undefined));
+    upsertLineScores = jest
+      .fn<Promise<void>, [GameLineScore[]]>()
+      .mockImplementation(track('upsertLineScores', undefined));
 
     const unused = [
       GameScraper,
