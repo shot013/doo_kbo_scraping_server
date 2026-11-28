@@ -79,7 +79,8 @@ jobs:
           printf '%s\n' "$EC2_SSH_KEY" >~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           if [ -n "$EC2_KNOWN_HOSTS" ]; then
-            printf '%s\n' "$EC2_KNOWN_HOSTS" >~/.ssh/known_hosts
+            # Windows에서 복사한 값의 CRLF를 지운다 (남아 있으면 키를 못 읽어 Host key verification failed).
+            printf '%s\n' "$EC2_KNOWN_HOSTS" | tr -d '\r' >~/.ssh/known_hosts
           else
             echo "::warning::EC2_KNOWN_HOSTS 시크릿이 없어 ssh-keyscan으로 호스트 키를 받습니다"
             for _ in 1 2 3 4 5; do
