@@ -375,9 +375,10 @@ interface DedupableSeasonStat {
 
 /**
  * 시즌 기록은 (시즌, 팀, 선수명)으로 저장하므로 같은 키가 한 배치에 두 번 들어가면 일괄 upsert가
- * `ON CONFLICT DO UPDATE command cannot affect row a second time`으로 실패한다. KBO 표에는
- * 같은 팀·같은 이름이 두 번 나오는 경우가 있어(동명이인 등) 키마다 경기 수가 많은 행 하나만
- * 남기고, 버린 행은 `onDuplicate`로 알린다. 순서는 처음 나온 위치를 유지한다.
+ * `ON CONFLICT DO UPDATE command cannot affect row a second time`으로 실패한다. 같은 팀의
+ * 동명이인은 KBO 표에 두 줄로 나온다(2026년 투수: 삼성 이승현, 한화 박준영). 지금 키로는 둘을
+ * 함께 저장할 수 없어 경기 수가 많은 선수 하나만 남기고, 버린 행은 `onDuplicate`로 알린다.
+ * 순서는 처음 나온 위치를 유지한다.
  */
 export function dedupeByStatKey<T extends DedupableSeasonStat>(
   stats: readonly T[],

@@ -146,6 +146,14 @@ export class RosterScraper {
       const physicalText = $(cells[5]).text().trim();
       const school = $(cells[6]).text().trim();
 
+      // 포지션이 빈 행은 선수가 아니라 코치·스태프다(등번호도 비어 있음, 예: LG 이정준 1977년생).
+      if (name && !positionText) {
+        this.logger.debug(
+          `Skipping non-player roster row (team=${teamCode}, name="${name}")`,
+        );
+        return;
+      }
+
       const idMatch = PLAYER_ID_PATTERN.exec(href);
       const position = POSITION_TEXT_MAP[positionText];
       if (!name || !idMatch || !position) {
